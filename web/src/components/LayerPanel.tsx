@@ -50,6 +50,7 @@ export function LayerPanel({
   const enableAllLayers = useViewerStore((s) => s.enableAllLayers);
   const selectStructure = useViewerStore((s) => s.selectStructure);
   const toggleHide = useViewerStore((s) => s.toggleHide);
+  const setStructuresHidden = useViewerStore((s) => s.setStructuresHidden);
   const setClipPlane = useViewerStore((s) => s.setClipPlane);
   const resetClipPlanes = useViewerStore((s) => s.resetClipPlanes);
 
@@ -134,6 +135,20 @@ export function LayerPanel({
       all[sys] = true;
     }
     setExpandedSystems(all);
+  };
+
+  const handleToggleSystem = (sys: SystemId) => {
+    const willBeEnabled = !layers[sys].enabled;
+    toggleLayer(sys);
+    if (willBeEnabled) {
+      const sysItems = groupedBySystem.get(sys) || [];
+      const hiddenInSys = sysItems
+        .map((i) => i.id)
+        .filter((id) => hiddenIds[id]);
+      if (hiddenInSys.length > 0) {
+        setStructuresHidden(hiddenInSys, false);
+      }
+    }
   };
 
   return (
@@ -402,7 +417,7 @@ export function LayerPanel({
                           className="icon-btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            toggleLayer(sys);
+                            handleToggleSystem(sys);
                           }}
                           title={
                             layers[sys].enabled
@@ -422,7 +437,10 @@ export function LayerPanel({
                     {isExpanded && items.length > 0 && (
                       <div className="tree-children">
                         {items.map((st) => {
-                          const isHidden = Boolean(hiddenIds[st.id]);
+                          const isSysEnabled = layers[st.system]?.enabled;
+                          const isExplicitlyHidden = Boolean(hiddenIds[st.id]);
+                          const isHidden = !isSysEnabled || isExplicitlyHidden;
+
                           return (
                             <div
                               key={st.id}
@@ -434,6 +452,7 @@ export function LayerPanel({
                                 className="tree-node-select"
                                 onClick={() => {
                                   setLayerEnabled(st.system, true);
+                                  if (isExplicitlyHidden) toggleHide(st.id);
                                   selectStructure(st.id);
                                 }}
                               >
@@ -446,11 +465,18 @@ export function LayerPanel({
                               </button>
                               <button
                                 className="icon-btn"
-                                onClick={() => toggleHide(st.id)}
+                                onClick={() => {
+                                  if (!isSysEnabled) {
+                                    setLayerEnabled(st.system, true);
+                                    if (isExplicitlyHidden) toggleHide(st.id);
+                                  } else {
+                                    toggleHide(st.id);
+                                  }
+                                }}
                                 title={
                                   isHidden
-                                    ? "Mostrar malla"
-                                    : "Ocultar malla"
+                                    ? "Mostrar estructura"
+                                    : "Ocultar estructura"
                                 }
                               >
                                 {isHidden ? (

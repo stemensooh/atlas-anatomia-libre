@@ -55,6 +55,7 @@ interface ViewerState {
   hoverStructure: (id: string | null) => void;
   toggleIsolate: (id: string) => void;
   toggleHide: (id: string) => void;
+  setStructuresHidden: (ids: string[], hidden: boolean) => void;
   resetVisibility: () => void;
 
   setSearchQuery: (q: string) => void;
@@ -206,6 +207,19 @@ export const useViewerStore = create<ViewerState>((set) => ({
         delete next[id];
       } else {
         next[id] = true;
+      }
+      return { hiddenIds: next };
+    }),
+
+  setStructuresHidden: (ids, hidden) =>
+    set((s) => {
+      const next = { ...s.hiddenIds };
+      for (const id of ids) {
+        if (hidden) {
+          next[id] = true;
+        } else {
+          delete next[id];
+        }
       }
       return { hiddenIds: next };
     }),
