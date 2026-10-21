@@ -255,7 +255,6 @@ function SystemLayerGroup({
               key={pin.structureId}
               position={pin.position}
               center
-              distanceFactor={1.6}
               zIndexRange={[10, 0]}
             >
               <button
@@ -269,23 +268,11 @@ function SystemLayerGroup({
                   className="pin-dot"
                   style={{ backgroundColor: pin.colorHex }}
                 />
-                <span>{pin.labelEs}</span>
+                <span className="pin-text">{pin.labelEs}</span>
               </button>
             </Html>
           );
         })}
-
-      {!showLabels3D && selectedCenter && selectedStruct && (
-        <Html position={selectedCenter} center distanceFactor={1.55}>
-          <div className="pin-3d selected">
-            <span
-              className="pin-dot"
-              style={{ backgroundColor: SYSTEM_META[system].colorHex }}
-            />
-            <span>{selectedStruct.nameEs}</span>
-          </div>
-        </Html>
-      )}
     </group>
   );
 }

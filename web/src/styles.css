@@ -1202,26 +1202,35 @@ body,
 /* Pines 3D flotantes */
 .pin-3d {
   background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(4px);
   color: #f8fafc;
-  border: 1px solid rgba(56, 189, 248, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.5);
   border-radius: 999px;
   padding: 2px 8px;
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   white-space: nowrap;
+  max-width: 140px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   transition: transform 0.12s, background 0.12s;
+  user-select: none;
+}
+
+.pin-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pin-3d:hover,
 .pin-3d.selected {
   background: #0284c7;
   border-color: #e0f2fe;
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 
 .pin-dot {
