@@ -38,4 +38,5 @@ Windows + PowerShell. Node 24, Python 3.13, pnpm. Blender y uv no están instala
 | `docs/ATTRIBUTION_HOWTO.md` | Procedimiento de verificación |
 | `docs/DECISIONES.md` | Registro de decisiones |
 | `docs/ENTORNO.md` | Herramientas instaladas y pendientes |
+| `docs/COMO_AGREGAR_MODELOS_Y_TRADUCCIONES.md` | Guía para añadir nuevos modelos `.glb` y personalizar traducciones/definiciones en español |
 | `CONTRIBUTING.md` | Reglas de aportes |

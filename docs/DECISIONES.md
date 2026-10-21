@@ -2,6 +2,19 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-20 · D-008 · Incorporación del cuerpo femenino por sistemas y traducción íntegra al español
+- **Contexto:** Algunas estructuras compuestas de FMA/UBERON conservaban términos en inglés (como `ventricle` o conectores `of`) cuando no tenían coincidencia literal en `TA2.csv`, y se requería además contar con el cuerpo femenino completo por capas en el visor principal.
+- **Decisión:**
+  - Crear `scripts/traductor_es.py` y `scripts/actualizar_metadata_es.py` para traducir el 100 % de los nombres (`nameEs`) y generar definiciones anatómicas educativas en español (`descriptionEs`) para todas las estructuras masculinas, femeninas y de HuBMAP.
+  - Extraer de `data/raw/hubmap/united-female/3d-vh-f-united.glb` los 10 sistemas anatómicos femeninos (`data/processed/female_<system>.glb`, 956 estructuras) mediante `scripts/procesar_femenino.mjs`, alineados en `y = 0` y comprimidos con `meshopt`.
+  - Documentar el flujo en `docs/COMO_AGREGAR_MODELOS_Y_TRADUCCIONES.md`.
+- **Consecuencia:** El visor permite alternar entre **♂ Cuerpo Masculino** y **♀ Cuerpo Femenino** con las mismas 10 capas, buscador y fichas 100 % en español.
+
+## 2026-10-20 · D-007 · Visor MVP (Fase 3) en `web/` sirviendo `data/processed/` sin duplicar modelos
+- **Contexto:** Para cumplir la separación estricta entre código (`MIT` en `web/`) y contenido (`CC BY-SA 4.0` en `data/processed/`), los `.glb` no deben mezclarse con el código fuente.
+- **Decisión:** Configurar un plugin en `web/vite.config.ts` que sirve `/data/processed/*` y `/data/raw/hubmap/*` en desarrollo directamente desde `../data/` y copia `data/processed/` a `dist/data/processed/` en el build de producción. Se usa `GLTFLoader` + `MeshoptDecoder` para descomprimir en cliente los `.glb` optimizados en la Fase 2.
+- **Consecuencia:** Se evita duplicar los 34,65 MB de `.glb` dentro de `web/` y el visor carga por sistema bajo demanda.
+
 ## 2026-10-20 · D-006 · Pipeline de Fase 2 directo con Python + glTF-Transform (sin Blender)
 - **Contexto:** Al usar BodyParts3D (`.obj` con IDs FMA en cabecera) y HuBMAP (`.glb` con `crosswalk.csv`), no hace falta abrir un archivo `.blend` de Z-Anatomy.
 - **Decisión:**

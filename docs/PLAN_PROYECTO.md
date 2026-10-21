@@ -270,12 +270,12 @@ web/src/
 ```
 
 ### Tareas
-- [ ] Inicializar `web/` con Vite + React + TS.
-- [ ] Cargar un GLB (esqueleto) y mostrarlo con luces y cámara.
-- [ ] Implementar raycasting y resaltado (outline o emisivo).
-- [ ] Panel de capas conectado al estado.
-- [ ] Panel de información leyendo `metadata.json`.
-- [ ] Página de créditos generada desde `ATTRIBUTIONS.md`.
+- [x] Inicializar `web/` con Vite + React + TS (`web/package.json`, `web/vite.config.ts`).
+- [x] Cargar los 10 GLB por sistema con `GLTFLoader` + `MeshoptDecoder`, luces e iluminación de estudio (`web/src/three/AnatomyCanvas.tsx`).
+- [x] Implementar raycasting (selección por clic y hover) y resaltado emisivo.
+- [x] Panel de capas conectado al estado (`web/src/components/LayerPanel.tsx`) + selector de los 87 órganos de HuBMAP y corte axial (plano Y).
+- [x] Panel de información leyendo `metadata.json` (`web/src/components/InfoPanel.tsx`) con buscador en ES/LA/EN/FMA, aislar, ocultar y restablecer.
+- [x] Modal y pie de créditos/licencias generados con las atribuciones verificadas (`web/src/components/CreditsModal.tsx`).
 - [ ] Despliegue de prueba en hosting gratuito.
 
 ### Criterio de salida
