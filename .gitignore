@@ -9,6 +9,7 @@ __pycache__/
 # Descargas originales pesadas: solo se versionan las notas de origen
 data/raw/**
 !data/raw/
+!data/raw/**/
 !data/raw/SOURCE.template.txt
 !data/raw/**/SOURCE.txt
 !data/raw/**/LICENSE*

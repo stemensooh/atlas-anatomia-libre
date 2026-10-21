@@ -1,0 +1,364 @@
+Recurso: HuBMAP Human Reference Atlas — 3D Reference Object Library
+URL de origen: https://lod.humanatlas.io/ref-organ
+Versión: última versión de cada órgano (ver lista)
+Fecha de descarga: 2026-10-20
+Licencia (nombre y URL): CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+Copia de la licencia guardada en: LICENSE-CC-BY-4.0.txt
+SHA-256 de la descarga:
+  07c4af6b6aec22945871ca25b3bf16a7b505126d79c1c1fe27f852e486ef986d  adipose-female/3d-vh-f-adipose.glb  (695648 bytes)
+  65011767f064fc92afa90249aca46351430d585e9c9ef531efa4de9ba7ae71ed  adipose-female/crosswalk.csv  (444 bytes)
+  b86a157fd3a231da6935acc23978149a393006c1bf5433fa729228e67cf1cb4d  adipose-male/3d-vh-m-adipose.glb  (325428 bytes)
+  bd2e95178d0eae2b0e011bd59d7044fb6ccc53ca06901958087f0de5b62b1750  adipose-male/crosswalk.csv  (444 bytes)
+  54622d7ba5c8df15d8655c2af5ad6ebece45b74f61d894167e6fd9db9e66be06  asct-b-3d-models-crosswalk/asct-b-3d-models-crosswalk.csv  (332136 bytes)
+  6bf794b4255c254d03afe254f765c93e7394e4397068268d4eaa3cde50ffdf60  blood-vasculature-female/3d-vh-f-blood-vasculature.glb  (17875996 bytes)
+  8fa4cd47b504323f2a942432bb673e81887ca438dd17ef64a2b915b9898216c7  blood-vasculature-female/crosswalk.csv  (7855 bytes)
+  3a9fe60549769f3a27c15a0901a055e7c4fd3a9f4a37f39a77f5047f0166d4c3  blood-vasculature-male/3d-vh-m-blood-vasculature.glb  (18050040 bytes)
+  854c93e70886689aec0791ddfab60f57d392c92cfb2650a55012879d53f16deb  blood-vasculature-male/crosswalk.csv  (7756 bytes)
+  f20d87a347f8d5c6467439cba7db18f19307d29b2c3e0c2b6ddb7e9d49e1c1fc  brain-female/3d-allen-f-brain.glb  (11983380 bytes)
+  605da1bee8d0a2df6e81081924571fcb175fe022aa96736e919510ad8a761d96  brain-female/crosswalk.csv  (7274 bytes)
+  c97d7d0b9ff0baebbdec5566fa7b08d789195ef965e0bd04cf743a8d683882db  brain-male/3d-allen-m-brain.glb  (11982812 bytes)
+  55907c4a83180f4af06a41a4b4361cf8afd4520ead71e6bef5f75ffef62febcf  brain-male/crosswalk.csv  (7274 bytes)
+  410a5fd45b40a7b36294076d5aa9448ca24bf8fa1104245a0f0bf74570184607  epiploic-appendage-of-transverse-colon-female/3d-vh-f-epiploic-appendage-of-transverse-colon.glb  (535024 bytes)
+  25cc211b50c32412619512272fb8b1e83b050846923adbccb46275b16306dc31  epiploic-appendage-of-transverse-colon-female/crosswalk.csv  (120 bytes)
+  3b6e014cf6176bc59ffaca8f6ca22601ab77678247b1b3d6d2ea12e370f89c3c  epiploic-appendage-of-transverse-colon-male/3d-vh-m-epiploic-appendage-of-transverse-colon.glb  (1366476 bytes)
+  431b215861a5822570516bd8cc00a1158b4229d58789d25ba9695404af6ac887  epiploic-appendage-of-transverse-colon-male/crosswalk.csv  (120 bytes)
+  1c92dc616e3dfb30e313cb2807b5eb5ab5b36ae0f94b631f890b19418bb152d1  eye-female-left/3d-vh-f-eye-l.glb  (27462656 bytes)
+  66fb999a85e50b748f3a6c8783ffe4d8bf7f071dbaeb2853174d794929a3af9c  eye-female-left/crosswalk.csv  (1347 bytes)
+  d7929a4abbda66813af99761c9c328826248188294f69c2e22b29704f9beabfa  eye-female-right/3d-vh-f-eye-r.glb  (20697640 bytes)
+  9dc71df189506cb47074b2773a93fa06d1198d4aa50509eb0ab801dec0a4e523  eye-female-right/crosswalk.csv  (1371 bytes)
+  a918173575ed1b6dbf3d90344a144940b7f055590f40e119de0ad43abee50c64  eye-male-left/3d-vh-m-eye-l.glb  (27462616 bytes)
+  d6fe76bc742494ace2efec966dbfc9324da1d0be43f4914381de76abdd064d98  eye-male-left/crosswalk.csv  (1341 bytes)
+  1a6ecc528e98e0bddb8e2905e4ddb799eb471383f7274dbb9bdd1676b06be73b  eye-male-right/3d-vh-m-eye-r.glb  (20697584 bytes)
+  a6046a2e476ae6aa51ad0306022146c13863a2504ef6c7d01845670b9ea662c8  eye-male-right/crosswalk.csv  (1363 bytes)
+  34817c498e038b599b338f8a35e6c1b3cbda576255c4f2ecca6d9efdebac6c15  fallopian-tube-female-left/3d-vh-f-fallopian-tube-l.glb  (336732 bytes)
+  f220127b2844cae86ab057abffac6c4f3b2a269ff83ab1f294ab6d2f24eed877  fallopian-tube-female-left/crosswalk.csv  (374 bytes)
+  eec911de07307d1a27cfe27c939e3f3562590e5c419e27decaf3b1d7b13ab038  fallopian-tube-female-right/3d-vh-f-fallopian-tube-r.glb  (327504 bytes)
+  92d42e1cb3623fbcaa25cb1140bd95f1e5abfb31587a87817f9634b770410ce6  fallopian-tube-female-right/crosswalk.csv  (379 bytes)
+  98f66e46b149bfc3836592d9404c50290e21d302ec55c98813435e2d9847b1d9  heart-female/3d-vh-f-heart.glb  (1745560 bytes)
+  a529992b6e444d40fa9e361542fd694d773de429f611276b292133aa30be1cb2  heart-female/crosswalk.csv  (1170 bytes)
+  689df039c8bc264ea06a44cd926762976f0666c0ff2dc532d046409b185e6b0c  heart-male/3d-vh-m-heart.glb  (4071772 bytes)
+  9c8ce8f37228aaeab359ffb7c40b83904062b773bf464a7ca5d5f7f7636f9313  heart-male/crosswalk.csv  (1216 bytes)
+  31d8c829ef6bc21bd249f8a246f0d69878a1e4884fa394b409a65fab585eb9b8  intervertebral-disk-female/3d-vh-f-intervertebral-disk.glb  (48436136 bytes)
+  0ce21bd0401cbcbaa986bd74a066f12a87aa617c465316fdd588556bd5eaea31  intervertebral-disk-female/crosswalk.csv  (6959 bytes)
+  f63335f49b3d90a97ab97cfb604fed7c524ea035ade350c9b44955d4c1f58de4  intervertebral-disk-male/3d-vh-m-intervertebral-disk.glb  (19567220 bytes)
+  d82764d390e98fdd1e4c9c3984b7b27792692a26a2f2ed3c3690e1deb8abe084  intervertebral-disk-male/crosswalk.csv  (6343 bytes)
+  58f0227d45b14d7bcfd2ed05a7bcd76000051ea08d52f844feebd70d612f8084  kidney-female-left/3d-vh-f-kidney-l.glb  (1356736 bytes)
+  19fbe87b7df8cf6b840456c7477ae5aaada30a7d535751d59e20941214bee445  kidney-female-left/crosswalk.csv  (1673 bytes)
+  d80ee5a109a5cd5c90ca0770d1087e28786e2c545747cbae15a5ea22b4b0af86  kidney-female-right/3d-vh-f-kidney-r.glb  (1383740 bytes)
+  a8b8cb5108a3e5baf6f94d35047db7c985a742dffecabd29bb0a93f650e93a36  kidney-female-right/crosswalk.csv  (1569 bytes)
+  1e9f54281652d0b05c9ae54a06380a41a8d9c62c1036829180750995b1730fac  kidney-male-left/3d-vh-m-kidney-l.glb  (1536980 bytes)
+  254de6f11d173d35a736cebd8b25509dd92e5b9279b29d61332e9c00f807910c  kidney-male-left/crosswalk.csv  (1461 bytes)
+  f23bac3f62fd050b689bdee86bb8a20bff6997e830cb508c847f74c03c6a964b  kidney-male-right/3d-vh-m-kidney-r.glb  (1547360 bytes)
+  9b647536778159808833556ea85a786f460e67dec0a151cdd4870d943408e36a  kidney-male-right/crosswalk.csv  (1549 bytes)
+  8c65eec0419b5c576e6fb0fb9f149384df4df29c543a171a0173281cb43f7f4c  knee-female-left/3d-vh-f-knee-l.glb  (348328 bytes)
+  25d240059a6f912fd75531d328cd1792aef8c97d6294abd95b58fc620e638281  knee-female-left/crosswalk.csv  (1039 bytes)
+  529e94d69a5f0212fbe541021539fb060fa59476fbca61e1d71452672984e674  knee-female-right/3d-vh-f-knee-r.glb  (348376 bytes)
+  0f896149478abef3d431a61c01eb82047a087c45b01a30e0e4936f5a5c953b87  knee-female-right/crosswalk.csv  (1055 bytes)
+  2f15b825da044aafef760ab62aa2e9111f63d674efaa4c3d96ddb04f9b1ef6aa  knee-male-left/3d-vh-m-knee-l.glb  (440020 bytes)
+  c897d53408127f7922b29dea8839d7d7a2b8fbfea3e8185f0c1c8c2d3946f7ad  knee-male-left/crosswalk.csv  (1048 bytes)
+  668b23ebdd01d8140a5fe32d4092fe53c541ba413f30159c48369653798f5100  knee-male-right/3d-vh-m-knee-r.glb  (440080 bytes)
+  1386537d5b7b9bfa2c22b7c4562db8fd8f3acf118dcf31b39998a5a0f85bbec3  knee-male-right/crosswalk.csv  (1064 bytes)
+  b3046d2af718e7f031578db4089a9f4bea707aa4a75af98aab78f172c2f53d74  large-intestine-female/3d-sbu-f-large-intestine.glb  (387376 bytes)
+  f464953061780cbd32cdf8da465481e8daf6da64c138421f5ead5ef31e5cfc39  large-intestine-female/crosswalk.csv  (605 bytes)
+  908a5c38bf14574a673f2d2619502281f7f9e47c46c4eba837aae2e80e38c489  large-intestine-male/3d-sbu-m-large-intestine.glb  (687076 bytes)
+  284ca9a8d42b453d36037e8b9236a6737d45d1186874a98e6f3c45a1f713c954  large-intestine-male/crosswalk.csv  (605 bytes)
+  01c300b96bb4686dc1b68701361bea00088dbe29f3d5268e9fd1382d7fde9efd  larynx-female/3d-vh-f-larynx.glb  (463320 bytes)
+  d13c2ea92880ecf4753eb89a6d117e7967eef44ed72d45117fb0b9854a1112fb  larynx-female/crosswalk.csv  (686 bytes)
+  cdb6b3b5b0abd2b06e99913a8f4719e7b0784421b0534ae728e832197d30e287  larynx-male/3d-vh-m-larynx.glb  (335576 bytes)
+  c047d77778de90c54a6647394ba9279f6edbc12579c319aea537d696531907f5  larynx-male/crosswalk.csv  (687 bytes)
+  944be5d4f78ddc9b93390ae6d83dbc11f0d45498a1849043593d90e340fc979a  LICENSE-CC-BY-4.0.txt  (357 bytes)
+  2ab712216dc8af026f87c43b0ad783273fffdf080bb312bcb4c34724f53e5fa6  liver-female/3d-vh-f-liver.glb  (1738552 bytes)
+  bbe0fe05526f6bf24ad039c160164e14533e06850d63348d0d4e87e82f1d5f55  liver-female/crosswalk.csv  (1521 bytes)
+  8e4c38293cfdb6b4f47ef2930c7f4af9e37b9144d1cf26d07c8f12c5045eb404  liver-male/3d-vh-m-liver.glb  (1136412 bytes)
+  fca2a8375741f84bfbfdfba2e1da005bbe4c1fdba5d842738d9417da0d39ce40  liver-male/crosswalk.csv  (1511 bytes)
+  101f48ec64f2ed762fde03fc1193eaae583a0d35c47b72a9ca007d72eefb5f71  lung-female/3d-vh-f-lung.glb  (23255188 bytes)
+  8598d9953dc373049c2939fc0bff2e2101451c0b6e9cd9426e33258bea8060e0  lung-female/crosswalk.csv  (5341 bytes)
+  bba95516fa993ac45c3b1c53f32b58d97232ffd78ae56397e5a2589c6ce4903d  lung-male/3d-vh-m-lung.glb  (10942332 bytes)
+  072b3741e7e60c16f8d6f577ff302978211e826d7b9e345eb725afe5bdd9b910  lung-male/crosswalk.csv  (5416 bytes)
+  d22091fb80b722a5fe35d817244e8dd2f92c604f66af652f42952e16312ebc31  lymph-node-female/3d-nih-f-lymph-node.glb  (4542968 bytes)
+  c4c14077821571a61d2deb67e2a6e44f04999b2ebb2a898aa6f3e7268c5abaa8  lymph-node-female/crosswalk.csv  (507 bytes)
+  0e4f88ec716da00dc589c8164dbabccd8b5e7ca661c4490e63287094512a1d54  lymph-node-female-left/crosswalk.csv  (475 bytes)
+  a4d0ec1ea7791b74967455722ff99b61609ae70b35e566fae6c3c9dc19dbf4ef  lymph-node-female-left/NIH_F_Lymph_Node_Left.glb  (4541028 bytes)
+  12a48fb4d2cfbc44202364ef2b8b1af914fd33d24f3d851a56e5d292a3d018fa  lymph-node-female-right/crosswalk.csv  (475 bytes)
+  59f0758076548c502f10cd7c23f782d4c177c7c898f90fc9b4dad9111cbbc77c  lymph-node-female-right/NIH_F_Lymph_Node_Right.glb  (4541048 bytes)
+  b3b21442de6efc5f6db7d905e80af333df4d07f10d121c16c4475313730ca6f8  lymph-node-male/3d-nih-m-lymph-node.glb  (7414024 bytes)
+  c4c14077821571a61d2deb67e2a6e44f04999b2ebb2a898aa6f3e7268c5abaa8  lymph-node-male/crosswalk.csv  (507 bytes)
+  f7e7aeb48055695602e5373b574a144d15ec3f48233a6c3c7dc1eb6426e87d3a  lymph-node-male-left/crosswalk.csv  (500 bytes)
+  bf3f3e7a327f0c26030bbd919249908b54278d3bc404898ffd213bc95c4753f0  lymph-node-male-left/NIH_M_Lymph_Node_Left.glb  (7412408 bytes)
+  bb66103182ea974e70ef91c638707973827e17398f4e5f7e9de2cb57815d0424  lymph-node-male-right/crosswalk.csv  (500 bytes)
+  c44f6da177f0a6a4842ebe7e3657fc0e6a353df8e738f83fe519c39468dcbc07  lymph-node-male-right/NIH_M_Lymph_Node_Right.glb  (7412504 bytes)
+  68cd9d5de66be827ef0a92b424c0a853de5c6f040676308fb969493a2c83addb  main-bronchus-female/3d-vh-f-main-bronchus.glb  (2858852 bytes)
+  5a7b43ef6bfd4a0af4315af90db689b87d4e36dcee99e94dfc6fc8accd9341bc  main-bronchus-female/crosswalk.csv  (349 bytes)
+  1f1f50659daba678a5738af67d4fc8add5a113a744c93427280a19ce9e0c5755  main-bronchus-male/3d-vh-m-main-bronchus.glb  (422324 bytes)
+  f4b533501699105d9383be295836c5d5fb7b4289b7d76361f0f8c74834c19749  main-bronchus-male/crosswalk.csv  (357 bytes)
+  e279f2dacb93d44b59dade4f52ed209ddffc1600f228bd544d464dc50663d7d5  mammary-gland-female-left/3d-vh-f-mammary-gland-l.glb  (13727256 bytes)
+  19679f9aec2f05a7a12580a8d439423d18bd32521158df9c7e0adfe0a114bbb5  mammary-gland-female-left/crosswalk.csv  (545 bytes)
+  07d176a3a93761e63de47f86628617e763973cb983ce77d92ec62e8f00a1e1db  mammary-gland-female-right/3d-vh-f-mammary-gland-r.glb  (24388580 bytes)
+  303b4f9a4858f0b62fe2b2b865e61157d81d86b2d5ad272131df4a976f58a6cd  mammary-gland-female-right/crosswalk.csv  (550 bytes)
+  65d757efc43367e5245f76c11689e9b50ba07115e575f9ce90c5c47bfb17c70e  manubrium-female/3d-vh-f-manubrium.glb  (132652 bytes)
+  1f97cc98f2b9e27f2b5860f6fade8395212d37bd3804afcdb3a81d7426118acb  manubrium-female/crosswalk.csv  (67 bytes)
+  5b7a4190043fe0243e1f2327006458492acb232773c58c14cbf5f570ee7a1113  metadatos/adipose-female.json  (8150 bytes)
+  f79f25fa7476030f0df2dab2b7d2a27d771125de85020ca5550eb8cdb4d301a8  metadatos/adipose-male.json  (8058 bytes)
+  685c75705ea8e6f2d6cad15bc9e9c686793b2f93abcfdc1b56f652310e4546c7  metadatos/asct-b-3d-models-crosswalk.json  (10464 bytes)
+  176ccbf37ef868d260c4e086676cdabeaf567546d095719afa3fa8196433fcdf  metadatos/blood-vasculature-female.json  (9552 bytes)
+  c6a734aa7f89bcbe9167196a4a5276b2a04bbb48670b135de39f0b98e73b7803  metadatos/blood-vasculature-male.json  (9470 bytes)
+  20f2ac4b26b3dff7d18e5250796258b01239c53a6225e2bc2abb6940f646f70d  metadatos/brain-female.json  (9500 bytes)
+  f605e1c87bb7720fcfdbadf98ce06b9340fe2787926be5d3f7e04009366eb544  metadatos/brain-male.json  (9287 bytes)
+  ef9767993cb8c44d160d6ad0f08f7130e67c753295fa247456d88f8684bc5338  metadatos/epiploic-appendage-of-transverse-colon-female.json  (9083 bytes)
+  49a879c33c88966a23d47ee47a6c4083589f9d84372daba825290fa1bac5c919  metadatos/epiploic-appendage-of-transverse-colon-male.json  (8991 bytes)
+  38284aa178c04cd4fcc60cb7da17560841472220c8960b7c02efc8ce2b62741d  metadatos/eye-female-left.json  (9862 bytes)
+  448dd31d27021b4d6ad158dac286f3782e0c625d9b9802d4d755d6b5173b1783  metadatos/eye-female-right.json  (9930 bytes)
+  c8b3c655b5083fe904f723c3d815da5c99bc62caa6473cf69575116c96f6d618  metadatos/eye-male-left.json  (9832 bytes)
+  86ca92849060a4b8a5d1fde3628f3345e4f4154035980fdea2b638c0c0d069c6  metadatos/eye-male-right.json  (9985 bytes)
+  acbffb7d03a22c6788130678293fa9589ee1c5beb90f0d0ba1c3efa2f8adcf29  metadatos/fallopian-tube-female-left.json  (9556 bytes)
+  3f2d7748ba0f6b5ec93f7284bbfd1df44675fcd2f2c0b64e04687d908307d2c5  metadatos/fallopian-tube-female-right.json  (9712 bytes)
+  50265300276c5adb09f48f3024a0b89bb514a0dca1d8195eed22f6f145e1a779  metadatos/heart-female.json  (8568 bytes)
+  d03ef06c2c2bee8a6e15ccb52746d0d339e9d3cb4a7720847c93680d87e61623  metadatos/heart-male.json  (8271 bytes)
+  51eead22313a3fbe448d2da1e4d223c7c23c35cf81c0ca3a0ea7265a9337ba37  metadatos/intervertebral-disk-female.json  (8756 bytes)
+  4326dde33c4392d719184d71d6f2bc0ddc1536fe4d7e628ceac1e0dd3da597f3  metadatos/intervertebral-disk-male.json  (9029 bytes)
+  0c09575848e60d742c808e7b4d1c97d4a9c34f86f65cb72f41c0f1f4a208de18  metadatos/kidney-female-left.json  (9386 bytes)
+  e1decb25206ad0f552a1901e7ad355a2003fc7b329af92a3aaf96284366ae9a2  metadatos/kidney-female-right.json  (9433 bytes)
+  6e629034b58dd706d967735fc27584157619d9cd8ee1c939026cd27ba698e2e1  metadatos/kidney-male-left.json  (9444 bytes)
+  b8a532fc9c865b4a7f19c545a430c969c171888523b8c5a1de510f1580f7931b  metadatos/kidney-male-right.json  (9491 bytes)
+  fc01338cfe0c19c79e4aab371f6b3e4577f6a269528a2a9f794cae68a224a5c1  metadatos/knee-female-left.json  (8778 bytes)
+  4a3882069fbe0304edce98ebe045744902feecbe6ff6b452a71b6e23d136d8ca  metadatos/knee-female-right.json  (8826 bytes)
+  e3b58a8b0db5644bd648c635bf16fe71104168ad914104cdd7bfa105e4aa325d  metadatos/knee-male-left.json  (8829 bytes)
+  255c5e900bf93b9adc65e27621813b8927e45acdc6d34c6cbc7e72f15742c001  metadatos/knee-male-right.json  (8854 bytes)
+  7e65dbaf8261da8344ff1b4c4788660d0838c2cf3b55b1bc96a8c419219bc88b  metadatos/large-intestine-female.json  (8817 bytes)
+  54f7e02ba1e4c7f9e205b8a62e523faee242a3faf9cf22c1ca25f9b6267f6f2c  metadatos/large-intestine-male.json  (9289 bytes)
+  3a2e271211a39b0c7f02065d0365dbca6c9e43a62a72c5464cac1591faf54de1  metadatos/larynx-female.json  (8726 bytes)
+  e1555277b03f703e19e7916ea659f961d964939eaf6ef96fdde048453e8fb4e5  metadatos/larynx-male.json  (8796 bytes)
+  32c63ce20eb9fc17a638407a3db42151ca64f0c6c7ce141417df59d18aa06439  metadatos/liver-female.json  (9247 bytes)
+  a2942eba7e7079bd631b068da26f50bfc03d82878fdc14d757eb47c5b6e5cc3d  metadatos/liver-male.json  (9327 bytes)
+  600303e6f77cada660cfaaa45e28f366f1074f02593a7a23fe2a029c360b6331  metadatos/lung-female.json  (8685 bytes)
+  3d1440b2923c53ec85fd6e203f0bea93d6ebd1b00bef26395e5a7ae91411b3ff  metadatos/lung-male.json  (8743 bytes)
+  40b02f42fbf7b15d0428b19b5929d58b87077f2676fbd217e4b205081cf56d00  metadatos/lymph-node-female-left.json  (8475 bytes)
+  7a7421eb1590616b671b316ee5608ed469aabf3a21cc00e8c36a1c1579e44c5c  metadatos/lymph-node-female-right.json  (8527 bytes)
+  ad6a3c1a7df994d48e425e8001f444a20653b7f865e71f85adb88b6cd3ab3923  metadatos/lymph-node-female.json  (9456 bytes)
+  cae124e56c0e034e9c573683f69cb2d36a1aac8b34c118357b660faef7060400  metadatos/lymph-node-male-left.json  (8381 bytes)
+  ac0ee89b0e96882b747ed81e4380ce0f0ca119e4f0372ecd52ce64d42550e746  metadatos/lymph-node-male-right.json  (8433 bytes)
+  67765f72cc6974f1e37afe5b4cb2bd4cea8baa210a885f399c0e283c3290b836  metadatos/lymph-node-male.json  (9007 bytes)
+  a1dcfe3cbba061bf7d03a6ada3b1dc796a5138119a30e8dc35fe47d7f6ae8a69  metadatos/main-bronchus-female.json  (9103 bytes)
+  4d3792be0e4bced40fc0d5c6bae60f0355de69409901b0182999c03bfafe931a  metadatos/main-bronchus-male.json  (9161 bytes)
+  741f52f8502c8345e665cd799792d6ee9409ccbe6e6499811b4ae7aa4d1247d9  metadatos/mammary-gland-female-left.json  (8972 bytes)
+  eb07a898d42366b937ab374df6464fe7154dcbf7a3dff7bc98da21166e06c265  metadatos/mammary-gland-female-right.json  (9018 bytes)
+  b450cc8d20a5f82fd6ccb367ccf3ebe182970be97662308b7e4703c829baa815  metadatos/manubrium-female.json  (8329 bytes)
+  0a644433e1d31fc0ddce890039138925468cbc276432768c86f4fbce9c5466e3  metadatos/mouth-female.json  (8853 bytes)
+  a116bc68d7f03d192e6420b8804781eabc44c80a0726d10aa7a2c28d92123f0b  metadatos/mouth-male.json  (8863 bytes)
+  52644cf32736780e7cc8be9db094381b1021d022292a933f30bcd0725a85a692  metadatos/omentum-female.json  (7502 bytes)
+  a38cbae301e431f95d29a8b1420625b512a6cf7a8ca1e3d77e02c76bab807efc  metadatos/omentum-male.json  (7410 bytes)
+  0b40112f16ce58b3a132ce406b2f682c940978411e8fc84057ea326a4b037c8d  metadatos/ovary-female-left.json  (9192 bytes)
+  32f7465dc9b92a0e471a898973a084c34834ccbb37ec90a477fed3c483260bc4  metadatos/ovary-female-right.json  (9239 bytes)
+  709b267d1f971ae680206ed2c8c42507d4a07dca1f153884ba9a473ddc9ad887  metadatos/palatine-tonsil-female-left.json  (9602 bytes)
+  a05ccb7ab1001826c080c514d830233af1301a216a34ab49c4ed97cdb46449a4  metadatos/palatine-tonsil-female-right.json  (9649 bytes)
+  391ddbc557908ce0c63df0e89d94e7305421184fbcbe756085becbf628155ffe  metadatos/palatine-tonsil-male-left.json  (9301 bytes)
+  be7125bc1cac7cab67274cd1626eb1fb6c3ce9ed792be897c4a14cb52d0b9660  metadatos/palatine-tonsil-male-right.json  (9457 bytes)
+  fd9e9bd39b14bb66aaed58b1299e018e6b6d6c04ebf8833dbe6e0ac2d1aefaf5  metadatos/pancreas-female.json  (8924 bytes)
+  5278950d6539886c3724875a99bfb5a679b6dff240b67081e4f16fe95e16ce7d  metadatos/pancreas-male.json  (8982 bytes)
+  f73a07038ba4e8eb06de02bd74907544c63cb8b59d00d4f149af17c1bf9e983a  metadatos/pelvis-female.json  (8650 bytes)
+  61675083278b2df4e8db3756969c924781b91df6e1b1adb76bdbba9625d74c4b  metadatos/pelvis-male.json  (8708 bytes)
+  7bd112f877e7604078b7c147a7a47c940eb31292010ecf565b5d92d7f588a594  metadatos/placenta-full-term-female.json  (10330 bytes)
+  f79edb263c889e577573df0e88d17655aa8c98a1ec67f065c979244b172e8145  metadatos/prostate-male.json  (8800 bytes)
+  8e454cc7f8a7986433476fc6f1499b964a71b3d3fcac1aa60b9b4414da6104b5  metadatos/renal-pelvis-female-left.json  (9556 bytes)
+  0b68e82e6c34e7fe1a827ab9f1524c597656883fb8dd496d5a526f421b6018d4  metadatos/renal-pelvis-female-right.json  (9603 bytes)
+  106f8d46ef3cbdeec75aa32be049a60d1838fa0fa9144463ceb34d5238707008  metadatos/renal-pelvis-male-left.json  (9614 bytes)
+  5984e275510de95c7bfb8a44844023755235d5477564df4195573c0deb8d7339  metadatos/renal-pelvis-male-right.json  (8984 bytes)
+  fbeaaf9084eba9a86d0f644250025064142c2780179ded01ee1ae0012283f5c5  metadatos/skin-female.json  (8968 bytes)
+  334317779c459231420c8ce249169a98c8ade2858b80cae4da6d23bb3d2f4e6a  metadatos/skin-male.json  (8786 bytes)
+  1107b32c1755f40d7eb2435bf2ee2f75f938cbf6680ee40a036b54bb8be53506  metadatos/small-intestine-female.json  (9458 bytes)
+  f59414ac1716cff6467a5c17f359fa687e4f33f399708d979b3d6594a9b9ae6b  metadatos/small-intestine-male.json  (9524 bytes)
+  b1ba7b99891449c91f81a212923a6ea0670bfe15dbff0a96d46939a4bc22e5af  metadatos/spinal-cord-female.json  (9058 bytes)
+  2e22cfc191627901857fc7187ec4370cca59c8897696ece5cc95dda890418d4a  metadatos/spinal-cord-male.json  (9307 bytes)
+  03e106962b5ce7e1f24466d74d29389fc8d8d9583ce726de5c2461fe704be582  metadatos/spleen-female.json  (8592 bytes)
+  b69ee4327be9ea1b3836b3273da0665da1aecfa095fab3760a0a9e5d089a6cac  metadatos/spleen-male.json  (8586 bytes)
+  16166b549971903e0ca5bbf6b58e4d5f31e6f46d4178f912b8baba9a716abebb  metadatos/sternum-female.json  (8176 bytes)
+  5fe9390892751df036f48253224bfff0cf2be6b0457f18591b8420b6d9c0b734  metadatos/thymus-female.json  (8586 bytes)
+  df994c25d8a21f2dee6c029d388c57cb94d7ee21137611f60ded3b8406d6482b  metadatos/thymus-male.json  (8689 bytes)
+  8ff9e3066d7a8448ff4115d72ffbc801a7f6128be6df8bba7f4c1cf2a7330a98  metadatos/trachea-female.json  (8644 bytes)
+  b321b7bd5c079adb337a97bf708085d47ec67fa80ebdb8b2f9bedcb12faa990c  metadatos/trachea-male.json  (8823 bytes)
+  86f6301b3e35e4f856f31ab7d44797ffeb3a0edab542de95efe271869344f41d  metadatos/united-female.json  (9046 bytes)
+  8f599dba6943478362b5b9adcc2979be5fa2595ed0c6a3aca5b0d2c08de09b6f  metadatos/united-male.json  (9104 bytes)
+  8b403b31b8d9c21c540758186dd293754c480196531d677be26b7992c6ff017d  metadatos/ureter-female-left.json  (8997 bytes)
+  8ca6430a92774c92ba20457575153acaf36ba1dd888033745403001623a5f404  metadatos/ureter-female-right.json  (9045 bytes)
+  21c64fa10857c786b86cd590577927dea59b4e4b4e8ddd87f786aa58fa1812a4  metadatos/ureter-male-left.json  (9055 bytes)
+  5fc482aacdb73dcee59d1cc901c373e053ba47c765dab1a65da1e88f6b13b0c9  metadatos/ureter-male-right.json  (9107 bytes)
+  9f66b021d385c2fe23d95d84b8d71f8e7326fe0cdaf9271ea403e172bcc3f594  metadatos/urinary-bladder-female.json  (9102 bytes)
+  d8aaa9ce73fcdf35d29053fc1de5e3526fe7e98ebcb442fef34f3e7c6d95a0bf  metadatos/urinary-bladder-male.json  (9193 bytes)
+  116febe293bc020577e4f4e82641e53c94f5588039df368447905ae7722c6d0b  metadatos/uterus-female.json  (8939 bytes)
+  bd8e24e9d52b49719c6a1cafa1f54fc40c1d3f811b9d32df78d5c20ebb78c197  mouth-female/3d-vh-f-mouth.glb  (103690760 bytes)
+  4bd45351e937796440eab53a65851393c0be4c504561330b28c2b5ba71512ec1  mouth-female/crosswalk.csv  (1823 bytes)
+  aa5bf5f40c45c4679f05d31e7708df3e89b9897c2ff95aa89dbfaf3c501578be  mouth-male/3d-vh-m-mouth.glb  (53487620 bytes)
+  5df36e7556cf550b880b951093c6adfadcb1b14b95b696c12e2274ff3fe7ae58  mouth-male/crosswalk.csv  (1823 bytes)
+  692622d5ab89014630ea6952dcb9849bb5c4ad6243d1792e2cb3efe94ef42d98  omentum-female/3d-vh-f-omentum.glb  (5931032 bytes)
+  928f5837e6786488317e40a0768c3558fa0392d777e0730ad5eadbc5fc927db9  omentum-female/crosswalk.csv  (63 bytes)
+  f77dd32911b9ef15bf831831914074b520e6fd1bf879f1eb6ca931e4049706b7  omentum-male/3d-vh-m-omentum.glb  (2603108 bytes)
+  124df29cd6e9e1e6f884bfea8d8c3deb1d9ecd87bbdb2f7712dd65416a1c9150  omentum-male/crosswalk.csv  (63 bytes)
+  defd5cdc4b053b4e92193c5864bab2abae1807864ffde8bde7a7cb57f4736609  ovary-female-left/3d-vh-f-ovary-l.glb  (9000 bytes)
+  a3487f60aa9aad8c8bf4fba037b58bebeb8c84d3ed44ecb37ae19f6c25a9b943  ovary-female-left/crosswalk.csv  (69 bytes)
+  381df741bf3d2511716e68db3ff70d94c0eda770d28a503af2d9fcb7b65113f8  ovary-female-right/3d-vh-f-ovary-r.glb  (8756 bytes)
+  40fec47dfddb4b9f91343c191fd4b9c602c971a905b4917282a32b7f34b0b518  ovary-female-right/crosswalk.csv  (71 bytes)
+  16735909f46d5514de0c0ca08dccb3fc9cc5c8654278fcd711ec07f2ec6f7c87  palatine-tonsil-female-left/3d-vh-f-palatine-tonsil-l.glb  (930340 bytes)
+  6eb7e5b11ad74d14a0a7dcc7ce549e28d52074b1db38e4798ef1a52b954a136c  palatine-tonsil-female-left/crosswalk.csv  (81 bytes)
+  89efbc8f90a26b6e5e3d55c9105e1fef2c00540daef5ee771740f913f72b1da6  palatine-tonsil-female-right/3d-vh-f-palatine-tonsil-r.glb  (663256 bytes)
+  f4a6610ab131daf0611be7b3b6cc72f83b9fb014be0f7afbfee2c9aa28cea780  palatine-tonsil-female-right/crosswalk.csv  (82 bytes)
+  6bacedee00b821f05f24a06a434f867814ca233d2ec1b898bc8344c56aa7be80  palatine-tonsil-male-left/3d-vh-m-palatine-tonsil-l.glb  (449008 bytes)
+  151ac626300d6151dcdfce0005f2efdda892834a216e7315cade7215e316eb38  palatine-tonsil-male-left/crosswalk.csv  (81 bytes)
+  7164e38f8cdbee2d6f107ce63bb666e52786871e78bd6724e9200a71eea59961  palatine-tonsil-male-right/3d-vh-m-palatine-tonsil-r.glb  (222132 bytes)
+  99ddf00a2426b8268f24f8f8105332aff811c2eab13356fa8b4fbfd6fdf6f78a  palatine-tonsil-male-right/crosswalk.csv  (82 bytes)
+  553411dfc0391d305191a8f204c88e9fd3c05f7a2c7501023914728f294d8b4e  pancreas-female/3d-vh-f-pancreas.glb  (714832 bytes)
+  21bd89a810244bb69bc9f5b400f1399acda2a2bf7a33b5ebc08d6f6b7425c3c3  pancreas-female/crosswalk.csv  (347 bytes)
+  a89d7acbc9448ca1e6c09f7f6d6a18b2bd8a2e94cd4a0b51709915a8b7bea84e  pancreas-male/3d-vh-m-pancreas.glb  (2110316 bytes)
+  02751ff545038977af564a40890b0cdd3fac41d8b9c21a28897dc6ef6602b653  pancreas-male/crosswalk.csv  (363 bytes)
+  6ef3436e42b7203afcdfa075e57098e97c4e1aaaec08cfdacf6300ba3d5a551d  pelvis-female/3d-vh-f-pelvis.glb  (1593612 bytes)
+  0bfeff126f5707b6ca58160af4cf192143453380be8e528f86d20898df30c48b  pelvis-female/crosswalk.csv  (1379 bytes)
+  5bfd2c34b62a7224796d50002bcdf9ded60ea11485a118351dfd1f19c6853e77  pelvis-male/3d-vh-m-pelvis.glb  (1348340 bytes)
+  05f1523a4c750a2121b37f352bbeeeddbe86ffbd071ec5daedc54fdbcaf0ee2b  pelvis-male/crosswalk.csv  (1379 bytes)
+  32381ebb2b2369e8e83c2b1e5f94cb1cafccf1e1e23439f80bada482ab9e57ef  placenta-full-term-female/3d-vh-f-placenta-full-term.glb  (4917432 bytes)
+  573bfcda8f1a66d205aa86086ca42416e7f1382741b646d9e22c3c50d7265b63  placenta-full-term-female/crosswalk.csv  (369 bytes)
+  b456bf89571b8ad46f7c01941cdc45d6c2176c1554849755b009819231142321  prostate-male/3d-vh-m-prostate.glb  (4086520 bytes)
+  373f677816cf05c783eb2dfcfadd32180e71a36153d80756317cc8a1aa0c0bdd  prostate-male/crosswalk.csv  (1222 bytes)
+  d0cb443c9ad254d9c472fd74a753bb7dae3cf4421a54a5969af0e5aa4bb75ce2  renal-pelvis-female-left/3d-vh-f-renal-pelvis-l.glb  (61080 bytes)
+  99344686017c5c621b46bfecbdbe3c68b6cf3647510573bd7987dbb2c9b1d105  renal-pelvis-female-left/crosswalk.csv  (80 bytes)
+  7ade8b72c57f52778621f4609b29c4730957a217736dc3aaf57971ab8acc4855  renal-pelvis-female-right/3d-vh-f-renal-pelvis-r.glb  (57612 bytes)
+  f396baa77f570df9bd54a7533341927475fd88e09aa3ac93ddf49a7fa9907451  renal-pelvis-female-right/crosswalk.csv  (81 bytes)
+  ee8af190d7104f9f326e749e5757897800e974ac76360faecc5cac9104379863  renal-pelvis-male-left/3d-vh-m-renal-pelvis-l.glb  (68824 bytes)
+  a38b90514d9b834a47121d14ae139e87a95d5aa4d674aace83d3a43422fa0cf7  renal-pelvis-male-left/crosswalk.csv  (80 bytes)
+  cee883e21ca4777caf0ca513f26a700699086556561598693d5f85383f36cbe7  renal-pelvis-male-right/3d-vh-m-renal-pelvis-r.glb  (55052 bytes)
+  c2835a39c2b87cfb9cf031c3adbd06acdcd925eda1bc7e23134448bfa44825aa  renal-pelvis-male-right/crosswalk.csv  (81 bytes)
+  b7dc8b3e5bae070f22f2619b10194b012a6f3cf930836d251828d5893e69594c  skin-female/3d-vh-f-skin.glb  (16003176 bytes)
+  bc49cd23a77552d7ce6a1998f86097dd3104f6a07f1d3db3df586624d6e4009e  skin-female/crosswalk.csv  (65 bytes)
+  4764602f0866fbdad19382e7f12ba148ee33141677153b556f7238116bc33c2a  skin-male/3d-vh-m-skin.glb  (19901928 bytes)
+  0445fc54a80a6b9a7af5e4953fc2f858a911c350a5db62ef24e8ecaf2d7b000f  skin-male/crosswalk.csv  (65 bytes)
+  850052a437ac12a57e05bdd97d314ade6f8e1cc4801d13cfbcdffe8d83fa3842  small-intestine-female/3d-vh-f-small-intestine.glb  (856536 bytes)
+  d3985b6d30a3339624e64f578e7e5226772b4aa845e5fc31799739a1eb04ec23  small-intestine-female/crosswalk.csv  (635 bytes)
+  5d51b9b102e762f9b64fd1e7d9fbd1f1a23ed9cfdb536a9e756cca3206fbc5bb  small-intestine-male/3d-vh-m-small-intestine.glb  (618728 bytes)
+  c7e89b390fb589c66e4d6b2b57d9e7ccef47aebf6dfd312418c9fa5f2084babb  small-intestine-male/crosswalk.csv  (694 bytes)
+  ececed633894787f9b0d22f2c68b65831202bc7b5f8b46f7517877a38fbcdb80  spinal-cord-female/3d-vh-f-spinal-cord.glb  (7657228 bytes)
+  1c3a82ceea6479ff3a1c823539d7a84ba21d896345c2cb9faab2eb1bbb6c9111  spinal-cord-female/crosswalk.csv  (2701 bytes)
+  b8a2c2a288a8f7af84d5b93900b3c506a7996aa28518e9fb8a3ab9b6db6e6827  spinal-cord-male/3d-vh-m-spinal-cord.glb  (490652 bytes)
+  aae2776684334b299d087f03bb273b824206bf5831fb0481bfddda1db108fd4e  spinal-cord-male/crosswalk.csv  (2789 bytes)
+  09231afe99908ac8c08be0945c76431ac247faed2e7f10e80ae4374f8c1f0251  spleen-female/3d-vh-f-spleen.glb  (276824 bytes)
+  0a28368947e3e0a65fefd9b209caddf0ee918990a3d750ae46dd9b2721f37f98  spleen-female/crosswalk.csv  (390 bytes)
+  826012b9dc6b69064b76c3aabbce32a2baa32d1f97fde3e88a015f399c9040b8  spleen-male/3d-vh-m-spleen.glb  (540348 bytes)
+  47c85117442a55972b1abdf9c6818eedb9ff48357f9c3d2f87a7b291220d09b5  spleen-male/crosswalk.csv  (390 bytes)
+  530d45a6f7919b29fead3e66e8fa95dd18380e3069d5fbdcd0fd18a8cc230535  sternum-female/3d-vh-f-sternum.glb  (223388 bytes)
+  68dcc4a07779cd8f9c21e23da3d9bc4910bc790ffb59486ed4704e2aac3f8aa4  sternum-female/crosswalk.csv  (63 bytes)
+  532d05c9f572c11c7bc6a92b12a66cd9ab6be5cd13dd04dd4b0d08b605f11930  thymus-female/3d-vh-f-thymus.glb  (71968 bytes)
+  5dbf8fc7f18927cbd6f246e71002435beb040b85ba2e510e9717a139668592d0  thymus-female/crosswalk.csv  (166 bytes)
+  33119356ac2a1108bf8aeec7d27ab908213464e0dd4a8e0bd390f40a8848c933  thymus-male/3d-vh-m-thymus.glb  (74912 bytes)
+  e09752a786902c7ad9bff2e2cb1efd6ff91fbda62cdcfa9b39c4bdcdf1b1ba35  thymus-male/crosswalk.csv  (166 bytes)
+  3896867da7e9d9c6614deaba723ab180b479da85d81af9b0e6a4af4d104535fe  trachea-female/3d-vh-f-trachea.glb  (729604 bytes)
+  cfadef5ef35f36a8eff5a9e93050e3b5f12943e9826e29755b7f16584ba8edaa  trachea-female/crosswalk.csv  (167 bytes)
+  bca5616e505baff61dce1bbc31d6602eb72c112bcbe4531931e37e0c254ddd8d  trachea-male/3d-vh-m-trachea.glb  (1184848 bytes)
+  0c6e067ad6f321e936d511754ac6da5f1c7e54f3686267a3fad5465a7f4a843c  trachea-male/crosswalk.csv  (248 bytes)
+  95f0c3d2f918582608692ca1139e8bdb18c147a16470e9ee9af8b276bd77c422  united-female/3d-vh-f-united.glb  (374505632 bytes)
+  2a367d3ad8c1cf1b083c884aed7d99fb3b504d482e1e49570ecdb4f03c84d55f  united-female/crosswalk.csv  (58346 bytes)
+  fae3ac193835e9e24cd13a0d0f11e6788183b290b0691b9b83ec81d907d94581  united-male/3d-vh-m-united.glb  (241633636 bytes)
+  9ac1f2e278c9ae1febe0d1f79010de9721a5653a16a374c605fc8389419c58c1  united-male/crosswalk.csv  (57298 bytes)
+  a530ed1b4064221db5d3e82774911a9735ebe6c878ec2671be3faff7cf849df9  ureter-female-left/3d-vh-f-ureter-l.glb  (682688 bytes)
+  8034e49d56d90a392529bbed30813a23f9cf4f46ea164afc476dab8f3d9c49b9  ureter-female-left/crosswalk.csv  (951 bytes)
+  5f800b7dfd8056054ee030fad32de4e648920fbf1bada134fb989b2cc66f4436  ureter-female-right/3d-vh-f-ureter-r.glb  (611468 bytes)
+  87bcf9e5b2f330229919c6bf79660500f00ea5f6f3ebfc7c1e24c5b511553355  ureter-female-right/crosswalk.csv  (903 bytes)
+  ebdd493c2e8095ccb6e795f49bf26c94e8d205c94097a7e1f9a9d7b168a1173c  ureter-male-left/3d-vh-m-ureter-l.glb  (682892 bytes)
+  38cddedbb9ebe8b57bdf27cae343418fde9d597b6d9bcb9fd1e08b7cc82f0f56  ureter-male-left/crosswalk.csv  (850 bytes)
+  215978b67cf4d3876249a8dafb8c83a13471b5e1eb601559dca25a61a7c9d091  ureter-male-right/3d-vh-m-ureter-r.glb  (540788 bytes)
+  2dc84b45611314a2119bf31027f364f37b6ef05a604107d2650e347f9ce9206c  ureter-male-right/crosswalk.csv  (795 bytes)
+  4bec5fdc117cbc4247a7d16f22f320717264f0fe7cae75fcb2e06432e1ab1a3c  urinary-bladder-female/3d-vh-f-urinary-bladder.glb  (765224 bytes)
+  7a0af24763e19d0a3ab48713087220ef5763d2fc7ddc7e553f241b55fc1caeb9  urinary-bladder-female/crosswalk.csv  (516 bytes)
+  070893aea9139d9a2c4f8da3aa66ca309a3c683a599d93a37dd7031c7d71021d  urinary-bladder-male/3d-vh-m-urinary-bladder.glb  (199044 bytes)
+  241df5e74cb6e707aeabc06591361e19ba1cf831a3a326527c766e6900e4e2c5  urinary-bladder-male/crosswalk.csv  (590 bytes)
+  41014d2b222c2dbbe8d1cc38206b0099ce76d79659a9fdea9f28b8c7d669b864  uterus-female/3d-vh-f-uterus.glb  (980408 bytes)
+  d30bd7a11810bdc964543dfd675ad859b81f8f36997efeff95f48d48a5050b06  uterus-female/crosswalk.csv  (605 bytes)
+
+Cita general: Browne, Schlehlein, Herr II, Quardokus, Bueckle, Börner. 2024.
+"HuBMAP CCF 3D Reference Object Library." https://humanatlas.io/3d-reference-library
+
+Citas por órgano:
+- adipose-female (v1.0): Heidi Schlehlein. 2025. *3D reference organ for subcutaneous adipose tissue, Female v1.0.* [https://doi.org/10.48539/HBM747.MSDM.942](https://doi.org/10.48539/HBM747.MSDM.942). Accessed on December 15, 2025.
+- adipose-male (v1.0): Heidi Schlehlein. 2025. *3D reference organ for subcutaneous adipose tissue, Male v1.0.* [https://doi.org/10.48539/HBM344.KNDS.959](https://doi.org/10.48539/HBM344.KNDS.959). Accessed on December 15, 2025.
+- asct-b-3d-models-crosswalk (v1.10): Quardokus, Ellen M.,	Heidi Schlehlein,	Bruce W. Herr II,	and Katy Börner.	 2026.	"Anatomical Structures, Cell Types and Biomarkers (ASCT+B) Tables to 3D Reference Object Library Crosswalk, v1.10."	 https://doi.org/10.48539/HBM626.BRWN.943.	Accessed June 15, 2026.
+- blood-vasculature-female (v1.3): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Blood Vasculature, Female v1.3."	 https://doi.org/10.48539/HBM322.KKFC.394.	Accessed June 15, 2024.
+- blood-vasculature-male (v1.3): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Blood Vasculature, Male v1.3."	 https://doi.org/10.48539/HBM473.XTPP.725.	Accessed June 15, 2024.
+- brain-female (v1.4): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Brain, Female v1.4."	 https://doi.org/10.48539/HBM674.NTLM.353.	Accessed June 15, 2024.
+- brain-male (v1.4): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Brain, Male v1.4."	 https://doi.org/10.48539/HBM538.NKCT.649.	Accessed June 15, 2024.
+- epiploic-appendage-of-transverse-colon-female (v1.0): Heidi Schlehlein. 2026. *3D reference organ for epiploic appendage of transverse colon, Female v1.0.* [https://doi.org/10.48539/HBM926.ZRGW.252](https://doi.org/10.48539/HBM926.ZRGW.252). Accessed on June 15, 2026.
+- epiploic-appendage-of-transverse-colon-male (v1.0): Heidi Schlehlein. 2026. *3D reference organ for epiploic appendage of transverse colon, Male v1.0.* [https://doi.org/10.48539/HBM829.BSRC.927](https://doi.org/10.48539/HBM829.BSRC.927). Accessed on June 15, 2026.
+- eye-female-left (v1.3): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Eye, Female, Left v1.3."	 https://doi.org/10.48539/HBM525.TRWD.376.	Accessed June 15, 2024.
+- eye-female-right (v1.3): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Eye, Female, Right v1.3."	 https://doi.org/10.48539/HBM632.KTDP.379.	Accessed June 15, 2024.
+- eye-male-left (v1.3): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Eye, Male, Left v1.3."	 https://doi.org/10.48539/HBM769.RWTZ.963.	Accessed June 15, 2024.
+- eye-male-right (v1.3): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Eye, Male, Right v1.3."	 https://doi.org/10.48539/HBM272.VPJG.573.	Accessed June 15, 2024.
+- fallopian-tube-female-left (v1.2): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Fallopian Tube, Female, Left v1.2."	 https://doi.org/10.48539/HBM529.KBQT.896.	Accessed June 15, 2024.
+- fallopian-tube-female-right (v1.2): Browne, Kristen,	and Heidi Schlehlein.	 2024.	"3D Reference Organ for Fallopian Tube, Female, Right v1.2."	 https://doi.org/10.48539/HBM952.XJJV.857.	Accessed June 15, 2024.
+- heart-female (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Heart, Female v1.3." https://doi.org/10.48539/HBM449.SHRV.225. Accessed on June 15, 2024.
+- heart-male (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Heart, Male v1.3." https://doi.org/10.48539/HBM564.WKNG.249. Accessed on June 15, 2024.
+- intervertebral-disk-female (v1.0): Heidi Schlehlein. 2025. *3D reference organ for intervertebral discs, Female v1.0.* [https://doi.org/10.48539/HBM824.BNBP.227](https://doi.org/10.48539/HBM824.BNBP.227). Accessed on December 15, 2025.
+- intervertebral-disk-male (v1.0): Kristen Browne, Heidi Schlehlein. 2025. *3D reference organ for intervertebral discs, Male v1.0.* [https://doi.org/10.48539/HBM747.XJJX.236](https://doi.org/10.48539/HBM747.XJJX.236). Accessed on December 15, 2025.
+- kidney-female-left (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Kidney, Female, Left v1.3." https://doi.org/10.48539/HBM449.JPXL.964. Accessed on June 15, 2024.
+- kidney-female-right (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Kidney, Female, Right v1.3." https://doi.org/10.48539/HBM968.HSNL.854. Accessed on June 15, 2024.
+- kidney-male-left (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Kidney, Male, Left v1.3." https://doi.org/10.48539/HBM759.JKKF.434. Accessed on June 15, 2024.
+- kidney-male-right (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Kidney, Male, Right v1.3." https://doi.org/10.48539/HBM364.QTSC.334. Accessed on June 15, 2024.
+- knee-female-left (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Knee, Female, Left v1.3." https://doi.org/10.48539/HBM892.RGKB.238. Accessed on December 15, 2024.
+- knee-female-right (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Knee, Female, Right v1.3." https://doi.org/10.48539/HBM542.WHJW.673. Accessed on December 15, 2024.
+- knee-male-left (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Knee, Male, Left v1.2." https://doi.org/10.48539/HBM839.JJQF.873. Accessed on June 15, 2024.
+- knee-male-right (v1.2): Browne, Kristen. 2024. "3D Reference Organ for Knee, Male, Right v1.2." https://doi.org/10.48539/HBM984.JRHT.838. Accessed on June 15, 2024.
+- large-intestine-female (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Large Intestine, Female v1.3." https://doi.org/10.48539/HBM682.RSXX.965. Accessed on June 15, 2024.
+- large-intestine-male (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Large Intestine, Male v1.3." https://doi.org/10.48539/HBM487.ZKSN.693. Accessed on June 15, 2024.
+- larynx-female (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Larynx, Female v1.1." https://doi.org/10.48539/HBM525.FJHR.643. Accessed on June 15, 2024.
+- larynx-male (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Larynx, Male v1.1." https://doi.org/10.48539/HBM362.HNZB.247. Accessed on June 15, 2024.
+- liver-female (v1.2): Browne, Kristen. 2024. "3D Reference Organ for Liver, Female v1.2." https://doi.org/10.48539/HBM599.GZLD.639. Accessed on June 15, 2024.
+- liver-male (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Liver, Male v1.2." https://doi.org/10.48539/HBM896.WMSL.867. Accessed on June 15, 2024.
+- lung-female (v1.4): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Lung, Female v1.4." https://doi.org/10.48539/HBM994.HXJP.575. Accessed on June 15, 2024.
+- lung-male (v1.4): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Lung, Male v1.4." https://doi.org/10.48539/HBM532.KLZD.394. Accessed on June 15, 2024.
+- lymph-node-female (v1.4): Yao, Li, Kristen Browne, and Heidi Schlehlein. 2024. "3D Reference Organ for Lymph Node, Female v1.4." https://doi.org/10.48539/HBM425.PTPB.732. Accessed on December 15, 2024.
+- lymph-node-female-left (v1.0): Yao, Li. 2021. "3D Reference Organ for Lymph Node, Female, Left v1.0." https://doi.org/10.48539/hbm897.hvmv.989. Accessed on March 12, 2021.
+- lymph-node-female-right (v1.0): Yao, Li. 2021. "3D Reference Organ for Lymph Node, Female, Right v1.0." https://doi.org/10.48539/hbm439.ztgh.778. Accessed on March 12, 2021.
+- lymph-node-male (v1.4): Yao, Li, Kristen Browne, and Heidi Schlehlein. 2024. "3D Reference Organ for Lymph Node, Male v1.4." https://doi.org/10.48539/HBM532.TNXR.875. Accessed on December 15, 2024.
+- lymph-node-male-left (v1.0): Yao, Li. 2021. "3D Reference Organ for Lymph Node, Male, Left v1.0." https://doi.org/10.48539/hbm668.rblw.256. Accessed on March 12, 2021.
+- lymph-node-male-right (v1.0): Yao, Li. 2021. "3D Reference Organ for Lymph Node, Male, Right v1.0." https://doi.org/10.48539/hbm699.blks.298. Accessed on March 12, 2021.
+- main-bronchus-female (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Main Bronchus, Female v1.1." https://doi.org/10.48539/HBM266.CXBT.375. Accessed on June 15, 2024.
+- main-bronchus-male (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Main Bronchus, Male v1.1." https://doi.org/10.48539/HBM373.XHXV.928. Accessed on June 15, 2024.
+- mammary-gland-female-left (v1.1): Schlehlein, Heidi. 2024. "3D Reference Organ for Breast (mammary gland), Female left, v1.1." https://doi.org/10.48539/HBM533.BNJL.834. Accessed on June 15, 2024.
+- mammary-gland-female-right (v1.1): Schlehlein, Heidi. 2024. "3D Reference Organ for Breast (mammary gland), Female left, v1.1." https://doi.org/10.48539/HBM235.CHRK.259. Accessed on June 15, 2024.
+- manubrium-female (v1.0): Schlehlein, Heidi. 2024. "3D Reference Organ for manubrium, Female v1.0." https://doi.org/10.48539/HBM668.VJNV.946. Accessed on December 15, 2024.
+- mouth-female (v1.0): Schlehlein, Heidi. 2024. "3D Reference Organ for mouth, Female v1.0." https://doi.org/10.48539/HBM856.VZWZ.422. Accessed on June 15, 2025.
+- mouth-male (v1.0): Schlehlein, Heidi. 2024. "3D Reference Organ for mouth, Female v1.0." https://doi.org/10.48539/HBM568.RFGM.978. Accessed on June 15, 2025.
+- omentum-female (v1.0): Heidi Schlehlein. 2026. *3D reference organ for omentum, Female v1.0.* [https://doi.org/10.48539/HBM636.GWRW.698](https://doi.org/10.48539/HBM636.GWRW.698). Accessed on June 15, 2026.
+- omentum-male (v1.0): Heidi Schlehlein. 2026. *3D reference organ for omentum, Male v1.0.* [https://doi.org/10.48539/HBM428.TMNG.749](https://doi.org/10.48539/HBM428.TMNG.749). Accessed on June 15, 2026.
+- ovary-female-left (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Ovary, Female, Left v1.3." https://doi.org/10.48539/HBM695.KCXS.294. Accessed on December 15, 2024.
+- ovary-female-right (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Ovary, Female, Right v1.3." https://doi.org/10.48539/HBM277.TVMB.676. Accessed on December 15, 2024.
+- palatine-tonsil-female-left (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Palatine Tonsil, Female, Left v1.2." https://doi.org/10.48539/HBM245.VCTP.795. Accessed on June 15, 2025.
+- palatine-tonsil-female-right (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Palatine Tonsil, Female, Right v1.2." https://doi.org/10.48539/HBM549.HTLQ.527. Accessed on June 15, 2025.
+- palatine-tonsil-male-left (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Palatine Tonsil, Male, Left v1.2." https://doi.org/10.48539/HBM366.GHGT.974. Accessed on June 15, 2025.
+- palatine-tonsil-male-right (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Palatine Tonsil, Male, Right v1.2." https://doi.org/10.48539/HBM867.FQCX.589. Accessed on June 15, 2025.
+- pancreas-female (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Pancreas, Female v1.3." https://doi.org/10.48539/HBM866.PNNZ.328. Accessed on June 15, 2024.
+- pancreas-male (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Pancreas, Male v1.3." https://doi.org/10.48539/HBM396.QWWJ.639. Accessed on June 15, 2024.
+- pelvis-female (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Pelvis, Female v1.3." https://doi.org/10.48539/HBM853.VCFM.778. Accessed on June 15, 2024.
+- pelvis-male (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Pelvis, Male v1.3." https://doi.org/10.48539/HBM384.SBWX.873. Accessed on June 15, 2024.
+- placenta-full-term-female (v1.1): Schlehlein, Heidi. 2024. "3D Reference Organ for Placenta, Full Term, Female v1.1." https://doi.org/10.48539/HBM593.ZRJH.644. Accessed on June 15, 2024.
+- prostate-male (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Prostate, Male v1.2." https://doi.org/10.48539/HBM545.CTNV.442. Accessed on June 15, 2024.
+- renal-pelvis-female-left (v1.0): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Renal Pelvis, Female, left v1.0." https://doi.org/10.48539/HBM425.ZSXF.722. Accessed on December 15, 2024.
+- renal-pelvis-female-right (v1.0): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Renal Pelvis, Female, right v1.0." https://doi.org/10.48539/HBM445.MNJL.333. Accessed on December 15, 2021.
+- renal-pelvis-male-left (v1.0): Browne, Kristen, and Heidi Schlehlein. 2024. "3D Reference Organ for Renal Pelvis, Male, Left v1.0." https://doi.org/10.48539/HBM636.ZFCT.453. Accessed on December 15, 2024.
+- renal-pelvis-male-right (v1.0): Browne, Kristen, Heidi Schlehlein, Bruce W. Herr II, Ellen Quardokus, Andreas Bueckle, and Katy Börner. 2024. [*HuBMAP CCF 3D Reference Object Library*.](https://humanatlas.io/3d-reference-library) Accessed on December 15, 2024.
+- skin-female (v1.5): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Skin, Female v1.5*. https://doi.org/10.48539/HBM453.MVPL.398. Accessed on June 15, 2025.
+- skin-male (v1.4): Browne, Kristen. 2024. *3D Reference Organ for Skin, Male v1.4*. https://doi.org/10.48539/HBM953.DCMN.563. Accessed on June 15, 2025.
+- small-intestine-female (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Small Intestine, Female v1.2*. https://doi.org/10.48539/HBM784.FBXB.245. Accessed on June 15, 2024.
+- small-intestine-male (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Small Intestine, Male v1.2*. https://doi.org/10.48539/HBM789.XTDK.794. Accessed on June 15, 2024.
+- spinal-cord-female (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Spinal Cord, Female, v1.1*. https://doi.org/10.48539/HBM242.QQQB.777. Accessed on June 15, 2024.
+- spinal-cord-male (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Spinal Cord, Male, v1.1*. https://doi.org/10.48539/HBM575.VDJW.494. Accessed on June 15, 2024.
+- spleen-female (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Spleen, Female v1.3*. https://doi.org/10.48539/HBM883.DZCZ.658. Accessed on June 15, 2024.
+- spleen-male (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Spleen, Male v1.3*. https://doi.org/10.48539/HBM437.LMTZ.752. Accessed on June 15, 2024.
+- sternum-female (v1.0): Schlehlein, Heidi. 2024. *3D Reference Organ for Sternum, Female v1.0*. https://doi.org/10.48539/HBM669.VLNS.645. Accessed on December 15, 2024.
+- thymus-female (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Thymus, Female v1.3*. https://doi.org/10.48539/HBM962.VFVM.626. Accessed on June 15, 2024.
+- thymus-male (v1.3): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Thymus, Male v1.2*. https://doi.org/10.48539/HBM923.RZCC.934. Accessed on June 15, 2024.
+- trachea-female (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Trachea, Female v1.1*. https://doi.org/10.48539/HBM795.KFPV.358. Accessed on June 15, 2024.
+- trachea-male (v1.1): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Trachea, Male v1.1*. https://doi.org/10.48539/HBM357.VGJC.676. Accessed on June 15, 2024.
+- united-female (v1.10): Browne, Kristen, and Heidi Schlehlein. 2026. *3D Reference Organ Set for Female, v1.10*. https://doi.org/10.48539/HBM637.DWBM.744. Accessed on June 15, 2026.
+- united-male (v1.10): Browne, Kristen, and Heidi Schlehlein. 2026. *3D Reference Organ Set for Male, v1.10*. https://doi.org/10.48539/HBM833.WZWN.425. Accessed on June 15, 2026.
+- ureter-female-left (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Ureter, Female, Left v1.2*. https://doi.org/10.48539/HBM343.JGCD.345. Accessed on June 15, 2024.
+- ureter-female-right (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Ureter, Female, Right v1.2*. https://doi.org/10.48539/HBM375.FNHZ.563. Accessed on June 15, 2024.
+- ureter-male-left (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Ureter, Male, Left v1.2*. https://doi.org/10.48539/HBM434.VLQJ.299. Accessed on June 15, 2024.
+- ureter-male-right (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Ureter, Male, Right v1.2*. https://doi.org/10.48539/HBM852.SVFJ.388. Accessed on June 15, 2024.
+- urinary-bladder-female (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Urinary Bladder, Female v1.2*. https://doi.org/10.48539/HBM595.LMKX.573. Accessed on June 15, 2024.
+- urinary-bladder-male (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Urinary Bladder, Male v1.2*. https://doi.org/10.48539/HBM722.RMHQ.397. Accessed on June 15, 2024.
+- uterus-female (v1.2): Browne, Kristen, and Heidi Schlehlein. 2024. *3D Reference Organ for Uterus v1.1*. https://doi.org/10.48539/HBM627.VTKD.892. Accessed on June 15, 2024.

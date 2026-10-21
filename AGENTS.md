@@ -7,7 +7,8 @@ Visor anatómico 3D libre, web, no comercial, hecho por STEMENSOFT para aprender
 
 ## Estado
 - **Fase 0: cerrada.** Estructura, licencias y registro de atribuciones.
-- **Siguiente: Fase 1** (verificar licencias y descargar modelos). Ver `docs/PLAN_PROYECTO.md`.
+- **Fase 1: cerrada.** Licencias verificadas, modelos descargados en `data/raw/` (BodyParts3D v4.0 + HuBMAP 3D Reference Organs, ambos CC BY 4.0; `TA2.csv` de Z-Anatomy como referencia) y catalogados en `data/metadata/sources.csv`.
+- **Siguiente: Fase 2** (procesamiento de modelos, agrupación por sistemas y generación de `metadata.json`). Ver `docs/PLAN_PROYECTO.md`.
 - Rama `main`. No hay remoto; se configura en la Fase 6. No hagas push.
 
 ## Reglas obligatorias

@@ -10,9 +10,9 @@ Regla: **ningún archivo entra a `data/` sin una fila aquí.**
 
 | ID | Recurso | Autor / Titular | URL | Licencia | Estado verificación | Fecha verif. | Archivo local | Modificaciones | Obligaciones |
 |---|---|---|---|---|---|---|---|---|---|
-| S01 | Z-Anatomy | Equipo Z-Anatomy | https://www.z-anatomy.com | CC BY-SA 4.0 (esperada) | ⏳ pendiente | | `data/raw/z-anatomy/` | | Atribución, indicar cambios, ShareAlike |
-| S02 | BodyParts3D | DBCLS (Database Center for Life Science), Japón | https://lifesciencedb.jp/bp3d/ | CC BY-SA 2.1 JP (esperada) | ⏳ pendiente | | `data/raw/bodyparts3d/` | | Atribución, ShareAlike |
-| S03 | HuBMAP 3D Reference Object Library | HuBMAP / Human Reference Atlas | https://humanatlas.io | CC BY 4.0 (esperada) | ⏳ pendiente | | `data/raw/hubmap/` | | Atribución |
+| S01 | Z-Anatomy (solo `TA2.csv`, sin mallas) | Equipo Z-Anatomy (Gauthier Kervyn et al.) | https://github.com/Z-Anatomy/Models-of-human-anatomy | CC BY-SA 4.0 | ✅ verificado (mallas descartadas por incluir partes NC) | 2026-10-20 | `data/raw/z-anatomy/` | Ninguna (solo consulta de términos; no se redistribuyen sus mallas ni la tabla TA2 completa) | Atribución, indicar cambios, ShareAlike (si se reutiliza contenido) |
+| S02 | BodyParts3D (v4.0, IS-A y PART-OF 99%) | DBCLS (Database Center for Life Science), Japón | https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html | CC BY 4.0 (actualizada 2025-02-27) | ✅ verificado | 2026-10-20 | `data/raw/bodyparts3d/` | Limpieza, renombrado y conversión a GLB (Fase 2) | Atribuir: *"BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International"* e indicar cambios |
+| S03 | HuBMAP 3D Reference Object Library | HuBMAP / Human Reference Atlas (Katy Börner, Kristen Browne et al.) | https://lod.humanatlas.io/ref-organ | CC BY 4.0 | ✅ verificado | 2026-10-20 | `data/raw/hubmap/` | Integración y normalización de metadatos (Fase 2) | Atribución a HuBMAP CCF 3D Reference Object Library + cita/DOI por órgano e indicar cambios |
 | S04 | NIH 3D | Varios autores | https://3d.nih.gov | Varía por modelo | ⏳ pendiente | | | | Revisar cada modelo; evitar NC/ND |
 
 ## Ontologías y terminología
@@ -64,6 +64,6 @@ Verificado por / fecha:
 
 ## Texto de atribución para mostrar en la UI (borrador)
 
-> Modelos 3D basados en Z-Anatomy y BodyParts3D (DBCLS), con licencia CC BY-SA.
+> Modelos 3D basados en **BodyParts3D** (© The Database Center for Life Science, CC BY 4.0) y **HuBMAP CCF 3D Reference Object Library** (CC BY 4.0).
 > Modificados para este proyecto (limpieza, nombrado y compresión).
 > Este contenido derivado se distribuye bajo CC BY-SA 4.0.

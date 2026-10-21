@@ -1,0 +1,6 @@
+Los 3D Reference Organs del HuBMAP Human Reference Atlas se publican bajo
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+Evidencia: campo "license" de los metadatos oficiales https://lod.humanatlas.io/ref-organ/<organo>/latest
+(consultado el 2026-10-20). Ver también hubmap/metadatos/*.json.

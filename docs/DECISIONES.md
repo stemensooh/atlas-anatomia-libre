@@ -2,6 +2,21 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-20 · D-005 · Confirmación de supuestos iniciales (Sección 0)
+- **Contexto:** Revisión de los supuestos base de `docs/PLAN_PROYECTO.md` al iniciar la Fase 1.
+- **Decisión:** Se confirman los supuestos de la sección 0: plataforma web (escritorio primero), stack TypeScript + React + Three.js (`react-three-fiber`) + Vite, sin backend inicial (sitio estático), UI en español con respaldo en latín/inglés y presupuesto \$0.
+- **Consecuencia:** Se mantiene la arquitectura prevista para las Fases 2 y 3.
+
+## 2026-10-20 · D-004 · Fuentes 3D base: BodyParts3D + HuBMAP (ambas CC BY 4.0); mallas de Z-Anatomy descartadas
+- **Contexto:** Al verificar las licencias oficiales en la Fase 1:
+  1. `License.txt` de Z-Anatomy declara CC BY-SA 4.0 global, pero incluye modelos adaptados bajo licencias **no comerciales** (*"Anatomy of the Inner Ear"* CC BY-NC-SA 4.0 y *"Kidney"* CC BY-NC 4.0) y otros sin licencia explícita (*"Brainder"* / *"White matter"*), lo que incumple la regla 3 del proyecto.
+  2. El archivo oficial de BodyParts3D en NBDC/DBCLS actualizó su licencia el 2025-02-27 a **CC BY 4.0** (antes CC BY-SA 2.1 JP).
+  3. La librería de órganos 3D de referencia de HuBMAP (masculinos y femeninos) está publicada directamente en `.glb` bajo **CC BY 4.0** con mapeos a UBERON/FMA (`crosswalk.csv`).
+- **Decisión:**
+  - Usar **BodyParts3D v4.0** (conjuntos `isa_BP3D_4.0_obj_99` y `partof_BP3D_4.0_obj_99`) y **HuBMAP 3D Reference Object Library** (órganos masculinos y femeninos) como únicas fuentes de mallas 3D.
+  - Descargar de **Z-Anatomy** únicamente `TA2.csv`, `Readme.md` y `License.txt` como referencia de nomenclatura y traducción (sin usar sus mallas `.blend`/`.zip` ni redistribuir la tabla TA2 completa).
+- **Consecuencia:** Todas las mallas fuente del proyecto son **CC BY 4.0** limpias (sin cláusulas NC ni ND), compatibles con nuestra licencia de contenido y además los órganos de HuBMAP ya vienen en formato `.glb`.
+
 ## 2026-10-20 · D-003 · Rama main, titular STEMENSOFT, remoto en Fase 6
 - **Decisión:** rama principal `main`; copyright de código y contenido original a nombre de STEMENSOFT; el repositorio remoto se configura en la Fase 6.
 - **Consecuencia:** no se hace push hasta entonces.

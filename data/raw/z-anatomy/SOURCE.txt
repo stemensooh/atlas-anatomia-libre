@@ -1,0 +1,16 @@
+Recurso: Z-Anatomy — Models-of-human-anatomy (solo metadatos de referencia)
+URL de origen: https://github.com/Z-Anatomy/Models-of-human-anatomy
+Versión: rama por defecto (HEAD) a la fecha de descarga
+Fecha de descarga: 2026-10-20
+Licencia (nombre y URL): CC BY-SA 4.0 — https://creativecommons.org/licenses/by-sa/4.0/
+Copia de la licencia guardada en: LICENSE-License.txt
+SHA-256 de la descarga:
+  196b66b56551a862e59872f7cdb70e6d9a6ad84e9105962fca8ec28c14e97520  LICENSE-License.txt  (2754 bytes)
+  196b66b56551a862e59872f7cdb70e6d9a6ad84e9105962fca8ec28c14e97520  License.txt  (2754 bytes)
+  2439e8ccea759c644bbaf2f6fd48551fe054bfda30fd3d97d8384f75273466b3  Readme.md  (4243 bytes)
+  0f9092a328b27dcd15d696d9f9a4087deb229a1aad21b75876657622de835974  TA2.csv  (1510396 bytes)
+
+NO se descargan las mallas (Z-Anatomy.zip): incluyen material CC BY-NC y CC BY-NC-SA
+y modelos sin licencia explícita. Ver docs/DECISIONES.md D-004.
+TA2.csv: tabla completa de Terminologia Anatomica 2 con traducciones. Solo consulta;
+no redistribuir la tabla completa (ver PLAN_PROYECTO 1.4).

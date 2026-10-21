@@ -1,6 +1,6 @@
 # Plan de proyecto: Visor anatómico 3D libre y propio
 
-> Estado: v0.2 · Fase 0 cerrada · Fecha: 2026-10-20
+> Estado: v0.3 · Fase 1 cerrada · Fecha: 2026-10-20
 > Alcance: proyecto de aprendizaje, **no comercial**, con código y contenido abiertos.
 > Aviso: las licencias de este documento son un resumen de lo que conozco. **Verifica la licencia en la página oficial de cada recurso antes de descargarlo**, y registra la verificación en `docs/ATTRIBUTIONS.md` (Fase 0).
 
@@ -109,14 +109,14 @@ Repositorio inicial + `ATTRIBUTIONS.md` vacío pero con formato + licencias eleg
 
 ### 1.1 Fuentes primarias (recomendadas)
 
-| # | Fuente | Qué aporta | Licencia (a verificar) | Obligaciones |
+| # | Fuente | Qué aporta | Licencia verificada (2026-10-20) | Obligaciones |
 |---|---|---|---|---|
-| 1 | **Z-Anatomy** (z-anatomy.com, GitHub: Z-Anatomy) | Atlas completo en Blender, con estructuras nombradas en latín, jerarquía por sistemas y texturas | **CC BY-SA 4.0** | Atribución, indicar cambios, compartir derivados con la misma licencia |
-| 2 | **BodyParts3D** (DBCLS, Japón; Anatomography) | Más de 1.500 mallas (OBJ/STL) con ids de la **FMA** | **CC BY-SA 2.1 JP** (verificar si existe versión más reciente) | Atribución a "The Database Center for Life Science" y ShareAlike |
-| 3 | **HuBMAP Human Reference Atlas, 3D Reference Object Library** | Órganos de referencia en GLB con metadatos y ontologías (UBERON/FMA) | **CC BY 4.0** | Atribución |
+| 1 | **Z-Anatomy** (z-anatomy.com, GitHub: Z-Anatomy) | `TA2.csv` como referencia de nombres; **mallas descartadas** por incluir modelos CC BY-NC / CC BY-NC-SA (ver D-004) | **CC BY-SA 4.0** (con partes NC excluidas) | Solo consulta de términos; no redistribuir mallas ni tabla TA2 completa |
+| 2 | **BodyParts3D** (DBCLS, Japón; Anatomography) | Más de 1.500 mallas (OBJ) con ids de la **FMA** (árboles IS-A y PART-OF) | **CC BY 4.0** (actualizada 2025-02-27) | Atribución a "The Database Center for Life Science" e indicar cambios |
+| 3 | **HuBMAP Human Reference Atlas, 3D Reference Object Library** | Órganos de referencia masculinos y femeninos en GLB con metadatos y ontologías (`crosswalk.csv` UBERON/FMA) | **CC BY 4.0** | Atribución a HuBMAP CCF 3D Reference Object Library + cita por órgano |
 | 4 | **NIH 3D** (3d.nih.gov) | Modelos de ciencias de la salud, de varios autores | **Varía por modelo** (CC0, CC BY, dominio público...) | Revisar cada modelo; evitar los NC o ND |
 
-> **Z-Anatomy se construye sobre BodyParts3D.** No los trates como dos fuentes independientes: Z-Anatomy ya limpió, nombró y mejoró parte de ese trabajo. Empieza por Z-Anatomy y usa BodyParts3D como referencia o para estructuras faltantes.
+> **Decisión Fase 1 (D-004):** Usamos **BodyParts3D v4.0** y **HuBMAP 3D Reference Organs** (ambos CC BY 4.0) como fuentes de geometría 3D, y `TA2.csv` de Z-Anatomy solo para consulta de nomenclatura.
 
 ### 1.2 Fuentes secundarias (opcionales)
 
@@ -154,12 +154,12 @@ Puedes consultar UBERON/FMA con el servicio **EMBL-EBI OLS** (hay un skill dispo
 | **Redacción propia** | La que elijas | Lo más limpio legalmente, y aprendes más |
 
 ### Tareas
-- [ ] Descargar Z-Anatomy (archivo `.blend` y/o exportaciones) y guardarlo en `data/raw/z-anatomy/`.
-- [ ] Descargar el conjunto de BodyParts3D de referencia en `data/raw/bodyparts3d/`.
-- [ ] Descargar los órganos de HuBMAP si necesitas complementar.
-- [ ] Por cada descarga: `SOURCE.txt` con URL, fecha, versión, hash y **captura/copia del texto de licencia**.
-- [ ] Rellenar `ATTRIBUTIONS.md`.
-- [ ] Catalogar en `data/metadata/sources.csv`.
+- [x] Descargar referencia de Z-Anatomy (`TA2.csv`, `License.txt`, `Readme.md`; sin mallas por D-004) en `data/raw/z-anatomy/`.
+- [x] Descargar el conjunto de BodyParts3D de referencia (`isa_BP3D_4.0_obj_99.zip`, `partof_BP3D_4.0_obj_99.zip` y tablas) en `data/raw/bodyparts3d/`.
+- [x] Descargar los órganos de HuBMAP (masculinos y femeninos en `.glb` + `crosswalk.csv`) en `data/raw/hubmap/`.
+- [x] Por cada descarga: `SOURCE.txt` con URL, fecha, versión, hash y **captura/copia del texto de licencia**.
+- [x] Rellenar `ATTRIBUTIONS.md`.
+- [x] Catalogar en `data/metadata/sources.csv`.
 
 ### Criterio de salida
 Toda malla en `data/raw/` tiene su licencia documentada y compatible con tu plan (CC BY / CC BY-SA / CC0 / dominio público).
@@ -387,9 +387,8 @@ Cada fase se cierra solo si:
 2. `ATTRIBUTIONS.md` está al día.
 3. Hay una nota en `docs/DECISIONES.md` si hubo cambios de rumbo.
 
-## 5. Próximos pasos inmediatos
+## 5. Próximos pasos inmediatos (Fase 2)
 
-1. Confirmar los supuestos de la sección 0.
-2. Elegir la licencia del código (MIT, Apache-2.0 o AGPL-3.0).
-3. Ejecutar la Fase 0: estructura de carpetas y `ATTRIBUTIONS.md`.
-4. Verificar en las páginas oficiales las licencias de Z-Anatomy, BodyParts3D y HuBMAP.
+1. Descomprimir e inventariar las mallas de BodyParts3D (`isa`/`partof`) y los `.glb` + `crosswalk.csv` de HuBMAP.
+2. Definir el script de agrupación por sistema anatómico (`skeletal`, `muscular`, `circulatory`, etc.) usando los IDs FMA/UBERON.
+3. Convertir los `.obj` de BodyParts3D a `.glb`, optimizar con `glTF-Transform` / `meshoptimizer` y generar `data/processed/metadata.json`.

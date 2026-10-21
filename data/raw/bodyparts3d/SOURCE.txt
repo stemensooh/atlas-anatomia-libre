@@ -1,0 +1,21 @@
+Recurso: BodyParts3D (Database Center for Life Science, DBCLS)
+URL de origen: https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html
+Versión: BP3D 4.0 (LATEST, licencia actualizada 2025-02-27)
+Fecha de descarga: 2026-10-20
+Licencia (nombre y URL): CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/legalcode.en
+Copia de la licencia guardada en: LICENSE-lic.html
+SHA-256 de la descarga:
+  4b10475026c1497c7015ccc0bc9e0ef5fcb6a2809fb11a9c031896c98dbe1a5c  download.html  (20945 bytes)
+  40665852c49f218326590e204db91064a1ecfc3c6f8cbd7bbbcaac62c7cd409e  isa_BP3D_4.0_obj_99.zip  (142903898 bytes)
+  a3de74423f943b0d724ae8f59b3a817f87c423a544f8db98113b1980817cbeaf  isa_element_parts.txt  (1142159 bytes)
+  26e7d818e03a8c909fe09c561f38d0d513423c87681f9450a803bc38f5b07564  isa_inclusion_relation_list.txt  (207664 bytes)
+  ab7796deedd49205e77f3609a1cb8c53e2bbee14ecb5c9a6ca05227469780513  isa_parts_list_e.txt  (128086 bytes)
+  72af19b85cf34bc322afe916dbe7adb36c52390f8316df102fb1296b9fafb5a5  lic.html  (14694 bytes)
+  72af19b85cf34bc322afe916dbe7adb36c52390f8316df102fb1296b9fafb5a5  LICENSE-lic.html  (14694 bytes)
+  9fbc713fffeee924a5a657d9813d84d7eb957bded63adb854931dd5e3eb61c97  partof_BP3D_4.0_obj_99.zip  (64888505 bytes)
+  3f5f6df1028eb122b30de77c711597b6bb8e5541658e5985859fd228adbf88ea  partof_element_parts.txt  (651179 bytes)
+  1b40738270931e3c1d955ce34e0fce0d8d10d8c5ad543463e40b4b4c0243007c  partof_inclusion_relation_list.txt  (91241 bytes)
+  9224080557053e6f1322f1e13ab27f0ecde0db19bb3b505f0631afad230eeebd  partof_parts_list_e.txt  (59351 bytes)
+  f9a90b4d945ad0fe50db45c712e931aa54e52667187b30d7085b6cc394f40107  README_e.html  (19263 bytes)
+
+Atribución exigida: "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International".
