@@ -1,0 +1,9 @@
+Copia este archivo como SOURCE.txt dentro de cada carpeta de descarga.
+
+Recurso:
+URL de origen:
+Versión:
+Fecha de descarga:
+Licencia (nombre y URL):
+Copia de la licencia guardada en:
+SHA-256 de la descarga:

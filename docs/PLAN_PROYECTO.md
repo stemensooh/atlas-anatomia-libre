@@ -1,0 +1,395 @@
+# Plan de proyecto: Visor anatómico 3D libre y propio
+
+> Estado: v0.2 · Fase 0 cerrada · Fecha: 2026-10-20
+> Alcance: proyecto de aprendizaje, **no comercial**, con código y contenido abiertos.
+> Aviso: las licencias de este documento son un resumen de lo que conozco. **Verifica la licencia en la página oficial de cada recurso antes de descargarlo**, y registra la verificación en `docs/ATTRIBUTIONS.md` (Fase 0).
+
+---
+
+## 0. Supuestos (cámbialos si no aplican)
+
+| Tema | Supuesto |
+|---|---|
+| Plataforma | Web (navegador de escritorio primero, móvil después) |
+| Stack | TypeScript + React + Three.js (react-three-fiber), Vite |
+| Backend | Ninguno al inicio (sitio estático). API + BD en la Fase 5 |
+| Objetivo | Aprender y publicar algo propio y libre, no competir con BioDigital |
+| Idioma de UI | Español (con nombres anatómicos en latín/inglés como respaldo) |
+| Presupuesto | $0 (hosting gratuito: GitHub Pages, Cloudflare Pages o Netlify) |
+
+## 1. Objetivos y no-objetivos
+
+**Objetivos**
+1. Visor 3D interactivo del cuerpo humano con capas por sistema.
+2. Selección de estructuras con nombre y descripción.
+3. Búsqueda, aislar/ocultar/transparencia, y cortes (clipping).
+4. Contenido didáctico propio: tours y cuestionarios.
+5. Cumplir todas las licencias, con atribución visible y trazable.
+
+**No-objetivos (por ahora)**
+- Uso clínico o diagnóstico. Debe incluir un aviso de que es solo educativo.
+- Patologías detalladas al nivel de BioDigital.
+- Monetización.
+- Datos de pacientes reales. Solo datasets públicos y anonimizados.
+
+---
+
+## 2. Mapa de fases
+
+```mermaid
+flowchart LR
+    F0["Fase 0<br/>Fundamentos y licencias"] --> F1["Fase 1<br/>Adquisición de modelos"]
+    F1 --> F2["Fase 2<br/>Procesamiento de modelos"]
+    F2 --> F3["Fase 3<br/>Visor MVP"]
+    F3 --> F4["Fase 4<br/>Funciones didácticas"]
+    F4 --> F5["Fase 5<br/>Backend y cuentas (opcional)"]
+    F5 --> F6["Fase 6<br/>Publicación y comunidad"]
+    F2 -.-> F7["Fase 7 (opcional)<br/>Modelos propios desde CT"]
+```
+
+| Fase | Resultado | Duración estimada* |
+|---|---|---|
+| 0 | Repositorio, licencias, política de atribución | 2-3 días |
+| 1 | Modelos fuente descargados y catalogados | 3-5 días |
+| 2 | Modelos limpios, nombrados y comprimidos (GLB) | 1-2 semanas |
+| 3 | Visor funcional con capas y selección | 2-3 semanas |
+| 4 | Búsqueda, cortes, tours, cuestionarios | 3-4 semanas |
+| 5 | API, BD y cuentas | 2-3 semanas |
+| 6 | Sitio público, documentación, CI | 1 semana |
+| 7 | Segmentación propia desde CT | 3+ semanas |
+
+\* Estimaciones para una persona aprendiendo, a tiempo parcial. Ajústalas.
+
+---
+
+## FASE 0: Fundamentos y licencias
+
+**Objetivo:** dejar el proyecto legalmente ordenado antes de tocar un solo modelo.
+
+### Tareas
+- [x] Crear repositorio Git con esta estructura:
+  ```
+  biologia/
+  ├─ docs/                  # planificación y documentación
+  │  ├─ PLAN_PROYECTO.md
+  │  ├─ ATTRIBUTIONS.md     # tabla de fuentes y licencias verificadas
+  │  └─ DECISIONES.md       # registro de decisiones técnicas (ADR cortos)
+  ├─ data/
+  │  ├─ raw/                # descargas originales (NO se editan)
+  │  ├─ processed/          # modelos procesados
+  │  └─ metadata/           # CSV/JSON de estructuras
+  ├─ scripts/               # automatización (Python/Node)
+  ├─ web/                   # aplicación frontend
+  └─ LICENSE-CODE, LICENSE-CONTENT
+  ```
+- [x] Decidir **licencia del código** y **licencia del contenido** por separado (ver 2.1).
+- [x] Crear `docs/ATTRIBUTIONS.md` con columnas: *Recurso, Autor, URL, Licencia, Fecha de verificación, Archivo local, Modificaciones, Obligaciones*.
+- [x] Plantilla `data/raw/SOURCE.template.txt` creada (se copia como `SOURCE.txt` en cada descarga) · Añadir en `data/raw/` un archivo `SOURCE.txt` por cada descarga, con URL, fecha y hash SHA-256.
+- [x] Aviso legal/educativo incluido en `README.md` (el del pie del sitio se hará en la Fase 3).
+
+### 2.1 Estrategia de licencias del proyecto
+
+| Componente | Licencia recomendada | Motivo |
+|---|---|---|
+| Código propio | **MIT** o **Apache-2.0** (o **AGPL-3.0** si quieres forzar que las mejoras sean libres) | Compatible con las dependencias (MIT/BSD/Apache) |
+| Modelos 3D derivados de Z-Anatomy / BodyParts3D | **CC BY-SA 4.0** (obligatoria por ShareAlike) | Las obras derivadas deben usar la misma licencia |
+| Textos propios (descripciones, cuestionarios) | **CC BY 4.0** o **CC BY-SA 4.0** | Si copias texto de Wikipedia debe ser CC BY-SA |
+| Documentación | CC BY 4.0 | Simple |
+
+> **Regla de oro:** mantén el **código** y el **contenido** en carpetas y licencias separadas. Así la cláusula ShareAlike del contenido no "contagia" tu código.
+
+### Entregable
+Repositorio inicial + `ATTRIBUTIONS.md` vacío pero con formato + licencias elegidas.
+
+---
+
+## FASE 1: Adquisición de modelos (diseños) y fuentes
+
+**Objetivo:** conseguir geometría anatómica con licencia que permita uso libre, modificación y redistribución.
+
+### 1.1 Fuentes primarias (recomendadas)
+
+| # | Fuente | Qué aporta | Licencia (a verificar) | Obligaciones |
+|---|---|---|---|---|
+| 1 | **Z-Anatomy** (z-anatomy.com, GitHub: Z-Anatomy) | Atlas completo en Blender, con estructuras nombradas en latín, jerarquía por sistemas y texturas | **CC BY-SA 4.0** | Atribución, indicar cambios, compartir derivados con la misma licencia |
+| 2 | **BodyParts3D** (DBCLS, Japón; Anatomography) | Más de 1.500 mallas (OBJ/STL) con ids de la **FMA** | **CC BY-SA 2.1 JP** (verificar si existe versión más reciente) | Atribución a "The Database Center for Life Science" y ShareAlike |
+| 3 | **HuBMAP Human Reference Atlas, 3D Reference Object Library** | Órganos de referencia en GLB con metadatos y ontologías (UBERON/FMA) | **CC BY 4.0** | Atribución |
+| 4 | **NIH 3D** (3d.nih.gov) | Modelos de ciencias de la salud, de varios autores | **Varía por modelo** (CC0, CC BY, dominio público...) | Revisar cada modelo; evitar los NC o ND |
+
+> **Z-Anatomy se construye sobre BodyParts3D.** No los trates como dos fuentes independientes: Z-Anatomy ya limpió, nombró y mejoró parte de ese trabajo. Empieza por Z-Anatomy y usa BodyParts3D como referencia o para estructuras faltantes.
+
+### 1.2 Fuentes secundarias (opcionales)
+
+| Fuente | Uso | Cuidado |
+|---|---|---|
+| **Visible Human Project** (NLM) | Cortes reales para texturas o segmentación | Requiere aceptar el acuerdo de licencia de la NLM. Léelo antes de redistribuir |
+| **TCIA** (The Cancer Imaging Archive) | CT/MRI para la Fase 7 | La licencia **varía por colección** (CC BY 3.0/4.0 o CC BY-NC). Evita datasets con restricciones que no entiendas |
+| **TotalSegmentator dataset** (Zenodo) | CT anotados con 100+ estructuras | Verifica la licencia del dataset (publicado con CC BY 4.0, confirmar) |
+| **Sketchfab** | Modelos sueltos | **Solo** filtrar por CC0 / CC BY / CC BY-SA. Revisa cada uno |
+| **Wikimedia Commons** | Imágenes y algunos modelos | Cada archivo tiene su licencia |
+
+### 1.3 Qué evitar
+- Modelos de **BioDigital, Visible Body, Complete Anatomy, Zygote/TurboSquid, 3D4Medical**: son propietarios. **No extraigas ni uses sus modelos**, aunque puedas verlos en el navegador.
+- Cualquier recurso con licencia **NC** (no comercial) o **ND** (sin derivadas) si vas a modificar y redistribuir.
+- Recursos sin licencia explícita: se asume "todos los derechos reservados".
+- Modelos de cuerpo basados en escaneos de personas identificables sin consentimiento claro.
+
+### 1.4 Ontologías y terminología (para nombres e IDs)
+
+| Recurso | Uso | Licencia (a verificar) |
+|---|---|---|
+| **FMA** (Foundational Model of Anatomy) | IDs y jerarquía anatómica | CC BY 3.0 |
+| **UBERON** | Ontología de anatomía multiespecie | CC BY 3.0 |
+| **Terminologia Anatomica** | Nombres oficiales | Los nombres se pueden citar, pero **no copies tablas completas**. Usa FMA/UBERON como columna vertebral |
+
+Puedes consultar UBERON/FMA con el servicio **EMBL-EBI OLS** (hay un skill disponible en este entorno).
+
+### 1.5 Fuentes de texto didáctico
+
+| Fuente | Licencia | Notas |
+|---|---|---|
+| **Wikipedia (es/en)** | CC BY-SA 4.0 | Se puede reutilizar con atribución y ShareAlike |
+| **OpenStax Anatomy & Physiology** | CC BY 4.0 | Libro completo, ideal para descripciones |
+| **Gray's Anatomy (1918)** | Dominio público | Texto y láminas antiguas, con terminología desactualizada |
+| **Redacción propia** | La que elijas | Lo más limpio legalmente, y aprendes más |
+
+### Tareas
+- [ ] Descargar Z-Anatomy (archivo `.blend` y/o exportaciones) y guardarlo en `data/raw/z-anatomy/`.
+- [ ] Descargar el conjunto de BodyParts3D de referencia en `data/raw/bodyparts3d/`.
+- [ ] Descargar los órganos de HuBMAP si necesitas complementar.
+- [ ] Por cada descarga: `SOURCE.txt` con URL, fecha, versión, hash y **captura/copia del texto de licencia**.
+- [ ] Rellenar `ATTRIBUTIONS.md`.
+- [ ] Catalogar en `data/metadata/sources.csv`.
+
+### Criterio de salida
+Toda malla en `data/raw/` tiene su licencia documentada y compatible con tu plan (CC BY / CC BY-SA / CC0 / dominio público).
+
+---
+
+## FASE 2: Procesamiento de modelos
+
+**Objetivo:** convertir las fuentes en un conjunto **ligero, nombrado y consistente** que cargue rápido en el navegador.
+
+### 2.1 Herramientas (todas libres)
+
+| Herramienta | Uso | Licencia |
+|---|---|---|
+| **Blender** | Abrir `.blend`, limpiar, reorganizar, exportar GLB | GPL (los modelos exportados no heredan GPL) |
+| **glTF-Transform** (CLI/Node) | Optimizar, deduplicar, comprimir | MIT |
+| **gltfpack / meshoptimizer** | Simplificar y comprimir mallas | MIT |
+| **Draco** | Compresión de geometría | Apache-2.0 |
+| **MeshLab** | Reparar y decimar mallas | GPL |
+| **Python (trimesh, pandas)** | Scripts de catalogación | MIT / BSD |
+
+### 2.2 Pipeline
+
+```mermaid
+flowchart TD
+    A["data/raw: .blend / OBJ / STL"] --> B["Blender: importar, limpiar, agrupar por sistema"]
+    B --> C["Nombrar mallas con ID FMA/UBERON"]
+    C --> D["Exportar GLB por sistema"]
+    D --> E["glTF-Transform: dedup, simplify, meshopt/Draco"]
+    E --> F["data/processed/*.glb"]
+    C --> G["Generar metadata.json"]
+    G --> F
+```
+
+### 2.3 Convenciones
+
+- **Un GLB por sistema**: `skeletal.glb`, `muscular.glb`, `circulatory.glb`, `nervous.glb`, `digestive.glb`, `respiratory.glb`, `urinary.glb`, `reproductive.glb`, `lymphatic.glb`, `integumentary.glb`.
+- Nombre de cada malla: `FMA12345_Femur_R` (ID estable + nombre + lado).
+- Metadatos por estructura en `metadata.json`:
+  ```json
+  {
+    "id": "FMA9611",
+    "meshName": "FMA9611_Femur_R",
+    "nameLa": "Femur",
+    "nameEs": "Fémur",
+    "nameEn": "Femur",
+    "system": "skeletal",
+    "parentId": "FMA24474",
+    "side": "right",
+    "source": "z-anatomy",
+    "license": "CC BY-SA 4.0",
+    "descriptionEs": ""
+  }
+  ```
+  (los IDs son ilustrativos: verifícalos contra FMA)
+- **Presupuesto de rendimiento:** total ≤ 30-50 MB comprimido para la carga inicial; cargar el resto bajo demanda (lazy loading por sistema).
+- Colores y materiales unificados por sistema.
+
+### Tareas
+- [ ] Importar Z-Anatomy en Blender y listar colecciones/sistemas.
+- [ ] Script de Blender (Python) para exportar un GLB por colección.
+- [ ] Pipeline de optimización con glTF-Transform en `scripts/optimize.mjs`.
+- [ ] Script que genere `metadata.json` a partir de los nombres de malla.
+- [ ] Validar cada GLB con `gltf-validator`.
+- [ ] Anotar en `ATTRIBUTIONS.md` las **modificaciones realizadas** (requisito de CC BY).
+- [ ] Añadir un `LICENSE` y créditos dentro de los `extras` del glTF (asset.copyright).
+
+### Criterio de salida
+10 GLB optimizados + `metadata.json` válido, con peso dentro del presupuesto.
+
+---
+
+## FASE 3: Visor MVP
+
+**Objetivo:** una página web donde se vea el cuerpo, se pueda manipular y seleccionar.
+
+### 3.1 Stack
+
+| Capa | Opción | Licencia |
+|---|---|---|
+| Build | Vite + TypeScript | MIT |
+| UI | React | MIT |
+| 3D | three.js + @react-three/fiber + drei | MIT |
+| Estado | Zustand | MIT |
+| Estilos | Tailwind CSS (o CSS Modules) | MIT |
+| Tests | Vitest + Playwright | MIT / Apache-2.0 |
+
+*Alternativa:* Babylon.js (Apache-2.0), con más herramientas integradas.
+
+### 3.2 Funciones del MVP
+1. Carga de GLB por sistema, con barra de progreso.
+2. Cámara orbital (rotar, zoom, desplazar), con botones de vistas (frontal, posterior, lateral).
+3. **Panel de capas:** activar/desactivar y ajustar opacidad por sistema.
+4. **Selección por clic** (raycasting): resaltar la estructura y mostrar su nombre.
+5. Panel lateral con ficha de la estructura (nombre ES/LA/EN, sistema, descripción).
+6. Aislar, ocultar, restablecer.
+7. **Créditos y licencias** accesibles desde la UI (pie de página y página `/creditos`).
+
+### 3.3 Arquitectura del frontend
+
+```
+web/src/
+├─ components/   (Viewer, LayerPanel, InfoPanel, SearchBar)
+├─ three/        (loaders, picking, materiales, clipping)
+├─ store/        (estado: capas, selección, cámara)
+├─ data/         (carga de metadata.json)
+└─ pages/        (Home, Creditos, Acerca)
+```
+
+### Tareas
+- [ ] Inicializar `web/` con Vite + React + TS.
+- [ ] Cargar un GLB (esqueleto) y mostrarlo con luces y cámara.
+- [ ] Implementar raycasting y resaltado (outline o emisivo).
+- [ ] Panel de capas conectado al estado.
+- [ ] Panel de información leyendo `metadata.json`.
+- [ ] Página de créditos generada desde `ATTRIBUTIONS.md`.
+- [ ] Despliegue de prueba en hosting gratuito.
+
+### Criterio de salida
+Se puede abrir el sitio, navegar el cuerpo, ocultar sistemas y ver la ficha de una estructura con su atribución.
+
+---
+
+## FASE 4: Funciones didácticas
+
+**Objetivo:** convertir el visor en una herramienta de estudio.
+
+| Función | Descripción | Técnica |
+|---|---|---|
+| Búsqueda | Por nombre en ES/LA/EN, con autocompletado | Fuse.js (Apache-2.0) o MiniSearch (MIT) |
+| Jerarquía | Árbol de estructuras (sistema → región → órgano) | `parentId` de FMA |
+| Cortes | Planos de corte axial/sagital/coronal | `clippingPlanes` de three.js |
+| Etiquetas | Líneas guía con texto anclado a 3D | drei `Html` / sprites |
+| Tours | Secuencias de cámara + estructuras resaltadas + texto | JSON de pasos |
+| Cuestionarios | "Haz clic en el fémur", opción múltiple, identificar etiquetas | JSON + lógica propia |
+| Modo oscuro / accesibilidad | Teclado, contraste, lectores de pantalla | ARIA |
+| i18n | ES / EN | i18next (MIT) |
+
+### Contenido
+- Redactar descripciones breves para **al menos 100 estructuras clave** (huesos largos, músculos principales, corazón, pulmones, hígado, riñones, encéfalo...).
+- Fuentes permitidas: redacción propia, OpenStax (CC BY 4.0), Wikipedia (CC BY-SA 4.0, con atribución).
+- Cada texto registra su fuente en `metadata.json` (`descriptionSource`).
+
+### Criterio de salida
+Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.
+
+---
+
+## FASE 5: Backend y cuentas (opcional)
+
+**Objetivo:** guardar progreso, notas y resultados.
+
+- API: **FastAPI** (MIT) o **Node + Fastify** (MIT).
+- BD: **SQLite** al inicio, luego **PostgreSQL**.
+- Autenticación: sesiones propias o un proveedor libre/autohospedable.
+- Funciones: guardar vistas, notas por estructura, historial de cuestionarios.
+- Privacidad: guarda lo mínimo, explica qué datos almacenas, sin analítica invasiva.
+
+### Criterio de salida
+Un usuario puede registrarse, guardar una vista y recuperar sus resultados.
+
+---
+
+## FASE 6: Publicación y comunidad
+
+- Hosting estático (GitHub Pages / Cloudflare Pages / Netlify) y CDN para los GLB.
+- CI/CD con GitHub Actions: lint, tests, validación de GLB, verificación de que `ATTRIBUTIONS.md` cubra todos los archivos de `data/`.
+- `README.md` con capturas, instrucciones de ejecución y licencias.
+- `CONTRIBUTING.md` con reglas de licencia para aportes de contenido.
+- Aviso educativo (no sustituye consejo médico) visible en el sitio.
+- Repositorio público con las dos licencias (código y contenido).
+
+### Lista de verificación legal antes de publicar
+- [ ] Cada modelo tiene atribución visible: título, autor, fuente, licencia y enlace.
+- [ ] Se indican las modificaciones realizadas.
+- [ ] Los derivados de CC BY-SA se publican bajo CC BY-SA 4.0.
+- [ ] Se incluye copia o enlace de cada licencia.
+- [ ] No hay material NC/ND ni propietario mezclado.
+- [ ] Los textos copiados cumplen su licencia (Wikipedia: BY-SA).
+- [ ] No hay marcas ni logotipos de terceros que sugieran respaldo.
+
+---
+
+## FASE 7 (opcional): Modelos propios desde CT/MRI
+
+**Objetivo:** aprender el flujo de imagen médica generando mallas propias.
+
+```mermaid
+flowchart LR
+    A["Dataset CT público (TCIA / Zenodo)"] --> B["TotalSegmentator"]
+    B --> C["Máscaras NIfTI"]
+    C --> D["3D Slicer: segmentación a malla"]
+    D --> E["Blender: limpieza"]
+    E --> F["GLB optimizado"]
+```
+
+| Herramienta | Licencia (a verificar) |
+|---|---|
+| **TotalSegmentator** | Código Apache-2.0. Algunos modelos de tareas específicas pueden tener restricciones comerciales; en uso no comercial no te afecta, pero léelo |
+| **3D Slicer** | Licencia estilo BSD |
+| **Cornerstone3D / VTK.js** | MIT / BSD |
+
+Reglas:
+- Usa únicamente datasets públicos y anonimizados, con licencia verificada.
+- Evita colecciones con licencia que prohíba redistribuir derivados.
+- Registra el dataset, su licencia y la versión del modelo de segmentación en `ATTRIBUTIONS.md`.
+
+---
+
+## 3. Riesgos y mitigación
+
+| Riesgo | Impacto | Mitigación |
+|---|---|---|
+| Mezclar material con licencias incompatibles | Alto | Fase 0 y 1: registro estricto, revisión previa |
+| Modelos demasiado pesados | Medio | Compresión, LOD y carga por sistema (Fase 2) |
+| Nombres anatómicos inconsistentes | Medio | IDs FMA/UBERON como clave primaria |
+| Alcance excesivo | Alto | MVP primero. Las fases 5 y 7 son opcionales |
+| Errores en el contenido médico | Medio | Fuentes abiertas fiables, aviso educativo, revisión por un docente o estudiante avanzado |
+| Cambios de licencia en el origen | Bajo | Guardar copia de la licencia y fecha de verificación |
+
+## 4. Definición de "hecho" por fase
+
+Cada fase se cierra solo si:
+1. Los entregables existen y están versionados.
+2. `ATTRIBUTIONS.md` está al día.
+3. Hay una nota en `docs/DECISIONES.md` si hubo cambios de rumbo.
+
+## 5. Próximos pasos inmediatos
+
+1. Confirmar los supuestos de la sección 0.
+2. Elegir la licencia del código (MIT, Apache-2.0 o AGPL-3.0).
+3. Ejecutar la Fase 0: estructura de carpetas y `ATTRIBUTIONS.md`.
+4. Verificar en las páginas oficiales las licencias de Z-Anatomy, BodyParts3D y HuBMAP.

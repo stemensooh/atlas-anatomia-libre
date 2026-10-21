@@ -1,0 +1,25 @@
+# Dependencias y builds
+node_modules/
+dist/
+.vite/
+__pycache__/
+*.pyc
+.venv/
+
+# Descargas originales pesadas: solo se versionan las notas de origen
+data/raw/**
+!data/raw/
+!data/raw/SOURCE.template.txt
+!data/raw/**/SOURCE.txt
+!data/raw/**/LICENSE*
+
+# Blender
+*.blend1
+*.blend2
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.env
