@@ -5,10 +5,12 @@ export type CameraPreset = "front" | "back" | "left" | "right" | "top" | "reset"
 export type BodySex = "male" | "female";
 export type LeftTab = "body" | "tree" | "hubmap";
 export type RightTab = "info" | "tours" | "quiz";
+export type SliderMode = "dissection" | "opacity";
 
 interface LayerState {
   enabled: boolean;
   opacity: number;
+  depth: number;
   loading: boolean;
   loaded: boolean;
 }
@@ -37,6 +39,7 @@ interface ViewerState {
   clip: ClipPlanesState;
   showLabels3D: boolean;
   theme: "dark" | "light";
+  sliderMode: SliderMode;
   creditsOpen: boolean;
 
   // Callback opcional cuando hay una pregunta "find3d" activa en el cuestionario
@@ -45,9 +48,12 @@ interface ViewerState {
   setMode: (mode: LeftTab, hubmapOrganId?: string | null) => void;
   setRightTab: (tab: RightTab) => void;
   setBodySex: (sex: BodySex) => void;
+  setSliderMode: (mode: SliderMode) => void;
   toggleLayer: (sys: SystemId) => void;
   setLayerEnabled: (sys: SystemId, enabled: boolean) => void;
   setLayerOpacity: (sys: SystemId, opacity: number) => void;
+  setLayerDepth: (sys: SystemId, depth: number) => void;
+  setLayerSliderValue: (sys: SystemId, val: number) => void;
   setLayerLoading: (sys: SystemId, loading: boolean, loaded?: boolean) => void;
   enableAllLayers: (enabled: boolean) => void;
 
@@ -83,6 +89,7 @@ const initialLayers = Object.fromEntries(
     {
       enabled: SYSTEM_META[sys].defaultEnabled,
       opacity: SYSTEM_META[sys].defaultOpacity,
+      depth: 1.0,
       loading: false,
       loaded: false,
     },
@@ -113,6 +120,7 @@ export const useViewerStore = create<ViewerState>((set) => ({
   clip: initialClip,
   showLabels3D: false,
   theme: "dark",
+  sliderMode: "dissection",
   creditsOpen: false,
   quizClickHandler: null,
 
@@ -135,6 +143,8 @@ export const useViewerStore = create<ViewerState>((set) => ({
       isolatedId: null,
       hiddenIds: {},
     })),
+
+  setSliderMode: (sliderMode) => set({ sliderMode }),
 
   toggleLayer: (sys) =>
     set((s) => ({
@@ -159,6 +169,33 @@ export const useViewerStore = create<ViewerState>((set) => ({
         [sys]: { ...s.layers[sys], opacity },
       },
     })),
+
+  setLayerDepth: (sys, depth) =>
+    set((s) => ({
+      layers: {
+        ...s.layers,
+        [sys]: { ...s.layers[sys], depth },
+      },
+    })),
+
+  setLayerSliderValue: (sys, val) =>
+    set((s) => {
+      if (s.sliderMode === "dissection") {
+        return {
+          layers: {
+            ...s.layers,
+            [sys]: { ...s.layers[sys], depth: val },
+          },
+        };
+      } else {
+        return {
+          layers: {
+            ...s.layers,
+            [sys]: { ...s.layers[sys], opacity: val },
+          },
+        };
+      }
+    }),
 
   setLayerLoading: (sys, loading, loaded) =>
     set((s) => ({

@@ -44,6 +44,9 @@ export function LayerPanel({
 
   const setMode = useViewerStore((s) => s.setMode);
   const setBodySex = useViewerStore((s) => s.setBodySex);
+  const sliderMode = useViewerStore((s) => s.sliderMode);
+  const setSliderMode = useViewerStore((s) => s.setSliderMode);
+  const setLayerSliderValue = useViewerStore((s) => s.setLayerSliderValue);
   const toggleLayer = useViewerStore((s) => s.toggleLayer);
   const setLayerEnabled = useViewerStore((s) => s.setLayerEnabled);
   const setLayerOpacity = useViewerStore((s) => s.setLayerOpacity);
@@ -279,6 +282,34 @@ export function LayerPanel({
             </button>
           </div>
         )}
+
+        {mode !== "hubmap" && (
+          <div className="slider-mode-card">
+            <span className="slider-mode-label">Modo de barra:</span>
+            <div className="slider-mode-toggle-btns">
+              <button
+                className={`btn-xs ${
+                  sliderMode === "dissection" ? "active" : ""
+                }`}
+                onClick={() => setSliderMode("dissection")}
+                title="Modo Disección (Z-Anatomy): Quita las capas superficiales para revelar las más internas"
+              >
+                <Layers size={12} />
+                <span>Disección (Z-Anatomy)</span>
+              </button>
+              <button
+                className={`btn-xs ${
+                  sliderMode === "opacity" ? "active" : ""
+                }`}
+                onClick={() => setSliderMode("opacity")}
+                title="Modo Transparencia (Rayos X): Vuelve las mallas translúcidas para ver a través de ellas"
+              >
+                <Eye size={12} />
+                <span>Transparencia</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2. Cuerpo central con un único scrollbar fluido */}
@@ -361,19 +392,31 @@ export function LayerPanel({
 
                     {st.enabled && (
                       <div className="opacity-row">
-                        <span className="opacity-label">Opacidad</span>
+                        <span className="opacity-label">
+                          {sliderMode === "dissection"
+                            ? "Profundidad"
+                            : "Opacidad"}
+                        </span>
                         <input
                           type="range"
-                          min={0.1}
+                          min={0.05}
                           max={1}
                           step={0.05}
-                          value={st.opacity}
+                          value={
+                            sliderMode === "dissection"
+                              ? st.depth ?? 1.0
+                              : st.opacity
+                          }
                           onChange={(e) =>
-                            setLayerOpacity(sys, parseFloat(e.target.value))
+                            setLayerSliderValue(sys, parseFloat(e.target.value))
                           }
                         />
                         <span className="opacity-val">
-                          {Math.round(st.opacity * 100)}%
+                          {Math.round(
+                            (sliderMode === "dissection"
+                              ? st.depth ?? 1.0
+                              : st.opacity) * 100
+                          )}%
                         </span>
                       </div>
                     )}
@@ -487,33 +530,77 @@ export function LayerPanel({
                         />
                         <span className="tree-sys-label">{meta.labelEs}</span>
                       </button>
-                      <div className="layer-badges">
-                        <span
-                          className="badge-count"
-                          title={`${visibleCount} de ${items.length} estructuras visibles`}
-                        >
-                          {visibleCount > 0 && visibleCount < items.length
-                            ? `${visibleCount}/${items.length}`
-                            : items.length}
-                        </span>
-                        <button
-                          className="icon-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleSystem(sys);
-                          }}
-                          title={
-                            isSysVisible
-                              ? "Ocultar todas las estructuras de este sistema"
-                              : "Mostrar todas las estructuras de este sistema"
-                          }
-                        >
-                          {isSysVisible ? (
-                            <Eye size={14} />
-                          ) : (
-                            <EyeOff size={14} />
-                          )}
-                        </button>
+                      <div className="tree-header-actions">
+                        {/* Control deslizante de Disección / Opacidad directamente en el árbol (estilo Z-Anatomy) */}
+                        {layers[sys].enabled && (
+                          <div
+                            className="tree-mini-slider"
+                            onClick={(e) => e.stopPropagation()}
+                            title={
+                              sliderMode === "dissection"
+                                ? `Disección de capas: ${Math.round(
+                                    (layers[sys].depth ?? 1.0) * 100
+                                  )}% (desliza a la izquierda para retirar capas superficiales)`
+                                : `Opacidad: ${Math.round(
+                                    layers[sys].opacity * 100
+                                  )}%`
+                            }
+                          >
+                            <input
+                              type="range"
+                              min={0.05}
+                              max={1}
+                              step={0.05}
+                              value={
+                                sliderMode === "dissection"
+                                  ? layers[sys].depth ?? 1.0
+                                  : layers[sys].opacity
+                              }
+                              onChange={(e) =>
+                                setLayerSliderValue(
+                                  sys,
+                                  parseFloat(e.target.value)
+                                )
+                              }
+                            />
+                            <span className="tree-slider-val">
+                              {Math.round(
+                                (sliderMode === "dissection"
+                                  ? layers[sys].depth ?? 1.0
+                                  : layers[sys].opacity) * 100
+                              )}%
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="layer-badges">
+                          <span
+                            className="badge-count"
+                            title={`${visibleCount} de ${items.length} estructuras visibles`}
+                          >
+                            {visibleCount > 0 && visibleCount < items.length
+                              ? `${visibleCount}/${items.length}`
+                              : items.length}
+                          </span>
+                          <button
+                            className="icon-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleSystem(sys);
+                            }}
+                            title={
+                              isSysVisible
+                                ? "Ocultar todas las estructuras de este sistema"
+                                : "Mostrar todas las estructuras de este sistema"
+                            }
+                          >
+                            {isSysVisible ? (
+                              <Eye size={14} />
+                            ) : (
+                              <EyeOff size={14} />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
 

@@ -54,8 +54,12 @@ function SystemLayerGroup({
       mesh: THREE.Mesh;
       structureId: string;
       baseMat: THREE.MeshStandardMaterial;
+      radialDist: number;
     }>
   >([]);
+  const rangeRRef = useRef<{ minR: number; maxR: number }>({ minR: 0, maxR: 1 });
+
+  const sliderMode = useViewerStore((s) => s.sliderMode);
 
   useEffect(() => {
     setSceneRoot(null);
@@ -84,6 +88,7 @@ function SystemLayerGroup({
           mesh: THREE.Mesh;
           structureId: string;
           baseMat: THREE.MeshStandardMaterial;
+          radialDist: number;
         }> = [];
         const centers = new Map<string, THREE.Box3>();
 
@@ -107,11 +112,11 @@ function SystemLayerGroup({
               side: THREE.DoubleSide,
             });
             mesh.material = mat;
-            mesh.userData.structureId = cid;
-            mesh.userData.system = system;
-            list.push({ mesh, structureId: cid, baseMat: mat });
-
             const box = new THREE.Box3().setFromObject(mesh);
+            const c = box.getCenter(new THREE.Vector3());
+            const radialDist = Math.sqrt(c.x * c.x + c.z * c.z);
+            list.push({ mesh, structureId: cid, baseMat: mat, radialDist });
+
             if (!box.isEmpty()) {
               const prev = centers.get(cid);
               if (prev) {
@@ -140,6 +145,17 @@ function SystemLayerGroup({
           }
         });
 
+        let minR = Infinity;
+        let maxR = -Infinity;
+        for (const item of list) {
+          if (item.radialDist < minR) minR = item.radialDist;
+          if (item.radialDist > maxR) maxR = item.radialDist;
+        }
+        rangeRRef.current = {
+          minR: Number.isFinite(minR) ? minR : 0,
+          maxR: Number.isFinite(maxR) && maxR > minR ? maxR : (minR || 0) + 0.001,
+        };
+
         centerByIdRef.current = centerMap;
         setLandmarks(pins);
         meshesRef.current = list;
@@ -160,24 +176,36 @@ function SystemLayerGroup({
 
   useEffect(() => {
     if (!sceneRoot) return;
-    const isTransparent = layer.opacity < 0.99;
+
+    const { minR, maxR } = rangeRRef.current;
+    const range = maxR > minR ? maxR - minR : 1;
 
     for (const item of meshesRef.current) {
-      const { mesh, structureId, baseMat } = item;
+      const { mesh, structureId, baseMat, radialDist } = item;
       const isHidden = !!hiddenIds[structureId];
       const isIsolatedOut = isolatedId !== null && isolatedId !== structureId;
-      mesh.visible = layer.enabled && !isHidden && !isIsolatedOut;
+
+      // Disección por capas (Z-Anatomy):
+      // normDepth va de 0.0 (estructuras más internas) a 1.0 (más superficiales)
+      const normDepth = (radialDist - minR) / range;
+      const isPeeledOut =
+        sliderMode === "dissection" && normDepth > (layer.depth ?? 1.0);
+
+      mesh.visible =
+        layer.enabled && !isHidden && !isIsolatedOut && !isPeeledOut;
 
       if (!mesh.visible) continue;
 
-      const isSelected = selectedId === structureId;
-      const isHovered = hoveredId === structureId;
+      const isTransparent = sliderMode === "opacity" && layer.opacity < 0.99;
 
       baseMat.transparent = isTransparent;
-      baseMat.opacity = layer.opacity;
+      baseMat.opacity = sliderMode === "opacity" ? layer.opacity : 1.0;
       baseMat.depthWrite = !isTransparent;
       baseMat.clippingPlanes = clippingPlanes;
       baseMat.clipShadows = true;
+
+      const isSelected = selectedId === structureId;
+      const isHovered = hoveredId === structureId;
 
       if (isSelected) {
         baseMat.emissive.setHex(0x0ea5e9);
@@ -195,6 +223,8 @@ function SystemLayerGroup({
     sceneRoot,
     layer.enabled,
     layer.opacity,
+    layer.depth,
+    sliderMode,
     selectedId,
     hoveredId,
     isolatedId,
