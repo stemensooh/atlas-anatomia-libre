@@ -1,0 +1,25 @@
+{
+  "name": "biologia-server",
+  "private": true,
+  "version": "0.1.0",
+  "description": "API de cuestionarios con SQLite (Fase 5) â€” STEMENSOFT",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --watch --disable-warning=ExperimentalWarning src/index.ts",
+    "start": "node --disable-warning=ExperimentalWarning src/index.ts",
+    "seed": "node --disable-warning=ExperimentalWarning src/seed.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.ts"
+  },
+  "dependencies": {
+    "fastify": "^5.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "~5.6.3"
+  }
+}

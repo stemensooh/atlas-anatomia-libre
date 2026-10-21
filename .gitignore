@@ -24,3 +24,7 @@ Thumbs.db
 .idea/
 .vscode/
 .env
+
+# Base de datos SQLite local (Fase 5)
+server/data/
+*.tsbuildinfo

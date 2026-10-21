@@ -43,6 +43,8 @@ Regla: **ningún archivo entra a `data/` sin una fila aquí.**
 | three.js, React, Vite, Zustand | MIT |
 | Babylon.js, Draco | Apache-2.0 |
 | glTF-Transform, meshoptimizer | MIT |
+| Fastify 5 (API de `server/`, licencia verificada en su `package.json` el 2026-10-21) | MIT |
+| SQLite (vía `node:sqlite`, integrado en Node.js 24) | Dominio público |
 | Blender, MeshLab | GPL (los modelos exportados no heredan GPL) |
 | 3D Slicer | Licencia estilo BSD |
 

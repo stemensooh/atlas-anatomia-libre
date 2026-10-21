@@ -60,6 +60,8 @@ interface ViewerState {
   enableAllLayers: (enabled: boolean) => void;
 
   selectStructure: (id: string | null) => void;
+  // Selección hecha con clic directo en el modelo 3D: además avisa al cuestionario activo.
+  pickStructure3D: (id: string) => void;
   hoverStructure: (id: string | null) => void;
   toggleIsolate: (id: string) => void;
   toggleHide: (id: string) => void;
@@ -118,7 +120,7 @@ function getStoredLeftWidth(): number {
   return 380;
 }
 
-export const useViewerStore = create<ViewerState>((set) => ({
+export const useViewerStore = create<ViewerState>((set, get) => ({
   mode: "body",
   rightTab: "info",
   bodySex: "male",
@@ -244,13 +246,12 @@ export const useViewerStore = create<ViewerState>((set) => ({
       };
     }),
 
-  selectStructure: (id) =>
-    set((s) => {
-      if (id && s.quizClickHandler) {
-        s.quizClickHandler(id);
-      }
-      return { selectedId: id };
-    }),
+  selectStructure: (id) => set({ selectedId: id }),
+
+  pickStructure3D: (id) => {
+    set({ selectedId: id });
+    get().quizClickHandler?.(id);
+  },
 
   hoverStructure: (id) => set({ hoveredId: id }),
 

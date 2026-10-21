@@ -327,6 +327,17 @@ Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.
 - Funciones: guardar vistas, notas por estructura, historial de cuestionarios.
 - Privacidad: guarda lo mínimo, explica qué datos almacenas, sin analítica invasiva.
 
+### Avance
+- [x] API **Node + Fastify** en `server/` con **SQLite** (`node:sqlite`) (D-011).
+- [x] Cuestionarios guardados en BD: listar, crear, editar y borrar desde la web (editor manual).
+- [x] Generador automático de cuestionarios a partir de `metadata.json` (clic 3D, opción múltiple o mixto).
+- [x] Historial de intentos por cuestionario (sin cuentas todavía).
+- [x] Corrección de los errores del quiz: puntos indebidos y respuestas visibles antes de contestar.
+- [ ] Autenticación y cuentas de usuario.
+- [ ] Guardar vistas y notas por estructura.
+- [ ] Página de privacidad (qué datos se guardan).
+- [ ] Migración a PostgreSQL.
+
 ### Criterio de salida
 Un usuario puede registrarse, guardar una vista y recuperar sus resultados.
 

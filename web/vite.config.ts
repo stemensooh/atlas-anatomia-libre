@@ -55,6 +55,10 @@ export default defineConfig({
   plugins: [react(), serveAnatomyDataPlugin()],
   server: {
     port: 5173,
+    // API de cuestionarios con SQLite (server/, Fase 5)
+    proxy: {
+      "/api": "http://127.0.0.1:3001",
+    },
     fs: {
       allow: [".."],
     },

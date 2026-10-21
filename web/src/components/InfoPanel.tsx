@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Search,
   Crosshair,
@@ -11,28 +11,27 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  CheckCircle2,
-  XCircle,
-  Lightbulb,
   Play,
-  Award,
 } from "lucide-react";
 import {
   AnatomyStructure,
   HubmapOrgan,
   SYSTEM_META,
 } from "../data/types";
-import { ANATOMY_QUIZZES, ANATOMY_TOURS } from "../data/didacticData";
+import { ANATOMY_TOURS } from "../data/didacticData";
+import { QuizPanel } from "./QuizPanel";
 import { useViewerStore } from "../store/useViewerStore";
 
 export function InfoPanel({
   structures,
   structureById,
   hubmapById,
+  catalogBySex,
 }: {
   structures: AnatomyStructure[];
   structureById: Map<string, AnatomyStructure>;
   hubmapById: Map<string, HubmapOrgan>;
+  catalogBySex: Record<"male" | "female", AnatomyStructure[]>;
 }) {
   const mode = useViewerStore((s) => s.mode);
   const rightTab = useViewerStore((s) => s.rightTab);
@@ -51,34 +50,14 @@ export function InfoPanel({
   const resetVisibility = useViewerStore((s) => s.resetVisibility);
   const setSearchQuery = useViewerStore((s) => s.setSearchQuery);
   const applySceneConfig = useViewerStore((s) => s.applySceneConfig);
-  const setQuizClickHandler = useViewerStore((s) => s.setQuizClickHandler);
 
   // Estado local de Tours
   const [activeTourId, setActiveTourId] = useState<string>(ANATOMY_TOURS[0].id);
   const [tourStepIdx, setTourStepIdx] = useState<number>(0);
 
-  // Estado local de Quiz
-  const [activeQuizId, setActiveQuizId] = useState<string>(
-    ANATOMY_QUIZZES[0].id
-  );
-  const [quizQuestionIdx, setQuizQuestionIdx] = useState<number>(0);
-  const [quizScore, setQuizScore] = useState<number>(0);
-  const [quizFinished, setQuizFinished] = useState<boolean>(false);
-  const [showHint, setShowHint] = useState<boolean>(false);
-  const [feedback, setFeedback] = useState<{
-    correct: boolean;
-    message: string;
-    selectedAnswer?: string;
-  } | null>(null);
-
   const activeTour =
     ANATOMY_TOURS.find((t) => t.id === activeTourId) || ANATOMY_TOURS[0];
   const currentTourStep = activeTour.steps[tourStepIdx] || activeTour.steps[0];
-
-  const activeQuiz =
-    ANATOMY_QUIZZES.find((q) => q.id === activeQuizId) || ANATOMY_QUIZZES[0];
-  const currentQuestion =
-    activeQuiz.questions[quizQuestionIdx] || activeQuiz.questions[0];
 
   // Aplicar paso del tour en la escena 3D
   const launchTourStep = (tourId: string, stepIndex: number) => {
@@ -97,65 +76,6 @@ export function InfoPanel({
       isolate: step.isolate,
     });
   };
-
-  // Preparar la escena para la pregunta actual del quiz
-  const prepareQuizQuestion = (quizId: string, qIndex: number) => {
-    const qz = ANATOMY_QUIZZES.find((q) => q.id === quizId);
-    if (!qz) return;
-    const q = qz.questions[qIndex];
-    if (!q) return;
-    setFeedback(null);
-    setShowHint(false);
-    applySceneConfig({
-      bodySex: q.bodySex,
-      enabledSystems: q.enabledSystems,
-      // En multipleChoice resaltamos la estructura objetivo para preguntar "¿Cuál es?";
-      // en find3d dejamos selectedId en null para que el usuario la busque y haga clic.
-      selectedId: q.type === "multipleChoice" ? q.targetStructureId : null,
-      cameraPreset: "front",
-      isolate: false,
-    });
-  };
-
-  // Registrar o limpiar el listener de clics 3D cuando estamos en la pestaña Quiz
-  useEffect(() => {
-    if (
-      rightTab === "quiz" &&
-      !quizFinished &&
-      currentQuestion?.type === "find3d" &&
-      !feedback
-    ) {
-      setQuizClickHandler((clickedId: string) => {
-        const isCorrect = clickedId === currentQuestion.targetStructureId;
-        const clickedSt = structureById.get(clickedId);
-        const clickedName = clickedSt ? clickedSt.nameEs : clickedId;
-        if (isCorrect) {
-          setQuizScore((s) => s + 1);
-          setFeedback({
-            correct: true,
-            message: currentQuestion.explanation,
-            selectedAnswer: clickedName,
-          });
-        } else {
-          setFeedback({
-            correct: false,
-            message: `Seleccionaste "${clickedName}" (${clickedId}). La respuesta correcta era ${currentQuestion.targetNameEs} (${currentQuestion.targetStructureId}). ${currentQuestion.explanation}`,
-            selectedAnswer: clickedName,
-          });
-        }
-      });
-    } else {
-      setQuizClickHandler(null);
-    }
-    return () => setQuizClickHandler(null);
-  }, [
-    rightTab,
-    quizFinished,
-    currentQuestion,
-    feedback,
-    structureById,
-    setQuizClickHandler,
-  ]);
 
   const selectedStructure = selectedId ? structureById.get(selectedId) : null;
   const hoveredStructure = hoveredId ? structureById.get(hoveredId) : null;
@@ -206,13 +126,10 @@ export function InfoPanel({
         </button>
         <button
           className={`mode-tab ${rightTab === "quiz" ? "active" : ""}`}
-          onClick={() => {
-            setRightTab("quiz");
-            prepareQuizQuestion(activeQuizId, quizQuestionIdx);
-          }}
+          onClick={() => setRightTab("quiz")}
         >
           <HelpCircle size={14} />
-          <span>Quiz ({ANATOMY_QUIZZES.length})</span>
+          <span>Quiz</span>
         </button>
       </div>
 
@@ -631,185 +548,8 @@ export function InfoPanel({
         </div>
       )}
 
-      {/* PESTAÑA 3: MODO QUIZ (CUESTIONARIOS) */}
-      {rightTab === "quiz" && (
-        <div className="didactic-section">
-          <div className="tour-selector">
-            {ANATOMY_QUIZZES.map((qz) => (
-              <button
-                key={qz.id}
-                className={`tour-select-card ${
-                  activeQuiz.id === qz.id ? "active" : ""
-                }`}
-                onClick={() => {
-                  setActiveQuizId(qz.id);
-                  setQuizQuestionIdx(0);
-                  setQuizScore(0);
-                  setQuizFinished(false);
-                  prepareQuizQuestion(qz.id, 0);
-                }}
-              >
-                <div className="tour-select-title">
-                  <Award size={14} />
-                  <strong>{qz.title}</strong>
-                </div>
-                <small>{qz.subtitle}</small>
-              </button>
-            ))}
-          </div>
-
-          {!quizFinished ? (
-            <div className="quiz-card">
-              <div className="tour-step-badge">
-                <span>
-                  Pregunta {quizQuestionIdx + 1} / {activeQuiz.questions.length}
-                </span>
-                <span className="fma-id">
-                  Aciertos: {quizScore} / {activeQuiz.questions.length}
-                </span>
-              </div>
-
-              <span className="quiz-mode-pill">
-                {currentQuestion.type === "find3d"
-                  ? "🎯 Haz clic directamente sobre la pieza en el visor 3D"
-                  : "📋 Identifica la estructura resaltada en el visor 3D"}
-              </span>
-
-              <h3 className="tour-step-title">{currentQuestion.prompt}</h3>
-
-              {currentQuestion.type === "multipleChoice" &&
-                currentQuestion.options && (
-                  <div className="quiz-options">
-                    {currentQuestion.options.map((opt) => {
-                      const isCorrectOption =
-                        opt === currentQuestion.targetNameEs;
-                      const isPicked = feedback?.selectedAnswer === opt;
-                      let cls = "quiz-option-btn";
-                      if (feedback) {
-                        if (isCorrectOption) cls += " correct";
-                        else if (isPicked) cls += " wrong";
-                      }
-                      return (
-                        <button
-                          key={opt}
-                          className={cls}
-                          disabled={Boolean(feedback)}
-                          onClick={() => {
-                            const ok = opt === currentQuestion.targetNameEs;
-                            if (ok) setQuizScore((s) => s + 1);
-                            setFeedback({
-                              correct: ok,
-                              selectedAnswer: opt,
-                              message: currentQuestion.explanation,
-                            });
-                          }}
-                        >
-                          <span>{opt}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-              {!feedback && (
-                <div className="quiz-hint-box">
-                  <button
-                    className="btn-xs"
-                    onClick={() => setShowHint((h) => !h)}
-                  >
-                    <Lightbulb size={13} />{" "}
-                    {showHint ? "Ocultar pista" : "Ver pista"}
-                  </button>
-                  {currentQuestion.type === "find3d" && (
-                    <button
-                      className="btn-xs"
-                      onClick={() => {
-                        selectStructure(currentQuestion.targetStructureId);
-                        setFeedback({
-                          correct: false,
-                          message: `Estructura revelada: ${currentQuestion.targetNameEs} (${currentQuestion.targetStructureId}). ${currentQuestion.explanation}`,
-                        });
-                      }}
-                    >
-                      Mostrar respuesta en 3D
-                    </button>
-                  )}
-                  {showHint && (
-                    <p className="hint-text">{currentQuestion.hint}</p>
-                  )}
-                </div>
-              )}
-
-              {feedback && (
-                <div
-                  className={`quiz-feedback ${
-                    feedback.correct ? "ok" : "fail"
-                  }`}
-                >
-                  <div className="quiz-feedback-header">
-                    {feedback.correct ? (
-                      <>
-                        <CheckCircle2 size={16} />
-                        <strong>¡Respuesta correcta!</strong>
-                      </>
-                    ) : (
-                      <>
-                        <XCircle size={16} />
-                        <strong>Respuesta incorrecta</strong>
-                      </>
-                    )}
-                  </div>
-                  <p>{feedback.message}</p>
-                  <button
-                    className="btn-credits"
-                    style={{ width: "100%", justifyContent: "center" }}
-                    onClick={() => {
-                      if (quizQuestionIdx + 1 < activeQuiz.questions.length) {
-                        const next = quizQuestionIdx + 1;
-                        setQuizQuestionIdx(next);
-                        prepareQuizQuestion(activeQuiz.id, next);
-                      } else {
-                        setQuizFinished(true);
-                      }
-                    }}
-                  >
-                    <span>
-                      {quizQuestionIdx + 1 < activeQuiz.questions.length
-                        ? "Siguiente pregunta →"
-                        : "Ver calificación final"}
-                    </span>
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="quiz-card">
-              <div className="quiz-summary">
-                <Award size={34} color="#38bdf8" />
-                <h3>¡Cuestionario completado!</h3>
-                <p className="quiz-final-score">
-                  Obtuviste <strong>{quizScore}</strong> de{" "}
-                  <strong>{activeQuiz.questions.length}</strong> aciertos (
-                  {Math.round((quizScore / activeQuiz.questions.length) * 100)}
-                  %)
-                </p>
-                <button
-                  className="btn-credits"
-                  onClick={() => {
-                    setQuizQuestionIdx(0);
-                    setQuizScore(0);
-                    setQuizFinished(false);
-                    prepareQuizQuestion(activeQuiz.id, 0);
-                  }}
-                >
-                  <RotateCcw size={14} />
-                  <span>Reintentar cuestionario</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {/* PESTAÑA 3: CUESTIONARIOS (BD SQLite vía server/). Siempre montado para conservar el progreso al cambiar de pestaña. */}
+      <QuizPanel structureById={structureById} catalogBySex={catalogBySex} />
     </aside>
   );
 }

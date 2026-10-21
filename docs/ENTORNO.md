@@ -5,7 +5,8 @@ Detectado el 2026-10-20 (Windows, PowerShell).
 | Herramienta | Estado | Versión | Uso |
 |---|---|---|---|
 | Node.js | Instalado | v24.14.1 | Frontend y scripts de optimización (Fases 2-3) |
-| npm / pnpm | Instalados | pnpm 11.17.0 | Gestor de paquetes elegido (`pnpm`) |
+| npm / pnpm | Instalados | pnpm 12.14.0 (2026-10-21, `npm install -g pnpm`; `corepack enable` falla sin permisos de administrador) | Gestor de paquetes elegido (`pnpm`) |
+| SQLite | Integrado en Node 24 (`node:sqlite`) | - | BD de la API de cuestionarios (`server/`, Fase 5) |
 | Python | Instalado | 3.13.7 | Scripts de descarga, construcción GLB y catalogación |
 | Git | Instalado | n/d | Control de versiones. Rama `main` |
 | uv | **No instalado** | - | Opcional: gestor de entornos Python |

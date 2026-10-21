@@ -95,6 +95,7 @@ export function App() {
     structureById,
     structureByMeshName,
     hubmapById,
+    catalogBySex,
   } = useMemo(() => {
     const byId = new Map<string, AnatomyStructure>();
     const byMesh = new Map<string, AnatomyStructure>();
@@ -129,6 +130,10 @@ export function App() {
       structureById: byId,
       structureByMeshName: byMesh,
       hubmapById: byHubmap,
+      catalogBySex: {
+        male: metadata?.structures || [],
+        female: metadata?.femaleStructures || [],
+      },
     };
   }, [metadata, bodySex]);
 
@@ -259,6 +264,7 @@ export function App() {
             structures={activeStructures}
             structureById={structureById}
             hubmapById={hubmapById}
+            catalogBySex={catalogBySex}
           />
         )}
       </main>

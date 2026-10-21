@@ -2,6 +2,17 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-011 · Fase 5 (parcial): API de cuestionarios con Fastify + SQLite, sin cuentas
+- **Contexto:** El usuario pidió empezar la Fase 5 solo con base de datos: guardar los cuestionarios en SQLite y poder generar nuevos. Las cuentas y la autenticación quedan fuera por ahora. Además, la revisión del quiz encontró que se podían sumar puntos sin acertar: "Mostrar respuesta" contaba como acierto, cualquier selección (buscador, árbol) contaba como clic 3D y se podía volver a contestar una pregunta. También había formas de ver la respuesta antes de contestar: la opción correcta siempre era la primera y las etiquetas de los pines 3D mostraban el nombre.
+- **Decisión:**
+  - Nuevo paquete `server/` (MIT): **Node 24 + Fastify 5** (MIT) y el módulo integrado **`node:sqlite`** (SQLite, dominio público). No necesita compilar módulos nativos ni instalar software global. Node ejecuta el TypeScript directamente, sin paso de compilación.
+  - BD en `server/data/biodigital.db` (no se versiona). Tres tablas: `quizzes`, `questions` y `quiz_attempts`; el esquema se versiona con `PRAGMA user_version`. Si la BD está vacía, al arrancar se cargan los cuestionarios de `web/src/data/defaultQuizzes.json`, que la web también usa como respaldo sin servidor.
+  - API REST bajo `/api` (Vite la reenvía al puerto 3001). Permite listar, crear, editar y borrar cuestionarios, generarlos y guardar y consultar intentos. Cada pregunta se valida contra `data/processed/metadata.json` y el servidor rechaza intentos cuya puntuación no cuadre con las respuestas.
+  - **Generador:** elige N estructuras al azar de los sistemas y del sexo escogidos, sin nombres repetidos. Las preguntas pueden ser de clic 3D, de opción múltiple o mixtas, con 3 distractores del mismo sistema. La pista indica sistema y lado; la explicación sale de `descriptionEs`.
+  - **Editor manual** en la web (`QuizEditor.tsx`) y nuevo panel `QuizPanel.tsx` separado de `InfoPanel.tsx`.
+  - **Correcciones:** solo cuenta el clic directo en el modelo 3D (`pickStructure3D`); se guarda una respuesta por pregunta; las opciones se muestran desordenadas; los pines se ocultan durante el cuestionario.
+- **Consecuencia:** Los cuestionarios y su historial de intentos se guardan en SQLite y la web sigue funcionando sin servidor. Para pasar a PostgreSQL o añadir cuentas basta con cambiar la capa `server/src/db.ts`.
+
 ## 2026-10-21 · D-010 · Subnodos jerárquicos multinivel en el árbol anatómico con cascada estricta de visibilidad
 - **Contexto:** En el árbol anatómico, la navegación plana de cientos de estructuras por sistema resultaba poco didáctica. Se requería una jerarquía multinivel análoga a Z-Anatomy (`Sistema → Regiones/Subnodos → Subgrupos → Estructuras`), preservando la regla estricta de que un nodo padre desmarcado desmarca a todos sus descendientes, y que la selección de un hijo desmarcado aísla ese único elemento sin activar a sus hermanos.
 - **Decisión:**

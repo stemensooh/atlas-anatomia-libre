@@ -44,6 +44,7 @@ function SystemLayerGroup({
   const hiddenIds = useViewerStore((s) => s.hiddenIds);
   const setLayerLoading = useViewerStore((s) => s.setLayerLoading);
   const selectStructure = useViewerStore((s) => s.selectStructure);
+  const pickStructure3D = useViewerStore((s) => s.pickStructure3D);
   const hoverStructure = useViewerStore((s) => s.hoverStructure);
 
   const [sceneRoot, setSceneRoot] = useState<THREE.Group | null>(null);
@@ -241,7 +242,7 @@ function SystemLayerGroup({
     const hit = e.object as THREE.Mesh;
     const cid = hit.userData?.structureId as string | undefined;
     if (cid) {
-      selectStructure(cid);
+      pickStructure3D(cid);
     }
   };
 
@@ -483,6 +484,8 @@ export function AnatomyCanvas({
   const activeHubmapOrganId = useViewerStore((s) => s.activeHubmapOrganId);
   const clip = useViewerStore((s) => s.clip);
   const showLabels3D = useViewerStore((s) => s.showLabels3D);
+  // En el cuestionario los pines se ocultan: sus etiquetas revelarían las respuestas.
+  const quizActive = useViewerStore((s) => s.rightTab === "quiz");
   const theme = useViewerStore((s) => s.theme);
   const selectStructure = useViewerStore((s) => s.selectStructure);
 
@@ -548,7 +551,7 @@ export function AnatomyCanvas({
               structureById={structureById}
               structureByMeshName={structureByMeshName}
               clippingPlanes={clippingPlanes}
-              showLabels3D={showLabels3D}
+              showLabels3D={showLabels3D && !quizActive}
             />
           );
         })}
