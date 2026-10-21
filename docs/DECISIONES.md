@@ -2,6 +2,14 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-20 · D-006 · Pipeline de Fase 2 directo con Python + glTF-Transform (sin Blender)
+- **Contexto:** Al usar BodyParts3D (`.obj` con IDs FMA en cabecera) y HuBMAP (`.glb` con `crosswalk.csv`), no hace falta abrir un archivo `.blend` de Z-Anatomy.
+- **Decisión:**
+  - Construir los 10 archivos `.glb` por sistema anatómico (`skeletal`, `muscular`, `circulatory`, `nervous`, `digestive`, `respiratory`, `urinary`, `reproductive`, `lymphatic`, `integumentary`) mediante `scripts/fase2_construir_glb.py`, uniendo las 2.234 mallas elementales `FJ*.obj` en las **1.659 estructuras FMA únicas**, convirtiendo coordenadas de `mm Z-up` a `m Y-up` e inyectando créditos `CC BY 4.0` en `asset.copyright`.
+  - Optimizar, cuantizar y comprimir con `EXT_meshopt_compression` y validar con `gltf-validator` en `scripts/optimize.mjs` (gestionado con `pnpm`).
+  - Generar `data/processed/metadata.json` cruzando BodyParts3D + HuBMAP + traducciones de `TA2.csv`.
+- **Consecuencia:** Pipeline 100 % reproducible por línea de comandos sin requerir instalación global de Blender.
+
 ## 2026-10-20 · D-005 · Confirmación de supuestos iniciales (Sección 0)
 - **Contexto:** Revisión de los supuestos base de `docs/PLAN_PROYECTO.md` al iniciar la Fase 1.
 - **Decisión:** Se confirman los supuestos de la sección 0: plataforma web (escritorio primero), stack TypeScript + React + Three.js (`react-three-fiber`) + Vite, sin backend inicial (sitio estático), UI en español con respaldo en latín/inglés y presupuesto \$0.

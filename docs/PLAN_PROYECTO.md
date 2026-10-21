@@ -1,6 +1,6 @@
 # Plan de proyecto: Visor anatómico 3D libre y propio
 
-> Estado: v0.3 · Fase 1 cerrada · Fecha: 2026-10-20
+> Estado: v0.4 · Fase 2 cerrada · Fecha: 2026-10-20
 > Alcance: proyecto de aprendizaje, **no comercial**, con código y contenido abiertos.
 > Aviso: las licencias de este documento son un resumen de lo que conozco. **Verifica la licencia en la página oficial de cada recurso antes de descargarlo**, y registra la verificación en `docs/ATTRIBUTIONS.md` (Fase 0).
 
@@ -219,13 +219,13 @@ flowchart TD
 - Colores y materiales unificados por sistema.
 
 ### Tareas
-- [ ] Importar Z-Anatomy en Blender y listar colecciones/sistemas.
-- [ ] Script de Blender (Python) para exportar un GLB por colección.
-- [ ] Pipeline de optimización con glTF-Transform en `scripts/optimize.mjs`.
-- [ ] Script que genere `metadata.json` a partir de los nombres de malla.
-- [ ] Validar cada GLB con `gltf-validator`.
-- [ ] Anotar en `ATTRIBUTIONS.md` las **modificaciones realizadas** (requisito de CC BY).
-- [ ] Añadir un `LICENSE` y créditos dentro de los `extras` del glTF (asset.copyright).
+- [x] Agrupar las 2.234 mallas de BodyParts3D en las 1.658 estructuras FMA únicas y clasificarlas en los 10 sistemas anatómicos (`scripts/fase2_construir_glb.py`, sin depender de Blender; ver D-006).
+- [x] Script de exportación (`scripts/fase2_construir_glb.py`) para generar un GLB por sistema (`skeletal.glb`, `muscular.glb`, `circulatory.glb`, `nervous.glb`, `digestive.glb`, `respiratory.glb`, `urinary.glb`, `reproductive.glb`, `lymphatic.glb`, `integumentary.glb`) en metros `Y-up`.
+- [x] Pipeline de optimización con glTF-Transform + `meshoptimizer` (`EXT_meshopt_compression` + `KHR_mesh_quantization`) en `scripts/optimize.mjs` (137,55 MB → **34,65 MB** totales).
+- [x] Generar `data/processed/metadata.json` con IDs FMA, `meshName`, `nameEn`, `nameLa`, `nameEs` (cruzando `TA2.csv`), `system`, `parentId`, `side` y el catálogo de 87 órganos de referencia de HuBMAP.
+- [x] Validar cada GLB con `gltf-validator` (**0 errores y 0 avisos** en los 10 GLB).
+- [x] Anotar en `ATTRIBUTIONS.md` las **modificaciones realizadas** (requisito de CC BY 4.0).
+- [x] Añadir `asset.copyright` y `asset.extras` con licencia y créditos dentro de cada glTF.
 
 ### Criterio de salida
 10 GLB optimizados + `metadata.json` válido, con peso dentro del presupuesto.
@@ -387,8 +387,8 @@ Cada fase se cierra solo si:
 2. `ATTRIBUTIONS.md` está al día.
 3. Hay una nota en `docs/DECISIONES.md` si hubo cambios de rumbo.
 
-## 5. Próximos pasos inmediatos (Fase 2)
+## 5. Próximos pasos inmediatos (Fase 3: Visor MVP)
 
-1. Descomprimir e inventariar las mallas de BodyParts3D (`isa`/`partof`) y los `.glb` + `crosswalk.csv` de HuBMAP.
-2. Definir el script de agrupación por sistema anatómico (`skeletal`, `muscular`, `circulatory`, etc.) usando los IDs FMA/UBERON.
-3. Convertir los `.obj` de BodyParts3D a `.glb`, optimizar con `glTF-Transform` / `meshoptimizer` y generar `data/processed/metadata.json`.
+1. Inicializar `web/` con Vite + React + TypeScript + `@react-three/fiber` + `@react-three/drei` + `zustand`.
+2. Configurar el decodificador `MeshoptDecoder` en el cargador glTF para cargar los 10 `.glb` comprimidos de `data/processed/`.
+3. Implementar el panel de capas por sistema, selección por clic (raycasting) y panel de ficha anatómica leyendo `data/processed/metadata.json`.

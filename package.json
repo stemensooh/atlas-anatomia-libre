@@ -1,0 +1,19 @@
+{
+  "name": "biologia-tools",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Herramientas de procesamiento de modelos 3D (Fase 2) — STEMENSOFT",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "fase2:build": "python scripts/fase2_construir_glb.py && node scripts/optimize.mjs",
+    "fase2:optimize": "node scripts/optimize.mjs"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.0.0",
+    "@gltf-transform/extensions": "^4.0.0",
+    "@gltf-transform/functions": "^4.0.0",
+    "gltf-validator": "^2.0.0-dev.3.10",
+    "meshoptimizer": "^0.22.0"
+  }
+}
