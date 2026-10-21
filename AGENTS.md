@@ -11,8 +11,8 @@ Visor anatómico 3D libre, web, no comercial, hecho por STEMENSOFT para aprender
 - **Fase 2: cerrada.** 10 archivos `.glb` masculinos y 10 femeninos optimizados con `meshopt` y validados en `data/processed/` + `data/processed/metadata.json` con 1.658 estructuras FMA masculinas, 956 estructuras femeninas y 87 órganos de HuBMAP (100 % traducidos al español).
 - **Fase 3: cerrada** (despliegue pospuesto a la Fase 6 por D-009). Visor 3D en `web/` con capas por sistema, conmutador masculino/femenino, selección por raycasting, buscador y modal de atribuciones.
 - **Fase 4: cerrada.** Funciones didácticas completas: 115+ descripciones anatómicas clave con `descriptionSource`, cortes en 3 ejes (Axial Y, Sagital X, Coronal Z), árbol anatómico jerárquico, pines 3D flotantes, 4 tours guiados, 2 cuestionarios interactivos (clic 3D + opción múltiple), modo claro/oscuro y atajos de teclado.
-- **Fase 5: en curso (solo BD, D-011).** API `server/` (Fastify + SQLite `node:sqlite`) con cuestionarios en BD, generador por niveles (sin IA, D-012), editor manual e historial de intentos. Autenticación propia (D-013): esquema v3 con `users` y `sessions`, roles estudiante/docente/admin, cuestionarios privados o públicos, pantallas de login, perfil, administración y privacidad. Faltan vistas y notas por estructura. **Se sigue con SQLite; no tocar PostgreSQL hasta que el usuario lo pida.**
-- **Siguiente:** completar la Fase 5 (cuentas) o pasar a la Fase 6 (publicación y hosting). Ver `docs/PLAN_PROYECTO.md`.
+- **Fase 5: cerrada (D-011 a D-014).** API `server/` (Fastify + SQLite `node:sqlite`, esquema v4): cuestionarios en BD con generador por niveles sin IA, autenticación propia (roles estudiante/docente/admin), vistas guardadas, notas por estructura y resultados para el docente. **Se sigue con SQLite; no tocar PostgreSQL hasta que el usuario lo pida.**
+- **Siguiente:** Fase 6 (publicación y hosting). Ver `docs/PLAN_PROYECTO.md`.
 - Rama `main` conectada a `origin` (`https://github.com/stemensooh/biodigital.git`).
 
 ## Reglas obligatorias

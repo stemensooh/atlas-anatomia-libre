@@ -24,7 +24,7 @@ test("lista los cuestionarios iniciales públicos sin iniciar sesión", async ()
   assert.equal(quizzes[0].questions.length, 5);
   assert.equal(quizzes[0].source, "seed");
   assert.equal(quizzes[0].isPublic, true);
-  assert.deepEqual(quizzes[0].permissions, { edit: false, delete: false, publish: false });
+  assert.deepEqual(quizzes[0].permissions, { edit: false, delete: false, publish: false, results: false });
 });
 
 test("los cuestionarios iniciales pasan la validación del catálogo", async () => {
@@ -53,7 +53,7 @@ test("genera un cuestionario mixto válido, privado y del usuario", async () => 
   assert.equal(quiz.source, "generated");
   assert.equal(quiz.isPublic, false);
   assert.equal(quiz.ownerName, "alumna");
-  assert.deepEqual(quiz.permissions, { edit: false, delete: true, publish: false });
+  assert.deepEqual(quiz.permissions, { edit: false, delete: true, publish: false, results: false });
   assert.equal(quiz.questions.length, 6);
   for (const q of quiz.questions) {
     assert.ok(catalog.byId.female.has(q.targetStructureId));
@@ -89,7 +89,7 @@ test("el docente crea, edita, publica y borra su cuestionario manual", async () 
   assert.equal(created.statusCode, 201, created.body);
   const { id, isPublic, permissions } = created.json();
   assert.equal(isPublic, false);
-  assert.deepEqual(permissions, { edit: true, delete: true, publish: true });
+  assert.deepEqual(permissions, { edit: true, delete: true, publish: true, results: true });
 
   const bad = await app.inject({
     method: "PUT",
@@ -122,7 +122,7 @@ test("el docente crea, edita, publica y borra su cuestionario manual", async () 
   // Publicado: lo ve cualquiera, pero solo su dueño (o un admin) lo edita.
   const seen = await app.inject({ url: `/api/quizzes/${id}`, headers: { cookie: estudiante } });
   assert.equal(seen.statusCode, 200);
-  assert.deepEqual(seen.json().permissions, { edit: false, delete: false, publish: false });
+  assert.deepEqual(seen.json().permissions, { edit: false, delete: false, publish: false, results: false });
   const foreignEdit = await app.inject({
     method: "PUT",
     url: `/api/quizzes/${id}`,
@@ -267,7 +267,7 @@ test("migra una base de datos v1 existente hasta la última versión sin perder 
 
   const migrated = openDb(file);
   const version = migrated.prepare("PRAGMA user_version").get() as { user_version: number };
-  assert.equal(version.user_version, 3);
+  assert.equal(version.user_version, 4);
   const row = migrated.prepare("SELECT title, user_id, is_public FROM quizzes WHERE id = 'viejo'").get() as any;
   assert.deepEqual({ ...row }, { title: "Quiz v1", user_id: null, is_public: 1 });
   // La reconstrucción de tablas no debe haber borrado preguntas ni intentos en cascada.

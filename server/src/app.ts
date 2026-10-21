@@ -4,6 +4,7 @@ import type { Catalog } from "./catalog.ts";
 import * as store from "./db.ts";
 import { generateQuiz, GenerateError } from "./generator.ts";
 import type { GenerateQuizInput, QuizAttemptInput, QuizInput, Role, Viewer } from "./types.ts";
+import * as library from "./library.ts";
 import * as users from "./users.ts";
 import {
   adminPasswordSchema,
@@ -14,9 +15,14 @@ import {
   deleteAccountSchema,
   generateInputSchema,
   loginSchema,
+  MAX_VIEW_STATE_BYTES,
+  noteSchema,
   quizInputSchema,
+  structureParams,
   updateUserSchema,
   validationMessageEs,
+  viewPatchSchema,
+  viewSchema,
   visibilitySchema,
 } from "./validate.ts";
 
@@ -274,6 +280,102 @@ export function buildApp(db: store.Db, catalog: Catalog, opts: AppOptions = {}) 
     }
   );
 
+  // ---------- Vistas guardadas (privadas) ----------
+
+  const viewTooBig = (state: unknown) => JSON.stringify(state).length > MAX_VIEW_STATE_BYTES;
+
+  app.get("/api/views", async (req, reply) => {
+    const viewer = requireRole(req, reply);
+    if (!viewer) return;
+    return library.listViews(db, viewer.id);
+  });
+
+  app.post<{ Body: { name: string; state: unknown } }>(
+    "/api/views",
+    { schema: { body: viewSchema } },
+    async (req, reply) => {
+      const viewer = requireRole(req, reply);
+      if (!viewer) return;
+      if (viewTooBig(req.body.state)) return reply.code(413).send({ error: "La vista es demasiado grande." });
+      if (library.countViews(db, viewer.id) >= library.MAX_VIEWS_PER_USER) {
+        return reply
+          .code(409)
+          .send({ error: `Has llegado al máximo de ${library.MAX_VIEWS_PER_USER} vistas: borra alguna antes.` });
+      }
+      return reply.code(201).send(library.createView(db, viewer.id, req.body.name.trim(), req.body.state));
+    }
+  );
+
+  app.patch<{ Params: { id: number }; Body: { name?: string; state?: unknown } }>(
+    "/api/views/:id",
+    { schema: { params: userIdParams, body: viewPatchSchema } },
+    async (req, reply) => {
+      const viewer = requireRole(req, reply);
+      if (!viewer) return;
+      if (req.body.state !== undefined && viewTooBig(req.body.state)) {
+        return reply.code(413).send({ error: "La vista es demasiado grande." });
+      }
+      const view = library.updateView(db, viewer.id, req.params.id, {
+        ...req.body,
+        name: req.body.name?.trim(),
+      });
+      return view ?? reply.code(404).send({ error: "Vista no encontrada." });
+    }
+  );
+
+  app.delete<{ Params: { id: number } }>(
+    "/api/views/:id",
+    { schema: { params: userIdParams } },
+    async (req, reply) => {
+      const viewer = requireRole(req, reply);
+      if (!viewer) return;
+      if (!library.deleteView(db, viewer.id, req.params.id)) return reply.code(404).send({ error: "Vista no encontrada." });
+      return reply.code(204).send();
+    }
+  );
+
+  // ---------- Notas por estructura (privadas) ----------
+
+  const structureExists = (id: string) => catalog.byId.male.has(id) || catalog.byId.female.has(id);
+
+  app.get("/api/notes", async (req, reply) => {
+    const viewer = requireRole(req, reply);
+    if (!viewer) return;
+    return library.listNotes(db, viewer.id);
+  });
+
+  // Guarda o reemplaza la nota; enviar una nota vacía la borra (204).
+  app.put<{ Params: { structureId: string }; Body: { note: string } }>(
+    "/api/notes/:structureId",
+    { schema: { params: structureParams, body: noteSchema } },
+    async (req, reply) => {
+      const viewer = requireRole(req, reply);
+      if (!viewer) return;
+      const { structureId } = req.params;
+      if (!structureExists(structureId)) return reply.code(404).send({ error: "Estructura no encontrada." });
+      if (
+        req.body.note.trim() &&
+        !library.hasNote(db, viewer.id, structureId) &&
+        library.countNotes(db, viewer.id) >= library.MAX_NOTES_PER_USER
+      ) {
+        return reply.code(409).send({ error: `Has llegado al máximo de ${library.MAX_NOTES_PER_USER} notas.` });
+      }
+      const note = library.saveNote(db, viewer.id, structureId, req.body.note);
+      return note ?? reply.code(204).send();
+    }
+  );
+
+  app.delete<{ Params: { structureId: string } }>(
+    "/api/notes/:structureId",
+    { schema: { params: structureParams } },
+    async (req, reply) => {
+      const viewer = requireRole(req, reply);
+      if (!viewer) return;
+      library.deleteNote(db, viewer.id, req.params.structureId);
+      return reply.code(204).send();
+    }
+  );
+
   // ---------- Cuestionarios ----------
 
   // Devuelve los cuestionarios visibles con sus preguntas y permisos (?full=1 se acepta por compatibilidad).
@@ -302,7 +404,7 @@ export function buildApp(db: store.Db, catalog: Catalog, opts: AppOptions = {}) 
   const loadForAction = (
     req: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-    action: "edit" | "delete" | "publish"
+    action: "edit" | "delete" | "publish" | "results"
   ) => {
     const viewer = requireRole(req, reply);
     if (!viewer) return null;
@@ -361,6 +463,17 @@ export function buildApp(db: store.Db, catalog: Catalog, opts: AppOptions = {}) 
         if (err instanceof GenerateError) return reply.code(400).send({ error: err.message });
         throw err;
       }
+    }
+  );
+
+  // Resultados de todos los usuarios: para el docente dueño del cuestionario y para el admin.
+  app.get<{ Params: { id: string } }>(
+    "/api/quizzes/:id/results",
+    { schema: { params: idParams } },
+    async (req, reply) => {
+      const ctx = loadForAction(req, reply, "results");
+      if (!ctx) return;
+      return library.quizResults(db, ctx.quiz.id, ctx.quiz.questions);
     }
   );
 

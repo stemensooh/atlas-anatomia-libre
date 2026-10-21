@@ -2,7 +2,7 @@ import type { Quiz, QuizPermissions, Role, Viewer } from "./types.ts";
 
 // Reglas de acceso (D-013). Sin sesión: ver y jugar los públicos, sin guardar.
 //   estudiante: + guardar intentos, generar (privados) y borrar los suyos.
-//   docente:    + crear y editar a mano, publicar/ocultar los suyos.
+//   docente:    + crear y editar a mano, publicar/ocultar los suyos y ver sus resultados.
 //   admin:      todo, sobre cualquier cuestionario, y gestionar usuarios.
 
 const RANK: Record<Role, number> = { estudiante: 1, docente: 2, admin: 3 };
@@ -13,10 +13,10 @@ const isOwner = (viewer: Viewer | null, quiz: Pick<Quiz, "userId">) =>
   !!viewer && quiz.userId !== null && quiz.userId === viewer.id;
 
 export function quizPermissions(viewer: Viewer | null, quiz: Pick<Quiz, "userId">): QuizPermissions {
-  if (viewer?.role === "admin") return { edit: true, delete: true, publish: true };
+  if (viewer?.role === "admin") return { edit: true, delete: true, publish: true, results: true };
   const own = isOwner(viewer, quiz);
   const docente = hasRole(viewer, "docente");
-  return { edit: own && docente, delete: own, publish: own && docente };
+  return { edit: own && docente, delete: own, publish: own && docente, results: own && docente };
 }
 
 export const withPermissions = (viewer: Viewer | null, quiz: Quiz): Quiz => ({

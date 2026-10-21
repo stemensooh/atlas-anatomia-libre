@@ -133,6 +133,27 @@ const MIGRATIONS: string[] = [
     CREATE INDEX idx_attempts_quiz ON quiz_attempts(quiz_id, finished_at);
     CREATE INDEX idx_attempts_user ON quiz_attempts(user_id, finished_at);
   `,
+  // v4: vistas guardadas y notas por estructura, privadas de cada usuario.
+  `
+    CREATE TABLE saved_views (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name        TEXT NOT NULL,
+      state       TEXT NOT NULL,          -- JSON: cámara, modelo, capas, cortes, selección…
+      created_at  TEXT NOT NULL DEFAULT ${NOW},
+      updated_at  TEXT NOT NULL DEFAULT ${NOW}
+    );
+    CREATE INDEX idx_views_user ON saved_views(user_id, updated_at);
+
+    -- Los ids de estructura son únicos entre modelos (FMA… masculino, VH_F_… femenino).
+    CREATE TABLE structure_notes (
+      user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      structure_id  TEXT NOT NULL,
+      note          TEXT NOT NULL,
+      updated_at    TEXT NOT NULL DEFAULT ${NOW},
+      PRIMARY KEY (user_id, structure_id)
+    );
+  `,
 ];
 
 // Se ejecuta con las claves foráneas desactivadas (necesario para reconstruir tablas sin

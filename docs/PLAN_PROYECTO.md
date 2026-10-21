@@ -337,13 +337,13 @@ Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.
 - [x] Corrección de los errores del quiz: puntos indebidos y respuestas visibles antes de contestar.
 - [x] Autenticación y cuentas de usuario: registro, login, sesiones, roles admin/docente/estudiante y panel de administración (D-013).
 - [x] Cuestionarios privados por usuario; docentes y administradores publican (D-013).
-- [ ] Guardar vistas y notas por estructura.
+- [x] Guardar vistas (cámara y estado de la escena) y notas privadas por estructura (D-014).
 - [x] Página de privacidad (qué datos se guardan) y borrado de cuenta desde Mi perfil (D-013).
-- [ ] Que un docente vea los resultados de sus alumnos en sus cuestionarios.
+- [x] Que un docente vea los resultados de sus alumnos en sus cuestionarios: por alumno y por pregunta (D-014).
 - [ ] Migración a PostgreSQL *(pospuesta: se sigue con SQLite hasta que el usuario lo indique, D-012)*.
 
 ### Criterio de salida
-Un usuario puede registrarse, guardar una vista y recuperar sus resultados.
+Un usuario puede registrarse, guardar una vista y recuperar sus resultados. **Cumplido (D-014).**
 
 ---
 

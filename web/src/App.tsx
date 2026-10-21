@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  Bookmark,
   Compass,
   Info,
   MapPin,
@@ -20,6 +21,8 @@ import { InfoPanel } from "./components/InfoPanel";
 import { CreditsModal } from "./components/CreditsModal";
 import { AccountModals, UserMenu } from "./components/UserMenu";
 import { useAuthStore } from "./store/useAuthStore";
+import { useNotesStore } from "./store/useNotesStore";
+import { LocateStructure } from "./components/ProfileModal";
 
 export function App() {
   const [metadata, setMetadata] = useState<MetadataDoc | null>(null);
@@ -39,10 +42,20 @@ export function App() {
   const setCreditsOpen = useViewerStore((s) => s.setCreditsOpen);
   const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
   const loadSession = useAuthStore((s) => s.loadSession);
+  const user = useAuthStore((s) => s.user);
+  const openModal = useAuthStore((s) => s.openModal);
+  const loadNotes = useNotesStore((s) => s.load);
+  const clearNotes = useNotesStore((s) => s.clear);
 
   useEffect(() => {
     loadSession();
   }, [loadSession]);
+
+  // Las notas son del usuario: se cargan al iniciar sesión y se vacían al cerrarla.
+  useEffect(() => {
+    if (user) loadNotes(user.id).catch(() => clearNotes());
+    else clearNotes();
+  }, [user, loadNotes, clearNotes]);
 
   useEffect(() => {
     fetch("/data/processed/metadata.json")
@@ -144,6 +157,13 @@ export function App() {
     };
   }, [metadata, bodySex]);
 
+  const locateStructure = useMemo<LocateStructure>(() => {
+    const index = new Map<string, ReturnType<LocateStructure>>();
+    for (const st of catalogBySex.male) index.set(st.id, { structure: st, bodySex: "male" });
+    for (const st of catalogBySex.female) index.set(st.id, { structure: st, bodySex: "female" });
+    return (id) => index.get(id) ?? null;
+  }, [catalogBySex]);
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -192,6 +212,13 @@ export function App() {
             title="Restablecer vista y filtros (Tecla R)"
           >
             <RotateCcw size={13} /> Centrar
+          </button>
+          <button
+            className="btn-cam"
+            onClick={() => openModal(user ? "views" : "login")}
+            title={user ? "Guardar o abrir vistas de la escena" : "Inicia sesión para guardar vistas"}
+          >
+            <Bookmark size={13} /> Vistas
           </button>
         </div>
 
@@ -278,7 +305,7 @@ export function App() {
       </main>
 
       <CreditsModal />
-      <AccountModals />
+      <AccountModals locate={locateStructure} />
     </div>
   );
 }

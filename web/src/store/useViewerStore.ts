@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { SYSTEM_META, SystemId } from "../data/types";
+import type { Vec3, ViewStateV1 } from "../data/viewState";
 
 export type CameraPreset = "front" | "back" | "left" | "right" | "top" | "reset";
 export type BodySex = "male" | "female";
@@ -36,6 +37,8 @@ interface ViewerState {
   hiddenIds: Record<string, boolean>;
   searchQuery: string;
   cameraPreset: { preset: CameraPreset; seq: number };
+  // Posición de cámara concreta pedida al abrir una vista guardada (seq para repetirla).
+  cameraView: { position: Vec3; target: Vec3; seq: number } | null;
   clip: ClipPlanesState;
   showLabels3D: boolean;
   theme: "dark" | "light";
@@ -76,6 +79,8 @@ interface ViewerState {
   toggleTheme: () => void;
   setCreditsOpen: (open: boolean) => void;
   setQuizClickHandler: (fn: ((id: string) => void) | null) => void;
+
+  applySavedView: (view: ViewStateV1) => void;
 
   applySceneConfig: (cfg: {
     bodySex: BodySex;
@@ -132,6 +137,7 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   hiddenIds: {},
   searchQuery: "",
   cameraPreset: { preset: "front", seq: 0 },
+  cameraView: null,
   clip: initialClip,
   showLabels3D: false,
   theme: "dark",
@@ -314,6 +320,36 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   setCreditsOpen: (creditsOpen) => set({ creditsOpen }),
 
   setQuizClickHandler: (quizClickHandler) => set({ quizClickHandler }),
+
+  applySavedView: (view) =>
+    set((s) => {
+      const layers = { ...s.layers };
+      for (const sys of Object.keys(layers) as SystemId[]) {
+        const saved = view.layers[sys];
+        layers[sys] = saved
+          ? { ...layers[sys], enabled: saved.enabled, opacity: saved.opacity, depth: saved.depth }
+          : { ...layers[sys], enabled: false };
+      }
+      return {
+        mode: view.mode,
+        bodySex: view.bodySex,
+        activeHubmapOrganId: view.activeHubmapOrganId,
+        layers,
+        sliderMode: view.sliderMode,
+        selectedId: view.selectedId,
+        isolatedId: view.isolatedId,
+        hiddenIds: Object.fromEntries(view.hiddenIds.map((id) => [id, true])),
+        clip: { ...initialClip, ...view.clip },
+        showLabels3D: view.showLabels3D,
+        hoveredId: null,
+        cameraView: view.camera
+          ? { ...view.camera, seq: (s.cameraView?.seq ?? 0) + 1 }
+          : s.cameraView,
+        cameraPreset: view.camera
+          ? s.cameraPreset
+          : { preset: "front", seq: s.cameraPreset.seq + 1 },
+      };
+    }),
 
   applySceneConfig: (cfg) =>
     set((s) => {

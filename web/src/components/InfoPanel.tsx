@@ -20,6 +20,7 @@ import {
 } from "../data/types";
 import { ANATOMY_TOURS } from "../data/didacticData";
 import { QuizPanel } from "./QuizPanel";
+import { StructureNotes } from "./StructureNotes";
 import { useViewerStore } from "../store/useViewerStore";
 
 export function InfoPanel({
@@ -361,6 +362,7 @@ export function InfoPanel({
                     )}
                   </div>
                 </div>
+                <StructureNotes structureId={selectedStructure.id} />
               </div>
             ) : (
               <div className="empty-state">

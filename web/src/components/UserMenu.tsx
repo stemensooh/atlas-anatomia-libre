@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChevronDown, LogIn, LogOut, Shield, ShieldCheck, UserCircle2 } from "lucide-react";
+import { Bookmark, ChevronDown, LogIn, LogOut, Shield, ShieldCheck, UserCircle2 } from "lucide-react";
 import { ROLE_LABEL } from "../data/authApi";
 import { useAuthStore } from "../store/useAuthStore";
 import { AdminUsersModal } from "./AdminUsersModal";
 import { AuthModal } from "./AuthModal";
 import { PrivacyModal } from "./PrivacyModal";
-import { ProfileModal } from "./ProfileModal";
+import { ProfileModal, LocateStructure } from "./ProfileModal";
+import { ViewsModal } from "./ViewsModal";
 
 // Botón de cuenta de la barra superior: "Iniciar sesión" o el menú del usuario.
 export function UserMenu() {
@@ -62,6 +63,9 @@ export function UserMenu() {
           <button role="menuitem" onClick={() => go("profile")}>
             <UserCircle2 size={14} /> Mi perfil
           </button>
+          <button role="menuitem" onClick={() => go("views")}>
+            <Bookmark size={14} /> Mis vistas
+          </button>
           {user.role === "admin" && (
             <button role="menuitem" onClick={() => go("admin")}>
               <Shield size={14} /> Administración
@@ -86,12 +90,13 @@ export function UserMenu() {
 }
 
 // Ventanas de cuenta abiertas desde cualquier sitio con useAuthStore().openModal(...).
-export function AccountModals() {
+export function AccountModals({ locate }: { locate: LocateStructure }) {
   const modal = useAuthStore((s) => s.modal);
   const user = useAuthStore((s) => s.user);
   if (modal === "login" || modal === "register") return <AuthModal mode={modal} />;
   if (modal === "privacy") return <PrivacyModal />;
-  if (modal === "profile" && user) return <ProfileModal />;
+  if (modal === "profile" && user) return <ProfileModal locate={locate} />;
+  if (modal === "views" && user) return <ViewsModal />;
   if (modal === "admin" && user?.role === "admin") return <AdminUsersModal />;
   return null;
 }

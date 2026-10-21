@@ -36,6 +36,7 @@ export interface QuizPermissions {
   edit: boolean;
   delete: boolean;
   publish: boolean;
+  results: boolean; // ver los resultados de todos los usuarios
 }
 
 export interface QuizQuestion {

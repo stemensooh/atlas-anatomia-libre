@@ -11,6 +11,7 @@ import {
   HubmapOrgan,
 } from "../data/types";
 import { KEY_LANDMARK_IDS } from "../data/didacticData";
+import { cameraBridge, Vec3 } from "../data/viewState";
 import { useViewerStore } from "../store/useViewerStore";
 
 interface Pin3D {
@@ -428,8 +429,30 @@ function HubmapOrganScene({
 
 function CameraController() {
   const cameraPreset = useViewerStore((s) => s.cameraPreset);
+  const cameraView = useViewerStore((s) => s.cameraView);
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
+
+  // Permite leer la cámara desde fuera del Canvas para guardar vistas.
+  useEffect(() => {
+    cameraBridge.read = () => ({
+      position: camera.position.toArray() as Vec3,
+      target: (controlsRef.current?.target ?? new THREE.Vector3(0, 0.88, 0)).toArray() as Vec3,
+    });
+    return () => {
+      cameraBridge.read = null;
+    };
+  }, [camera]);
+
+  // Vista guardada: posición y punto de mira exactos.
+  useEffect(() => {
+    if (!cameraView) return;
+    camera.position.set(...cameraView.position);
+    if (controlsRef.current) {
+      controlsRef.current.target.set(...cameraView.target);
+      controlsRef.current.update();
+    }
+  }, [cameraView, camera]);
 
   useEffect(() => {
     const target = new THREE.Vector3(0, 0.88, 0);

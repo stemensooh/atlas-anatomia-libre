@@ -2,7 +2,7 @@ import { create } from "zustand";
 import * as authApi from "../data/authApi";
 import { SessionUser } from "../data/authApi";
 
-export type AccountModal = "login" | "register" | "profile" | "admin" | "privacy" | null;
+export type AccountModal = "login" | "register" | "profile" | "admin" | "privacy" | "views" | null;
 
 interface AuthState {
   user: SessionUser | null;

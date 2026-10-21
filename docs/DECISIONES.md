@@ -2,6 +2,29 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-014 · Vistas guardadas, notas por estructura y resultados para el docente (cierre de la Fase 5)
+- **Contexto:** Faltaban, de la Fase 5: guardar vistas, notas por estructura y que un docente vea los resultados de sus alumnos.
+- **Decisión:**
+  - **Migración v4.**
+    - `saved_views` (id, user_id, nombre, `state` JSON y fechas).
+    - `structure_notes` (clave primaria `(user_id, structure_id)`; los ids de estructura no se repiten entre los dos modelos).
+    - Ambas con `ON DELETE CASCADE` hacia `users`, así que borrar la cuenta borra también vistas y notas.
+  - **Vistas:**
+    - El estado lo define la web (`web/src/data/viewState.ts`, `version: 1`): modo, sexo del modelo, órgano HuBMAP, capas (activa, opacidad y profundidad), modo de los sliders, selección, aislado, ocultos, cortes, pines, y posición y punto de mira de la cámara.
+    - La cámara se lee desde fuera del Canvas con un puente (`cameraBridge`) y se aplica con `cameraView` en el store.
+    - El servidor solo limita el tamaño (20 KB) y el número (100 por usuario).
+    - Las vistas son privadas: las consultas filtran siempre por `user_id`.
+  - **Notas:**
+    - Una por estructura y usuario (máximo 5.000 caracteres y 2.000 notas). Una nota vacía se borra.
+    - El servidor comprueba que la estructura exista en el catálogo.
+    - Se editan en la Ficha y se listan en Mi perfil, desde donde se puede saltar a la estructura.
+  - **Resultados:**
+    - Nuevo permiso `results`: el docente dueño del cuestionario o un admin.
+    - `GET /api/quizzes/:id/results` devuelve el resumen, una fila por alumno (intentos, mejor, último y media) y el porcentaje de aciertos por pregunta con los 3 errores más comunes.
+    - Solo cuenta intentos de usuarios registrados.
+    - Se actualiza la pantalla de Privacidad para explicar que el docente ve los resultados en sus cuestionarios.
+- **Consecuencia:** Se cumple el criterio de salida de la Fase 5. La migración a PostgreSQL sigue pospuesta hasta que el usuario lo indique (D-012).
+
 ## 2026-10-21 · D-013 · Autenticación propia con sesiones en SQLite, tres roles y cuestionarios privados
 - **Contexto:** Fase 5. El usuario eligió: roles admin, docente y estudiante; sin sesión se puede ver y jugar pero no guardar; registro libre solo con usuario y contraseña; los cuestionarios de los usuarios son privados hasta que un docente o admin los publica. Se sigue con SQLite (D-012).
 - **Decisión:**

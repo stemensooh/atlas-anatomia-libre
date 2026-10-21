@@ -1,10 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { KeyRound, Trash2, UserCircle2 } from "lucide-react";
+import { KeyRound, NotebookPen, Trash2, UserCircle2 } from "lucide-react";
 import { ApiError } from "../data/api";
 import { changePassword, deleteAccount, listMyAttempts, ROLE_LABEL } from "../data/authApi";
 import { QuizAttempt } from "../data/quizApi";
+import { AnatomyStructure } from "../data/types";
+import { BodySex, useViewerStore } from "../store/useViewerStore";
 import { useAuthStore } from "../store/useAuthStore";
+import { useNotesStore } from "../store/useNotesStore";
 import { Modal } from "./Modal";
+
+// Busca una estructura por id en los dos modelos (lo resuelve App con metadata.json).
+export type LocateStructure = (id: string) => { structure: AnatomyStructure; bodySex: BodySex } | null;
+
+function MyNotes({ locate }: { locate: LocateStructure }) {
+  const notes = useNotesStore((s) => s.byId);
+  const applySceneConfig = useViewerStore((s) => s.applySceneConfig);
+  const setRightTab = useViewerStore((s) => s.setRightTab);
+  const openModal = useAuthStore((s) => s.openModal);
+  const list = Object.values(notes).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+  // Lleva al visor: modelo y sistema de la estructura, seleccionada y con su ficha abierta.
+  const goTo = (structureId: string) => {
+    const found = locate(structureId);
+    if (!found) return;
+    applySceneConfig({
+      bodySex: found.bodySex,
+      enabledSystems: [found.structure.system],
+      selectedId: structureId,
+      cameraPreset: "front",
+    });
+    setRightTab("info");
+    openModal(null);
+  };
+
+  return (
+    <div className="account-section">
+      <h3>
+        <NotebookPen size={15} /> Mis notas ({list.length})
+      </h3>
+      {list.length === 0 ? (
+        <p>Selecciona una estructura en el visor y escribe en «Mis notas» de su ficha.</p>
+      ) : (
+        <ul className="notes-list">
+          {list.map((n) => {
+            const found = locate(n.structureId);
+            return (
+              <li key={n.structureId}>
+                <button className="views-open" onClick={() => goTo(n.structureId)} disabled={!found}>
+                  <strong>{found?.structure.nameEs ?? n.structureId}</strong>
+                  <small>{n.note.length > 140 ? `${n.note.slice(0, 140)}…` : n.note}</small>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function PasswordForm() {
   const [current, setCurrent] = useState("");
@@ -112,7 +165,7 @@ function DeleteAccount() {
   );
 }
 
-export function ProfileModal() {
+export function ProfileModal({ locate }: { locate: LocateStructure }) {
   const user = useAuthStore((s) => s.user);
   const openModal = useAuthStore((s) => s.openModal);
   const [attempts, setAttempts] = useState<QuizAttempt[] | null>(null);
@@ -174,6 +227,7 @@ export function ProfileModal() {
         )}
       </div>
 
+      <MyNotes locate={locate} />
       <PasswordForm />
       <DeleteAccount />
     </Modal>

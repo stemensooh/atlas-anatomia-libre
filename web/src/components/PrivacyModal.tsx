@@ -21,6 +21,7 @@ export function PrivacyModal() {
         </li>
         <li>Tu <strong>rol</strong> (estudiante, docente o administrador), la fecha de alta y la del último acceso.</li>
         <li>Los <strong>cuestionarios</strong> que generes o crees y los <strong>resultados</strong> de los que termines.</li>
+        <li>Las <strong>vistas</strong> que guardes (posición de cámara y estado de la escena) y tus <strong>notas</strong> por estructura.</li>
         <li>
           Una <strong>cookie de sesión</strong> técnica (<code>bd_session</code>, 30 días) para
           mantenerte conectado. En el servidor solo se guarda su huella (hash), no la cookie.
@@ -37,7 +38,13 @@ export function PrivacyModal() {
       <h3>Quién ve tus datos</h3>
       <ul>
         <li>Tus cuestionarios son privados hasta que un docente o administrador los publica.</li>
-        <li>Tu historial de resultados solo lo ves tú.</li>
+        <li>Tus vistas y tus notas solo las ves tú.</li>
+        <li>
+          Tu historial de resultados lo ves tú. Además, si haces un cuestionario creado por un
+          docente, ese docente ve tu nombre de usuario, tu puntuación y tus respuestas en ese
+          cuestionario (para seguir el aprendizaje de su grupo). Los administradores pueden ver
+          los resultados de cualquier cuestionario.
+        </li>
         <li>
           Los administradores ven la lista de usuarios con el número de cuestionarios e intentos de
           cada uno, para gestionar las cuentas.
@@ -47,8 +54,8 @@ export function PrivacyModal() {
       <h3>Tus derechos</h3>
       <p>
         Desde <strong>Mi perfil</strong> puedes ver tu historial, cambiar la contraseña y{" "}
-        <strong>borrar tu cuenta</strong>, lo que elimina de inmediato tu usuario, tus cuestionarios
-        y todos tus resultados.
+        <strong>borrar tu cuenta</strong>, lo que elimina de inmediato tu usuario, tus cuestionarios,
+        tus vistas, tus notas y todos tus resultados.
         {user && (
           <>
             {" "}

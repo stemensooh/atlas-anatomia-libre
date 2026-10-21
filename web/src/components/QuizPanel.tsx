@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Award,
+  BarChart3,
   CheckCircle2,
   Database,
   Globe,
@@ -29,6 +30,7 @@ import { hasRole } from "../data/authApi";
 import { useAuthStore } from "../store/useAuthStore";
 import { useViewerStore } from "../store/useViewerStore";
 import { QuizEditorModal, EditorMode } from "./QuizEditor";
+import { QuizResultsModal } from "./QuizResultsModal";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = arr.slice();
@@ -72,6 +74,7 @@ export function QuizPanel({
   const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [editor, setEditor] = useState<EditorMode | null>(null);
+  const [resultsFor, setResultsFor] = useState<AnatomyQuiz | null>(null);
 
   const reload = useCallback(async (selectId?: string) => {
     const res = await loadQuizzes();
@@ -302,6 +305,18 @@ export function QuizPanel({
                   {qz.isPublic ? "Público" : "Privado"} · {SOURCE_LABEL[qz.source || "seed"]}
                   {qz.ownerName ? ` · de ${qz.ownerName}` : ""} · {qz.questions.length} preguntas
                 </span>
+                {qz.permissions?.results && (
+                  <button
+                    className="icon-btn"
+                    title="Resultados de los alumnos"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setResultsFor(qz);
+                    }}
+                  >
+                    <BarChart3 size={13} />
+                  </button>
+                )}
                 {qz.permissions?.publish && (
                   <button
                     className="icon-btn"
@@ -499,6 +514,8 @@ export function QuizPanel({
           </ul>
         </div>
       )}
+
+      {resultsFor && <QuizResultsModal quiz={resultsFor} onClose={() => setResultsFor(null)} />}
 
       {editor && (
         <QuizEditorModal

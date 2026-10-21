@@ -114,6 +114,9 @@ const FIELD_ES: Record<string, string> = {
   newPassword: "La nueva contraseña",
   currentPassword: "La contraseña actual",
   title: "El título",
+  name: "El nombre",
+  note: "La nota",
+  structureId: "El identificador de la estructura",
   questions: "La lista de preguntas",
   count: "El número de preguntas",
   systems: "La lista de sistemas",
@@ -189,6 +192,44 @@ export const updateUserSchema = {
     role: { enum: ["estudiante", "docente", "admin"] },
     isActive: { type: "boolean" },
   },
+} as const;
+
+// ---- Vistas y notas ----
+
+export const MAX_VIEW_STATE_BYTES = 20_000;
+
+export const viewSchema = {
+  type: "object",
+  required: ["name", "state"],
+  additionalProperties: false,
+  properties: {
+    name: { type: "string", minLength: 1, maxLength: 80 },
+    // El contenido lo define la web (versión, cámara, capas…); aquí solo se limita el tamaño.
+    state: { type: "object" },
+  },
+} as const;
+
+export const viewPatchSchema = {
+  type: "object",
+  additionalProperties: false,
+  minProperties: 1,
+  properties: {
+    name: { type: "string", minLength: 1, maxLength: 80 },
+    state: { type: "object" },
+  },
+} as const;
+
+export const noteSchema = {
+  type: "object",
+  required: ["note"],
+  additionalProperties: false,
+  properties: { note: { type: "string", maxLength: 5000 } },
+} as const;
+
+export const structureParams = {
+  type: "object",
+  required: ["structureId"],
+  properties: { structureId: { type: "string", pattern: "^[A-Za-z0-9_.-]{1,128}$" } },
 } as const;
 
 export const visibilitySchema = {
