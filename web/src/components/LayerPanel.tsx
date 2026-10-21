@@ -138,17 +138,89 @@ export function LayerPanel({
   };
 
   const handleToggleSystem = (sys: SystemId) => {
-    const willBeEnabled = !layers[sys].enabled;
-    toggleLayer(sys);
-    if (willBeEnabled) {
-      const sysItems = groupedBySystem.get(sys) || [];
+    const sysItems = groupedBySystem.get(sys) || [];
+    const visibleCount = layers[sys].enabled
+      ? sysItems.filter((i) => !hiddenIds[i.id]).length
+      : 0;
+
+    if (visibleCount > 0) {
+      // Si tiene alguna estructura visible, al pulsar el nodo padre lo apagamos todo
+      setLayerEnabled(sys, false);
       const hiddenInSys = sysItems
         .map((i) => i.id)
         .filter((id) => hiddenIds[id]);
       if (hiddenInSys.length > 0) {
         setStructuresHidden(hiddenInSys, false);
       }
+    } else {
+      // Si está completamente apagado, al pulsar el nodo padre lo encendemos todo
+      const hiddenInSys = sysItems
+        .map((i) => i.id)
+        .filter((id) => hiddenIds[id]);
+      if (hiddenInSys.length > 0) {
+        setStructuresHidden(hiddenInSys, false);
+      }
+      setLayerEnabled(sys, true);
     }
+  };
+
+  const handleToggleChild = (st: AnatomyStructure) => {
+    const isSysEnabled = layers[st.system]?.enabled;
+    const isExplicitlyHidden = Boolean(hiddenIds[st.id]);
+    const isCurrentlyVisible = isSysEnabled && !isExplicitlyHidden;
+
+    if (isCurrentlyVisible) {
+      // Estaba visible -> lo ocultamos
+      toggleHide(st.id);
+      // Si era la última estructura visible de este sistema, desactivamos la capa
+      const sysItems = groupedBySystem.get(st.system) || [];
+      const remainingVisible = sysItems.filter(
+        (i) => i.id !== st.id && !hiddenIds[i.id]
+      ).length;
+      if (remainingVisible === 0) {
+        setLayerEnabled(st.system, false);
+      }
+    } else {
+      // Estaba oculta -> la queremos mostrar
+      if (!isSysEnabled) {
+        // EL CASO CLAVE: Si el sistema estaba apagado y se hace clic en un hijo:
+        // Se activa el sistema en 3D pero ocultando TODOS los demás hermanos
+        // para que ÚNICAMENTE se muestre este nodo hijo en 3D
+        const sysItems = groupedBySystem.get(st.system) || [];
+        const otherIds = sysItems
+          .map((i) => i.id)
+          .filter((id) => id !== st.id);
+        setStructuresHidden(otherIds, true);
+        if (isExplicitlyHidden) {
+          setStructuresHidden([st.id], false);
+        }
+        setLayerEnabled(st.system, true);
+      } else {
+        // El sistema ya estaba prendido, simplemente quitamos la marca de oculto de este hijo
+        toggleHide(st.id);
+      }
+    }
+  };
+
+  const handleSelectChild = (st: AnatomyStructure) => {
+    if (!layers[st.system]?.enabled) {
+      // Si el sistema estaba apagado y el usuario selecciona el nodo en el árbol:
+      // Mostramos ÚNICAMENTE este hijo
+      const sysItems = groupedBySystem.get(st.system) || [];
+      const otherIds = sysItems
+        .map((i) => i.id)
+        .filter((id) => id !== st.id);
+      setStructuresHidden(otherIds, true);
+      if (hiddenIds[st.id]) {
+        setStructuresHidden([st.id], false);
+      }
+      setLayerEnabled(st.system, true);
+    } else {
+      if (hiddenIds[st.id]) {
+        toggleHide(st.id);
+      }
+    }
+    selectStructure(st.id);
   };
 
   return (
@@ -387,6 +459,10 @@ export function LayerPanel({
                 const items = groupedBySystem.get(sys) || [];
                 const isExpanded =
                   Boolean(treeFilter.trim()) || Boolean(expandedSystems[sys]);
+                const visibleCount = layers[sys].enabled
+                  ? items.filter((i) => !hiddenIds[i.id]).length
+                  : 0;
+                const isSysVisible = visibleCount > 0;
 
                 return (
                   <div key={sys} className="tree-group">
@@ -412,7 +488,14 @@ export function LayerPanel({
                         <span className="tree-sys-label">{meta.labelEs}</span>
                       </button>
                       <div className="layer-badges">
-                        <span className="badge-count">{items.length}</span>
+                        <span
+                          className="badge-count"
+                          title={`${visibleCount} de ${items.length} estructuras visibles`}
+                        >
+                          {visibleCount > 0 && visibleCount < items.length
+                            ? `${visibleCount}/${items.length}`
+                            : items.length}
+                        </span>
                         <button
                           className="icon-btn"
                           onClick={(e) => {
@@ -420,12 +503,12 @@ export function LayerPanel({
                             handleToggleSystem(sys);
                           }}
                           title={
-                            layers[sys].enabled
-                              ? "Ocultar sistema"
-                              : "Mostrar sistema"
+                            isSysVisible
+                              ? "Ocultar todas las estructuras de este sistema"
+                              : "Mostrar todas las estructuras de este sistema"
                           }
                         >
-                          {layers[sys].enabled ? (
+                          {isSysVisible ? (
                             <Eye size={14} />
                           ) : (
                             <EyeOff size={14} />
@@ -450,11 +533,7 @@ export function LayerPanel({
                             >
                               <button
                                 className="tree-node-select"
-                                onClick={() => {
-                                  setLayerEnabled(st.system, true);
-                                  if (isExplicitlyHidden) toggleHide(st.id);
-                                  selectStructure(st.id);
-                                }}
+                                onClick={() => handleSelectChild(st)}
                               >
                                 <span className="tree-node-name">
                                   {st.nameEs}
@@ -465,18 +544,11 @@ export function LayerPanel({
                               </button>
                               <button
                                 className="icon-btn"
-                                onClick={() => {
-                                  if (!isSysEnabled) {
-                                    setLayerEnabled(st.system, true);
-                                    if (isExplicitlyHidden) toggleHide(st.id);
-                                  } else {
-                                    toggleHide(st.id);
-                                  }
-                                }}
+                                onClick={() => handleToggleChild(st)}
                                 title={
                                   isHidden
-                                    ? "Mostrar estructura"
-                                    : "Ocultar estructura"
+                                    ? "Mostrar solamente esta estructura"
+                                    : "Ocultar esta estructura"
                                 }
                               >
                                 {isHidden ? (
