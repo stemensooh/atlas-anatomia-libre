@@ -132,8 +132,9 @@ body,
 .workspace {
   flex: 1;
   display: grid;
-  grid-template-columns: 295px 1fr 330px;
+  grid-template-columns: 380px 1fr 330px;
   min-height: 0;
+  position: relative;
 }
 
 .panel {
@@ -147,8 +148,46 @@ body,
 }
 
 .panel-left {
+  position: relative;
   border-right: 1px solid var(--border);
   overflow: hidden;
+}
+
+/* Tirador interactivo para redimensionar el panel izquierdo arrastrando con el ratón */
+.panel-resizer-edge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  bottom: 0;
+  cursor: col-resize;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.panel-resizer-edge:hover,
+.panel-resizer-edge.is-dragging {
+  background: rgba(56, 189, 248, 0.22);
+  border-right: 2px solid var(--accent);
+}
+
+.panel-resizer-handle {
+  width: 3px;
+  height: 38px;
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+
+.panel-resizer-edge:hover .panel-resizer-handle,
+.panel-resizer-edge.is-dragging .panel-resizer-handle {
+  background: var(--accent);
+  height: 56px;
+  box-shadow: 0 0 8px var(--accent);
 }
 
 .panel-right {
@@ -1261,18 +1300,27 @@ body,
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
+  min-width: 0;
 }
 
 .tree-node-select:hover {
   color: var(--text-0);
 }
 
+.tree-node-name {
+  line-height: 1.35;
+  word-break: break-word;
+  flex: 1;
+}
+
 .tree-node-id {
   font-family: monospace;
   font-size: 0.65rem;
   color: var(--text-2);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Planos de corte (3 ejes) - Anclado y colapsable */

@@ -15,6 +15,7 @@ import {
   SlidersHorizontal,
   Minimize2,
   Maximize2,
+  MoveHorizontal,
 } from "lucide-react";
 import {
   AnatomyStructure,
@@ -62,6 +63,38 @@ export function LayerPanel({
   const setStructuresHidden = useViewerStore((s) => s.setStructuresHidden);
   const setClipPlane = useViewerStore((s) => s.setClipPlane);
   const resetClipPlanes = useViewerStore((s) => s.resetClipPlanes);
+  const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
+  const setLeftPanelWidth = useViewerStore((s) => s.setLeftPanelWidth);
+
+  // Redimensionamiento interactivo arrastrando el borde derecho
+  const [isDragging, setIsDragging] = useState(false);
+
+  const startResizing = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      moveEvent.preventDefault();
+      const newWidth = Math.max(
+        280,
+        Math.min(window.innerWidth * 0.65, moveEvent.clientX)
+      );
+      setLeftPanelWidth(newWidth);
+    };
+
+    const onMouseUp = () => {
+      setIsDragging(false);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
 
   // Estados del árbol: sistema abierto, modo acordeón (1 a la vez por defecto para vista limpia), filtro
   const [expandedSystems, setExpandedSystems] = useState<
@@ -675,6 +708,18 @@ export function LayerPanel({
                 <div className="tree-toolbar-group">
                   <button
                     className="btn-xs"
+                    onClick={() => {
+                      if (leftPanelWidth < 420) setLeftPanelWidth(480);
+                      else if (leftPanelWidth < 560) setLeftPanelWidth(620);
+                      else setLeftPanelWidth(380);
+                    }}
+                    title={`Ancho del panel: ${leftPanelWidth}px. Clic para alternar (380px / 480px / 620px), o arrastra el borde derecho.`}
+                  >
+                    <MoveHorizontal size={12} />
+                    <span>{leftPanelWidth}px</span>
+                  </button>
+                  <button
+                    className="btn-xs"
                     onClick={collapseAllSystems}
                     title="Cerrar todos los sistemas del árbol"
                   >
@@ -1025,6 +1070,16 @@ export function LayerPanel({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Tirador interactivo de borde para arrastrar y cambiar el ancho del panel */}
+      <div
+        className={`panel-resizer-edge ${isDragging ? "is-dragging" : ""}`}
+        onMouseDown={startResizing}
+        onDoubleClick={() => setLeftPanelWidth(380)}
+        title="Arrastra para cambiar el ancho del panel (Doble clic: restablecer a 380px)"
+      >
+        <div className="panel-resizer-handle" />
       </div>
     </aside>
   );

@@ -35,6 +35,7 @@ export function App() {
   const toggleLabels3D = useViewerStore((s) => s.toggleLabels3D);
   const toggleTheme = useViewerStore((s) => s.toggleTheme);
   const setCreditsOpen = useViewerStore((s) => s.setCreditsOpen);
+  const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
 
   useEffect(() => {
     fetch("/data/processed/metadata.json")
@@ -209,7 +210,12 @@ export function App() {
         </div>
       </header>
 
-      <main className="workspace">
+      <main
+        className="workspace"
+        style={{
+          gridTemplateColumns: `${leftPanelWidth}px 1fr 330px`,
+        }}
+      >
         {metadata && (
           <LayerPanel
             systemsInfo={activeSystemsInfo}

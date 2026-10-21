@@ -41,6 +41,7 @@ interface ViewerState {
   theme: "dark" | "light";
   sliderMode: SliderMode;
   creditsOpen: boolean;
+  leftPanelWidth: number;
 
   // Callback opcional cuando hay una pregunta "find3d" activa en el cuestionario
   quizClickHandler: ((clickedStructureId: string) => void) | null;
@@ -49,6 +50,7 @@ interface ViewerState {
   setRightTab: (tab: RightTab) => void;
   setBodySex: (sex: BodySex) => void;
   setSliderMode: (mode: SliderMode) => void;
+  setLeftPanelWidth: (width: number) => void;
   toggleLayer: (sys: SystemId) => void;
   setLayerEnabled: (sys: SystemId, enabled: boolean) => void;
   setLayerOpacity: (sys: SystemId, opacity: number) => void;
@@ -105,6 +107,17 @@ const initialClip: ClipPlanesState = {
   invertZ: false,
 };
 
+function getStoredLeftWidth(): number {
+  try {
+    const val = localStorage.getItem("biodigital_left_width");
+    if (val) {
+      const n = parseInt(val, 10);
+      if (!isNaN(n) && n >= 280 && n <= 700) return n;
+    }
+  } catch {}
+  return 380;
+}
+
 export const useViewerStore = create<ViewerState>((set) => ({
   mode: "body",
   rightTab: "info",
@@ -123,6 +136,7 @@ export const useViewerStore = create<ViewerState>((set) => ({
   sliderMode: "dissection",
   creditsOpen: false,
   quizClickHandler: null,
+  leftPanelWidth: getStoredLeftWidth(),
 
   setMode: (mode, hubmapOrganId = null) =>
     set((s) => ({
@@ -145,6 +159,14 @@ export const useViewerStore = create<ViewerState>((set) => ({
     })),
 
   setSliderMode: (sliderMode) => set({ sliderMode }),
+
+  setLeftPanelWidth: (width) => {
+    const clamped = Math.max(280, Math.min(700, Math.round(width)));
+    try {
+      localStorage.setItem("biodigital_left_width", String(clamped));
+    } catch {}
+    set({ leftPanelWidth: clamped });
+  },
 
   toggleLayer: (sys) =>
     set((s) => ({
