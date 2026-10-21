@@ -2,6 +2,14 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-010 · Subnodos jerárquicos multinivel en el árbol anatómico con cascada estricta de visibilidad
+- **Contexto:** En el árbol anatómico, la navegación plana de cientos de estructuras por sistema resultaba poco didáctica. Se requería una jerarquía multinivel análoga a Z-Anatomy (`Sistema → Regiones/Subnodos → Subgrupos → Estructuras`), preservando la regla estricta de que un nodo padre desmarcado desmarca a todos sus descendientes, y que la selección de un hijo desmarcado aísla ese único elemento sin activar a sus hermanos.
+- **Decisión:**
+  - Crear el módulo `web/src/data/hierarchyData.ts` que clasifica automáticamente el 100 % de las estructuras anatómicas (masculinas y femeninas) en subregiones naturales (ej. esqueleto: Cráneo y cara, Columna vertebral, Caja torácica, Miembro superior [Hombro y brazo, Antebrazo, Mano y dedos], Pelvis y miembro inferior [Pelvis y muslo, Pierna, Pie y dedos]).
+  - Implementar en `web/src/components/LayerPanel.tsx` un renderizado recursivo con subnodos colapsables, contadores visibles/totales, botones de alternancia `[Eye / EyeOff]` y controles independientes por nivel.
+  - Aplicar la cascada estricta: si un nodo padre (sistema o subnodo) está desactivado, todos sus hijos se visualizan desmarcados (`EyeOff` y `.is-hidden`). Al hacer clic en un hijo u órgano desmarcado, se visualiza en 3D exclusivamente ese elemento (y su ruta de ancestros con su contador respectivo), manteniendo ocultos a todos los demás hermanos.
+- **Consecuencia:** La exploración anatómica en el árbol es limpia, jerárquica y 100 % fiel a la pedagogía de Z-Anatomy.
+
 ## 2026-10-20 · D-009 · Cierre de Fase 4 (Funciones didácticas) y aplazamiento del hosting a Fase 6
 - **Contexto:** Antes de desplegar en un hosting público es necesario ajustar de dónde se servirán los archivos pesados (`data/processed/` y `data/raw/hubmap/`). Mientras tanto se priorizó completar todas las herramientas didácticas de la Fase 4.
 - **Decisión:**

@@ -23,6 +23,12 @@ import {
   SystemInfo,
   HubmapOrgan,
 } from "../data/types";
+import {
+  buildSystemHierarchy,
+  TreeNodeItem,
+  TreeBranchNode,
+  getStructureHierarchyPath,
+} from "../data/hierarchyData";
 import { useViewerStore } from "../store/useViewerStore";
 
 export function LayerPanel({
@@ -63,6 +69,9 @@ export function LayerPanel({
   >({
     skeletal: true,
   });
+  const [expandedSubnodes, setExpandedSubnodes] = useState<
+    Record<string, boolean>
+  >({});
   const [accordionMode, setAccordionMode] = useState<boolean>(true);
   const [treeFilter, setTreeFilter] = useState<string>("");
 
@@ -81,7 +90,7 @@ export function LayerPanel({
     }
   }, [hasAnyClip]);
 
-  // Si se selecciona una estructura en 3D o búsqueda, auto-expandir su sistema en el árbol
+  // Si se selecciona una estructura en 3D o búsqueda, auto-expandir su sistema y subnodos en el árbol
   useEffect(() => {
     if (selectedId && mode === "tree") {
       const st = structures.find((s) => s.id === selectedId);
@@ -89,6 +98,14 @@ export function LayerPanel({
         setExpandedSystems((prev) =>
           accordionMode ? { [st.system]: true } : { ...prev, [st.system]: true }
         );
+        const path = getStructureHierarchyPath(st);
+        const l2Id = `${st.system}/${path[0]}`;
+        const l3Id = path[1] ? `${l2Id}/${path[1]}` : null;
+        setExpandedSubnodes((prev) => ({
+          ...prev,
+          [l2Id]: true,
+          ...(l3Id ? { [l3Id]: true } : {}),
+        }));
       }
     }
   }, [selectedId, mode, structures, accordionMode]);
@@ -117,6 +134,16 @@ export function LayerPanel({
     return map;
   }, [structures, treeFilter]);
 
+  // Construir la jerarquía multinivel para cada sistema
+  const hierarchyBySystem = useMemo(() => {
+    const map = new Map<SystemId, TreeNodeItem[]>();
+    for (const sys of Object.keys(SYSTEM_META) as SystemId[]) {
+      const items = groupedBySystem.get(sys) || [];
+      map.set(sys, buildSystemHierarchy(sys, items));
+    }
+    return map;
+  }, [groupedBySystem]);
+
   const toggleSystemExpand = (sys: SystemId) => {
     setExpandedSystems((prev) => {
       const isCurrentlyOpen = Boolean(prev[sys]);
@@ -128,20 +155,41 @@ export function LayerPanel({
     });
   };
 
+  const toggleSubnodeExpand = (branchId: string) => {
+    setExpandedSubnodes((prev) => ({
+      ...prev,
+      [branchId]: !prev[branchId],
+    }));
+  };
+
   const collapseAllSystems = () => {
     setExpandedSystems({});
+    setExpandedSubnodes({});
   };
 
   const expandAllSystems = () => {
-    const all: Partial<Record<SystemId, boolean>> = {};
+    const allSys: Partial<Record<SystemId, boolean>> = {};
+    const allSubs: Record<string, boolean> = {};
     for (const sys of Object.keys(SYSTEM_META) as SystemId[]) {
-      all[sys] = true;
+      allSys[sys] = true;
     }
-    setExpandedSystems(all);
+    for (const [, treeItems] of hierarchyBySystem) {
+      const visit = (items: TreeNodeItem[]) => {
+        for (const it of items) {
+          if (it.type === "branch") {
+            allSubs[it.id] = true;
+            visit(it.children);
+          }
+        }
+      };
+      visit(treeItems);
+    }
+    setExpandedSystems(allSys);
+    setExpandedSubnodes(allSubs);
   };
 
   const handleToggleSystem = (sys: SystemId) => {
-    const sysItems = groupedBySystem.get(sys) || [];
+    const sysItems = structures.filter((s) => s.system === sys);
     const visibleCount = layers[sys].enabled
       ? sysItems.filter((i) => !hiddenIds[i.id]).length
       : 0;
@@ -167,16 +215,55 @@ export function LayerPanel({
     }
   };
 
+  const handleToggleBranch = (branch: TreeBranchNode) => {
+    const sys = branch.system;
+    const isSysEnabled = Boolean(layers[sys]?.enabled);
+    const branchIds = branch.allItemIds;
+    const visibleCount = isSysEnabled
+      ? branchIds.filter((id) => !hiddenIds[id]).length
+      : 0;
+
+    const sysItems = structures.filter((s) => s.system === sys);
+
+    if (visibleCount > 0) {
+      // Rama con estructuras visibles -> las ocultamos todas
+      setStructuresHidden(branchIds, true);
+      // Si ya no queda ninguna visible en el sistema, apagamos la capa
+      const otherVisible = sysItems.filter(
+        (s) => !branchIds.includes(s.id) && !hiddenIds[s.id]
+      ).length;
+      if (otherVisible === 0) {
+        setLayerEnabled(sys, false);
+      }
+    } else {
+      // Rama apagada -> la encendemos
+      if (!isSysEnabled) {
+        // Si el sistema estaba apagado, activamos el sistema pero ocultando todos los demás
+        // elementos ajenos a esta rama para que ÚNICAMENTE se muestre esta rama en 3D
+        const otherIds = sysItems
+          .map((s) => s.id)
+          .filter((id) => !branchIds.includes(id));
+        setStructuresHidden(otherIds, true);
+        setStructuresHidden(branchIds, false);
+        setLayerEnabled(sys, true);
+      } else {
+        // El sistema ya estaba activo, simplemente desocultamos las estructuras de esta rama
+        setStructuresHidden(branchIds, false);
+      }
+    }
+  };
+
   const handleToggleChild = (st: AnatomyStructure) => {
     const isSysEnabled = layers[st.system]?.enabled;
     const isExplicitlyHidden = Boolean(hiddenIds[st.id]);
     const isCurrentlyVisible = isSysEnabled && !isExplicitlyHidden;
 
+    const sysItems = structures.filter((s) => s.system === st.system);
+
     if (isCurrentlyVisible) {
       // Estaba visible -> lo ocultamos
       toggleHide(st.id);
       // Si era la última estructura visible de este sistema, desactivamos la capa
-      const sysItems = groupedBySystem.get(st.system) || [];
       const remainingVisible = sysItems.filter(
         (i) => i.id !== st.id && !hiddenIds[i.id]
       ).length;
@@ -189,7 +276,6 @@ export function LayerPanel({
         // EL CASO CLAVE: Si el sistema estaba apagado y se hace clic en un hijo:
         // Se activa el sistema en 3D pero ocultando TODOS los demás hermanos
         // para que ÚNICAMENTE se muestre este nodo hijo en 3D
-        const sysItems = groupedBySystem.get(st.system) || [];
         const otherIds = sysItems
           .map((i) => i.id)
           .filter((id) => id !== st.id);
@@ -206,10 +292,10 @@ export function LayerPanel({
   };
 
   const handleSelectChild = (st: AnatomyStructure) => {
+    const sysItems = structures.filter((s) => s.system === st.system);
     if (!layers[st.system]?.enabled) {
       // Si el sistema estaba apagado y el usuario selecciona el nodo en el árbol:
       // Mostramos ÚNICAMENTE este hijo
-      const sysItems = groupedBySystem.get(st.system) || [];
       const otherIds = sysItems
         .map((i) => i.id)
         .filter((id) => id !== st.id);
@@ -224,6 +310,118 @@ export function LayerPanel({
       }
     }
     selectStructure(st.id);
+  };
+
+  // Renderizado recursivo de elementos del árbol (subnodos / hojas)
+  const renderTreeItem = (item: TreeNodeItem) => {
+    if (item.type === "leaf") {
+      const st = item.structure;
+      const isSysEnabled = Boolean(layers[st.system]?.enabled);
+      const isExplicitlyHidden = Boolean(hiddenIds[st.id]);
+      const isHidden = !isSysEnabled || isExplicitlyHidden;
+      const indentPx = item.level === 4 ? 36 : item.level === 3 ? 24 : 14;
+
+      return (
+        <div
+          key={st.id}
+          className={`tree-node-row ${
+            selectedId === st.id ? "selected" : ""
+          } ${isHidden ? "is-hidden" : ""}`}
+          style={{ paddingLeft: `${indentPx}px` }}
+        >
+          <button
+            className="tree-node-select"
+            onClick={() => handleSelectChild(st)}
+          >
+            <span className="tree-node-name">{st.nameEs}</span>
+            <small className="tree-node-id">{st.id}</small>
+          </button>
+          <button
+            className="icon-btn"
+            onClick={() => handleToggleChild(st)}
+            title={
+              isHidden
+                ? "Mostrar solamente esta estructura"
+                : "Ocultar esta estructura"
+            }
+          >
+            {isHidden ? <EyeOff size={13} /> : <Eye size={13} />}
+          </button>
+        </div>
+      );
+    }
+
+    const branch = item;
+    const isSysEnabled = Boolean(layers[branch.system]?.enabled);
+    const branchIds = branch.allItemIds;
+    const branchVisibleCount = isSysEnabled
+      ? branchIds.filter((id) => !hiddenIds[id]).length
+      : 0;
+    const isBranchVisible = branchVisibleCount > 0;
+    const isFiltering = Boolean(treeFilter.trim());
+    const isExpanded = isFiltering || Boolean(expandedSubnodes[branch.id]);
+    const indentPx = branch.level === 3 ? 24 : 14;
+
+    return (
+      <div key={branch.id} className="tree-subnode">
+        <div
+          className={`tree-subnode-header ${
+            !isBranchVisible ? "is-hidden" : ""
+          }`}
+          style={{ paddingLeft: `${indentPx}px` }}
+        >
+          <button
+            className="tree-subnode-btn"
+            onClick={() => toggleSubnodeExpand(branch.id)}
+            title={
+              isExpanded
+                ? `Colapsar ${branch.label}`
+                : `Expandir ${branch.label}`
+            }
+          >
+            {isExpanded ? (
+              <ChevronDown size={13} />
+            ) : (
+              <ChevronRight size={13} />
+            )}
+            <span className="tree-subnode-title">{branch.label}</span>
+          </button>
+
+          <div className="tree-subnode-actions">
+            <span
+              className="tree-subnode-badge"
+              title={`${branchVisibleCount} de ${branchIds.length} visibles`}
+            >
+              {branchVisibleCount > 0 &&
+              branchVisibleCount < branchIds.length
+                ? `${branchVisibleCount}/${branchIds.length}`
+                : branchIds.length}
+            </span>
+
+            <button
+              className="icon-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleBranch(branch);
+              }}
+              title={
+                isBranchVisible
+                  ? `Ocultar todas las estructuras de ${branch.label}`
+                  : `Mostrar todas las estructuras de ${branch.label}`
+              }
+            >
+              {isBranchVisible ? <Eye size={13} /> : <EyeOff size={13} />}
+            </button>
+          </div>
+        </div>
+
+        {isExpanded && branch.children.length > 0 && (
+          <div className="tree-subnode-children">
+            {branch.children.map((child) => renderTreeItem(child))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -606,47 +804,9 @@ export function LayerPanel({
 
                     {isExpanded && items.length > 0 && (
                       <div className="tree-children">
-                        {items.map((st) => {
-                          const isSysEnabled = layers[st.system]?.enabled;
-                          const isExplicitlyHidden = Boolean(hiddenIds[st.id]);
-                          const isHidden = !isSysEnabled || isExplicitlyHidden;
-
-                          return (
-                            <div
-                              key={st.id}
-                              className={`tree-node-row ${
-                                selectedId === st.id ? "selected" : ""
-                              } ${isHidden ? "is-hidden" : ""}`}
-                            >
-                              <button
-                                className="tree-node-select"
-                                onClick={() => handleSelectChild(st)}
-                              >
-                                <span className="tree-node-name">
-                                  {st.nameEs}
-                                </span>
-                                <small className="tree-node-id">
-                                  {st.id}
-                                </small>
-                              </button>
-                              <button
-                                className="icon-btn"
-                                onClick={() => handleToggleChild(st)}
-                                title={
-                                  isHidden
-                                    ? "Mostrar solamente esta estructura"
-                                    : "Ocultar esta estructura"
-                                }
-                              >
-                                {isHidden ? (
-                                  <EyeOff size={13} />
-                                ) : (
-                                  <Eye size={13} />
-                                )}
-                              </button>
-                            </div>
-                          );
-                        })}
+                        {(hierarchyBySystem.get(sys) || []).map((child) =>
+                          renderTreeItem(child)
+                        )}
                       </div>
                     )}
                   </div>
