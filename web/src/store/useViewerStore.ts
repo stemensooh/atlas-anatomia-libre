@@ -177,7 +177,11 @@ export const useViewerStore = create<ViewerState>((set) => ({
       for (const k of Object.keys(next) as SystemId[]) {
         next[k] = { ...next[k], enabled };
       }
-      return { layers: next };
+      return {
+        layers: next,
+        hiddenIds: enabled ? {} : s.hiddenIds,
+        isolatedId: enabled ? null : s.isolatedId,
+      };
     }),
 
   selectStructure: (id) =>

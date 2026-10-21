@@ -226,6 +226,14 @@ export function LayerPanel({
               <GitBranch size={15} />
               <span>Árbol anatómico ({structures.length})</span>
             </div>
+            <div className="mini-actions">
+              <button className="btn-xs" onClick={() => enableAllLayers(true)}>
+                Todos
+              </button>
+              <button className="btn-xs" onClick={() => enableAllLayers(false)}>
+                Ninguno
+              </button>
+            </div>
           </div>
 
           <input
