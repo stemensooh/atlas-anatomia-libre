@@ -140,18 +140,44 @@ body,
   background: rgba(15, 23, 42, 0.92);
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-height: 0;
-  overflow-y: auto;
   padding: 12px;
   gap: 10px;
 }
 
 .panel-left {
   border-right: 1px solid var(--border);
+  overflow: hidden;
 }
 
 .panel-right {
   border-left: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.panel-fixed-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.panel-scroll-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.layers-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
 }
 
 .mode-tabs {
@@ -273,6 +299,10 @@ body,
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 3px;
 }
 
 .layer-card {
@@ -950,6 +980,14 @@ body,
   gap: 8px;
   min-height: 0;
   flex: 1;
+  overflow: hidden;
+}
+
+.tree-header-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .tree-filter-input {
@@ -966,20 +1004,35 @@ body,
   border-color: var(--accent);
 }
 
+.tree-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.tree-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .tree-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding-right: 2px;
+  padding-right: 3px;
+  scroll-behavior: smooth;
 }
 
 .tree-group {
   border: 1px solid var(--border);
   border-radius: 7px;
   background: rgba(30, 41, 59, 0.35);
-  overflow: hidden;
+  overflow: visible; /* Permite que el encabezado del sistema sea sticky */
 }
 
 [data-theme="light"] .tree-group {
@@ -987,10 +1040,21 @@ body,
 }
 
 .tree-group-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 7px;
+  padding: 6px 8px;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+[data-theme="light"] .tree-group-header {
+  background: rgba(241, 245, 249, 0.96);
 }
 
 .tree-expand-btn {
@@ -1008,9 +1072,9 @@ body,
 }
 
 .tree-children {
-  border-top: 1px solid var(--border);
-  max-height: 210px;
-  overflow-y: auto;
+  border-top: none;
+  max-height: none; /* Sin scrollbars anidadas internas */
+  overflow: visible; /* Todo fluye naturalmente en el scroll del árbol */
   display: flex;
   flex-direction: column;
 }
@@ -1019,7 +1083,7 @@ body,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 3px 6px 3px 18px;
+  padding: 4px 6px 4px 18px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.08);
   gap: 4px;
 }
@@ -1057,14 +1121,53 @@ body,
   color: var(--text-2);
 }
 
-/* Planos de corte (3 ejes) */
+/* Planos de corte (3 ejes) - Anclado y colapsable */
 .clip-section {
+  flex-shrink: 0;
   margin-top: auto;
-  padding-top: 10px;
+  padding-top: 8px;
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.clip-header-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.clip-header-btn:hover {
+  color: var(--text-0);
+}
+
+.clip-active-badge {
+  font-size: 0.65rem;
+  background: rgba(56, 189, 248, 0.2);
+  color: var(--accent);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 2px;
+}
+
+.clip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .clip-plane-box {
