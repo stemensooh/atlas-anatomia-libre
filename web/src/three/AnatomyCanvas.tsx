@@ -112,6 +112,8 @@ function SystemLayerGroup({
               side: THREE.DoubleSide,
             });
             mesh.material = mat;
+            mesh.userData.structureId = cid;
+            mesh.userData.system = system;
             const box = new THREE.Box3().setFromObject(mesh);
             const c = box.getCenter(new THREE.Vector3());
             const radialDist = Math.sqrt(c.x * c.x + c.z * c.z);
