@@ -18,6 +18,8 @@ import { AnatomyCanvas } from "./three/AnatomyCanvas";
 import { LayerPanel } from "./components/LayerPanel";
 import { InfoPanel } from "./components/InfoPanel";
 import { CreditsModal } from "./components/CreditsModal";
+import { AccountModals, UserMenu } from "./components/UserMenu";
+import { useAuthStore } from "./store/useAuthStore";
 
 export function App() {
   const [metadata, setMetadata] = useState<MetadataDoc | null>(null);
@@ -36,6 +38,11 @@ export function App() {
   const toggleTheme = useViewerStore((s) => s.toggleTheme);
   const setCreditsOpen = useViewerStore((s) => s.setCreditsOpen);
   const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
+  const loadSession = useAuthStore((s) => s.loadSession);
+
+  useEffect(() => {
+    loadSession();
+  }, [loadSession]);
 
   useEffect(() => {
     fetch("/data/processed/metadata.json")
@@ -212,6 +219,7 @@ export function App() {
             <ShieldCheck size={15} />
             <span>Créditos y Licencias</span>
           </button>
+          <UserMenu />
         </div>
       </header>
 
@@ -270,6 +278,7 @@ export function App() {
       </main>
 
       <CreditsModal />
+      <AccountModals />
     </div>
   );
 }

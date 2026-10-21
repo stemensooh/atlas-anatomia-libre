@@ -16,6 +16,27 @@ export const SYSTEM_IDS = [
 export type SystemId = (typeof SYSTEM_IDS)[number];
 export type BodySex = "male" | "female";
 export type QuizSource = "seed" | "manual" | "generated";
+export type Role = "estudiante" | "docente" | "admin";
+
+// Usuario que hace la petición (null = sin sesión).
+export interface Viewer {
+  id: number;
+  username: string;
+  role: Role;
+}
+
+export interface User extends Viewer {
+  isActive: boolean;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+// Lo que el usuario actual puede hacer con un cuestionario (lo calcula access.ts).
+export interface QuizPermissions {
+  edit: boolean;
+  delete: boolean;
+  publish: boolean;
+}
 
 export interface QuizQuestion {
   id: string;
@@ -35,23 +56,13 @@ export interface Quiz {
   title: string;
   subtitle: string;
   source: QuizSource;
-  userId: number | null; // dueño (null = sin dueño); se usará con la autenticación
+  userId: number | null; // dueño (null = sin dueño: incluidos y anteriores a las cuentas)
+  ownerName: string | null;
+  isPublic: boolean;
   createdAt: string;
   updatedAt: string;
   questions: QuizQuestion[];
-}
-
-export interface QuizSummary {
-  id: string;
-  title: string;
-  subtitle: string;
-  source: QuizSource;
-  userId: number | null;
-  createdAt: string;
-  updatedAt: string;
-  questionCount: number;
-  attemptCount: number;
-  bestRatio: number | null;
+  permissions?: QuizPermissions;
 }
 
 export interface QuizInput {
@@ -77,6 +88,7 @@ export interface QuizAttemptInput {
 export interface QuizAttempt extends QuizAttemptInput {
   id: number;
   quizId: string;
+  quizTitle?: string;
   userId: number | null;
   finishedAt: string;
 }

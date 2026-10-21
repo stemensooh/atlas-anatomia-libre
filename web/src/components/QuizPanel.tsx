@@ -3,7 +3,10 @@ import {
   Award,
   CheckCircle2,
   Database,
+  Globe,
   Lightbulb,
+  Lock,
+  LogIn,
   Pencil,
   Plus,
   RotateCcw,
@@ -20,7 +23,10 @@ import {
   QuizAnswer,
   QuizAttempt,
   saveAttempt,
+  setQuizVisibility,
 } from "../data/quizApi";
+import { hasRole } from "../data/authApi";
+import { useAuthStore } from "../store/useAuthStore";
 import { useViewerStore } from "../store/useViewerStore";
 import { QuizEditorModal, EditorMode } from "./QuizEditor";
 
@@ -50,6 +56,9 @@ export function QuizPanel({
   const selectStructure = useViewerStore((s) => s.selectStructure);
   const applySceneConfig = useViewerStore((s) => s.applySceneConfig);
   const setQuizClickHandler = useViewerStore((s) => s.setQuizClickHandler);
+  const user = useAuthStore((s) => s.user);
+  const authReady = useAuthStore((s) => s.ready);
+  const openModal = useAuthStore((s) => s.openModal);
 
   const [quizzes, setQuizzes] = useState<AnatomyQuiz[]>([]);
   const [online, setOnline] = useState<boolean | null>(null);
@@ -76,9 +85,10 @@ export function QuizPanel({
     });
   }, []);
 
+  // Al iniciar o cerrar sesión cambian los cuestionarios visibles y sus permisos.
   useEffect(() => {
-    reload();
-  }, [reload]);
+    if (authReady) reload();
+  }, [reload, authReady, user?.id]);
 
   const activeQuiz = quizzes.find((q) => q.id === activeQuizId) || null;
   const currentQuestion: QuizQuestion | null =
@@ -131,14 +141,14 @@ export function QuizPanel({
 
   // Historial de intentos del cuestionario activo.
   useEffect(() => {
-    if (!online || !activeQuizId) {
+    if (!online || !user || !activeQuizId) {
       setAttempts([]);
       return;
     }
     listAttempts(activeQuizId)
       .then(setAttempts)
       .catch(() => setAttempts([]));
-  }, [online, activeQuizId]);
+  }, [online, user, activeQuizId]);
 
   const recordAnswer = useCallback(
     (q: QuizQuestion, a: Omit<QuizAnswer, "questionId">) => {
@@ -189,6 +199,10 @@ export function QuizPanel({
       setSaveStatus("Sin servidor: el resultado no se ha guardado.");
       return;
     }
+    if (!user) {
+      setSaveStatus("Inicia sesión para guardar tus resultados.");
+      return;
+    }
     const list = activeQuiz.questions.map(
       (q) =>
         answers[q.id] || { questionId: q.id, correct: false, answer: null, revealed: false }
@@ -207,6 +221,15 @@ export function QuizPanel({
     try {
       await deleteQuiz(quiz.id);
       await reload(quiz.id === activeQuizId ? undefined : activeQuizId ?? undefined);
+    } catch (err) {
+      window.alert((err as Error).message);
+    }
+  };
+
+  const onToggleVisibility = async (quiz: AnatomyQuiz) => {
+    try {
+      await setQuizVisibility(quiz.id, !quiz.isPublic);
+      await reload(activeQuizId ?? undefined);
     } catch (err) {
       window.alert((err as Error).message);
     }
@@ -233,14 +256,25 @@ export function QuizPanel({
         </span>
       </div>
 
-      {online && (
+      {online && !user && (
+        <div className="quiz-login-hint">
+          <span>Inicia sesión para guardar tus resultados y generar cuestionarios.</span>
+          <button className="btn-xs" onClick={() => openModal("login")}>
+            <LogIn size={13} /> Entrar
+          </button>
+        </div>
+      )}
+
+      {online && user && (
         <div className="quiz-toolbar">
           <button className="btn-xs" onClick={() => setEditor({ kind: "generate" })}>
             <Sparkles size={13} /> Generar
           </button>
-          <button className="btn-xs" onClick={() => setEditor({ kind: "create" })}>
-            <Plus size={13} /> Nuevo
-          </button>
+          {hasRole(user, "docente") && (
+            <button className="btn-xs" onClick={() => setEditor({ kind: "create" })}>
+              <Plus size={13} /> Nuevo
+            </button>
+          )}
         </div>
       )}
 
@@ -264,28 +298,46 @@ export function QuizPanel({
             {online && (
               <div className="quiz-card-actions">
                 <span className="quiz-source-badge">
-                  {SOURCE_LABEL[qz.source || "seed"]} · {qz.questions.length} preguntas
+                  {qz.isPublic ? <Globe size={11} /> : <Lock size={11} />}{" "}
+                  {qz.isPublic ? "Público" : "Privado"} · {SOURCE_LABEL[qz.source || "seed"]}
+                  {qz.ownerName ? ` · de ${qz.ownerName}` : ""} · {qz.questions.length} preguntas
                 </span>
-                <button
-                  className="icon-btn"
-                  title="Editar"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditor({ kind: "edit", quiz: qz });
-                  }}
-                >
-                  <Pencil size={13} />
-                </button>
-                <button
-                  className="icon-btn"
-                  title="Borrar"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(qz);
-                  }}
-                >
-                  <Trash2 size={13} />
-                </button>
+                {qz.permissions?.publish && (
+                  <button
+                    className="icon-btn"
+                    title={qz.isPublic ? "Ocultar (hacer privado)" : "Publicar para todos"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleVisibility(qz);
+                    }}
+                  >
+                    {qz.isPublic ? <Lock size={13} /> : <Globe size={13} />}
+                  </button>
+                )}
+                {qz.permissions?.edit && (
+                  <button
+                    className="icon-btn"
+                    title="Editar"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditor({ kind: "edit", quiz: qz });
+                    }}
+                  >
+                    <Pencil size={13} />
+                  </button>
+                )}
+                {qz.permissions?.delete && (
+                  <button
+                    className="icon-btn"
+                    title="Borrar"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(qz);
+                    }}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -426,9 +478,9 @@ export function QuizPanel({
         </div>
       )}
 
-      {online && attempts.length > 0 && (
+      {online && user && attempts.length > 0 && (
         <div className="quiz-history">
-          <strong>Historial ({attempts.length})</strong>
+          <strong>Tu historial ({attempts.length})</strong>
           {bestAttempt && (
             <small>
               Mejor resultado: {bestAttempt.score}/{bestAttempt.total} (

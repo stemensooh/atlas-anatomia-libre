@@ -2,6 +2,33 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-013 · Autenticación propia con sesiones en SQLite, tres roles y cuestionarios privados
+- **Contexto:** Fase 5. El usuario eligió: roles admin, docente y estudiante; sin sesión se puede ver y jugar pero no guardar; registro libre solo con usuario y contraseña; los cuestionarios de los usuarios son privados hasta que un docente o admin los publica. Se sigue con SQLite (D-012).
+- **Decisión:**
+  - **Sin dependencias nuevas.** Contraseñas con `scrypt` de `node:crypto` (N=2^15, r=8, p=1, sal de 16 bytes; los parámetros se guardan en el hash). Sesiones con un token aleatorio de 32 bytes en una cookie `bd_session` `HttpOnly` + `SameSite=Strict` (+ `Secure` con `COOKIE_SECURE=1`), de 30 días. En la BD solo se guarda el SHA-256 del token.
+  - **Migración v3:** tablas `users` (nombre sin distinguir mayúsculas, rol, activo, alta y último acceso) y `sessions`. `quizzes` y `quiz_attempts` se reconstruyen para que `user_id` sea clave foránea con `ON DELETE CASCADE` (borrar una cuenta borra sus datos), y se añade `is_public`. Lo anterior a las cuentas queda sin dueño y público. Las migraciones se ejecutan con las claves foráneas desactivadas y `PRAGMA foreign_key_check` al final.
+  - **Accesos** (`server/src/access.ts`):
+    - **Sin sesión:** ve y juega los cuestionarios públicos.
+    - **Estudiante:** además guarda intentos, genera cuestionarios privados y borra los suyos.
+    - **Docente:** además crea y edita a mano, y publica u oculta los suyos.
+    - **Admin:** todo sobre cualquier cuestionario y gestión de usuarios.
+    - El servidor envía `permissions` en cada cuestionario y la web solo muestra lo permitido. Cada usuario ve solo su historial.
+  - **Seguridad:**
+    - Bloqueo tras 5 fallos de login por IP y usuario en 15 min.
+    - Se verifica siempre un hash, aunque el usuario no exista, para que el tiempo de respuesta no lo delate.
+    - **CSRF:** las peticiones que cambian datos deben traer un `Origin` igual al host (o a `X-Forwarded-Host` detrás de un proxy). El proxy de Vite usa `changeOrigin: false` para conservar el `Host`.
+    - Cambiar o restablecer la contraseña cierra las otras sesiones.
+    - Nunca se queda el sistema sin un admin activo.
+  - **Primer administrador:** `pnpm run create-admin -- <usuario>` pide la contraseña sin mostrarla (o la lee de `BIODIGITAL_ADMIN_PASSWORD`).
+  - **Pantallas:**
+    - Iniciar sesión / Crear cuenta.
+    - Menú de usuario en la barra superior.
+    - Mi perfil: historial, cambiar contraseña y borrar la cuenta.
+    - Administración de usuarios: rol, activar/desactivar, restablecer contraseña y borrar.
+    - Privacidad: qué se guarda y qué no.
+  - Sin recuperación por correo (no se pide email): la contraseña la restablece un admin.
+- **Consecuencia:** Se cumple el criterio de salida de la Fase 5 salvo "guardar una vista": un usuario puede registrarse y recuperar sus resultados. Pendiente: vistas y notas por estructura, y que un docente vea los resultados de sus alumnos.
+
 ## 2026-10-21 · D-012 · Generador por niveles calculados desde los GLB, columna user_id y SQLite como única BD
 - **Contexto:** El generador de D-011 elegía estructuras al azar con una sola plantilla. Podía tocar piezas diminutas o **grupos sin malla propia**, como los 22 grupos femeninos de HuBMAP (por ejemplo `VH_F_femur_L`), imposibles de acertar con un clic. El usuario pidió mejorarlo sin IA y preparar los cuestionarios para la autenticación. Indicó también que se siga con SQLite y que no se haga nada con PostgreSQL hasta que lo pida.
 - **Decisión:**

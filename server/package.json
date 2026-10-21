@@ -13,7 +13,8 @@
     "start": "node --disable-warning=ExperimentalWarning src/index.ts",
     "seed": "node --disable-warning=ExperimentalWarning src/seed.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.ts"
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.ts",
+    "create-admin": "node --disable-warning=ExperimentalWarning src/create-admin.ts"
   },
   "dependencies": {
     "fastify": "^5.12.7"

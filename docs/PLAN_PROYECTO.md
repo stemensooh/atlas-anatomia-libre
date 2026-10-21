@@ -335,9 +335,11 @@ Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.
 - [x] Columna `user_id` en cuestionarios e intentos, preparada para las cuentas (migración v2, D-012).
 - [x] Historial de intentos por cuestionario (sin cuentas todavía).
 - [x] Corrección de los errores del quiz: puntos indebidos y respuestas visibles antes de contestar.
-- [ ] Autenticación y cuentas de usuario.
+- [x] Autenticación y cuentas de usuario: registro, login, sesiones, roles admin/docente/estudiante y panel de administración (D-013).
+- [x] Cuestionarios privados por usuario; docentes y administradores publican (D-013).
 - [ ] Guardar vistas y notas por estructura.
-- [ ] Página de privacidad (qué datos se guardan).
+- [x] Página de privacidad (qué datos se guardan) y borrado de cuenta desde Mi perfil (D-013).
+- [ ] Que un docente vea los resultados de sus alumnos en sus cuestionarios.
 - [ ] Migración a PostgreSQL *(pospuesta: se sigue con SQLite hasta que el usuario lo indique, D-012)*.
 
 ### Criterio de salida

@@ -1899,3 +1899,267 @@ body,
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ===== Cuentas y autenticación (Fase 5) ===== */
+.user-menu {
+  position: relative;
+}
+
+.user-chip .role-badge {
+  font-size: 0.62rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+}
+
+.role-badge.role-docente {
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.role-badge.role-admin {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 190px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
+}
+
+.user-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-0);
+  padding: 7px 9px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user-dropdown button:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.user-offline {
+  font-size: 0.7rem;
+  color: var(--text-2);
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.account-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-body h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-0);
+}
+
+.account-body p,
+.account-body ul {
+  margin: 0;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-submit {
+  justify-content: center;
+  width: 100%;
+}
+
+.account-submit:disabled,
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.account-note {
+  font-size: 0.74rem;
+  color: var(--text-2);
+}
+
+.account-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.account-danger {
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.account-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.account-inline input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-0);
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.account-ok {
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.12);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.btn-danger {
+  background: #dc2626;
+  border: 1px solid #b91c1c;
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-header div {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-header small {
+  color: var(--text-2);
+}
+
+.account-table-wrap {
+  overflow-x: auto;
+}
+
+.account-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+}
+
+.account-table th,
+.account-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.account-table th {
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.account-table select {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-0);
+  padding: 3px 6px;
+  font: inherit;
+}
+
+.account-table tr.is-inactive td {
+  opacity: 0.55;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-filter {
+  flex: 1;
+  max-width: 280px;
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-0);
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.quiz-login-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--text-1);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.08);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.quiz-source-badge svg {
+  vertical-align: -1px;
+}

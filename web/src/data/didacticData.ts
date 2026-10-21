@@ -40,6 +40,10 @@ export interface AnatomyQuiz {
   title: string;
   subtitle: string;
   source?: QuizSource;
+  // Campos de la API (server/); ausentes en los cuestionarios incluidos sin servidor.
+  isPublic?: boolean;
+  ownerName?: string | null;
+  permissions?: { edit: boolean; delete: boolean; publish: boolean };
   questions: QuizQuestion[];
 }
 

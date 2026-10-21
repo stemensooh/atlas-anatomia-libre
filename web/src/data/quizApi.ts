@@ -1,4 +1,5 @@
 import { AnatomyQuiz, ANATOMY_QUIZZES } from "./didacticData";
+import { json, request } from "./api";
 import { SystemId } from "./types";
 import { BodySex } from "../store/useViewerStore";
 
@@ -14,6 +15,7 @@ export interface QuizAnswer {
 export interface QuizAttempt {
   id: number;
   quizId: string;
+  quizTitle?: string;
   score: number;
   total: number;
   answers: QuizAnswer[];
@@ -31,37 +33,12 @@ export interface GenerateQuizInput {
 
 export type QuizInput = Pick<AnatomyQuiz, "title" | "subtitle" | "questions">;
 
-export class ApiError extends Error {
-  constructor(message: string, public details: string[] = []) {
-    super(message);
-  }
-}
-
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(url, {
-      ...init,
-      headers: init?.body ? { "Content-Type": "application/json" } : undefined,
-    });
-  } catch {
-    throw new ApiError("No se pudo conectar con el servidor de cuestionarios.");
-  }
-  if (res.status === 204) return undefined as T;
-  const body = await res.json().catch(() => null);
-  if (!res.ok) {
-    throw new ApiError(
-      body?.error || body?.message || `Error HTTP ${res.status}`,
-      body?.details || []
-    );
-  }
-  return body as T;
-}
+export { ApiError } from "./api";
 
 // Carga los cuestionarios de la BD; si el servidor no responde, usa los incluidos en la web.
 export async function loadQuizzes(): Promise<{ quizzes: AnatomyQuiz[]; online: boolean }> {
   try {
-    const quizzes = await request<AnatomyQuiz[]>("/api/quizzes?full=1");
+    const quizzes = await request<AnatomyQuiz[]>("/api/quizzes");
     return { quizzes, online: true };
   } catch {
     return { quizzes: ANATOMY_QUIZZES, online: false };
@@ -76,6 +53,9 @@ export const updateQuiz = (id: string, quiz: QuizInput) =>
     method: "PUT",
     body: JSON.stringify(quiz),
   });
+
+export const setQuizVisibility = (id: string, isPublic: boolean) =>
+  request<AnatomyQuiz>(`/api/quizzes/${encodeURIComponent(id)}/visibility`, json("PATCH", { isPublic }));
 
 export const deleteQuiz = (id: string) =>
   request<void>(`/api/quizzes/${encodeURIComponent(id)}`, { method: "DELETE" });

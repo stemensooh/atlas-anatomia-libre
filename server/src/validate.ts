@@ -81,6 +81,123 @@ export const attemptInputSchema = {
   },
 } as const;
 
+// ---- Cuentas ----
+
+const password = { type: "string", minLength: 8, maxLength: 128 } as const;
+
+export const credentialsSchema = {
+  type: "object",
+  required: ["username", "password"],
+  additionalProperties: false,
+  properties: {
+    // Letras, números, punto, guion y guion bajo; sin espacios para evitar nombres ambiguos.
+    username: { type: "string", pattern: "^[A-Za-z0-9._-]{3,32}$" },
+    password,
+  },
+} as const;
+
+// En el login no se exigen las reglas de formato: un dato que no las cumple es simplemente
+// un usuario o una contraseña incorrectos.
+export const loginSchema = {
+  type: "object",
+  required: ["username", "password"],
+  additionalProperties: false,
+  properties: {
+    username: { type: "string", minLength: 1, maxLength: 64 },
+    password: { type: "string", minLength: 1, maxLength: 128 },
+  },
+} as const;
+
+const FIELD_ES: Record<string, string> = {
+  username: "El usuario",
+  password: "La contraseña",
+  newPassword: "La nueva contraseña",
+  currentPassword: "La contraseña actual",
+  title: "El título",
+  questions: "La lista de preguntas",
+  count: "El número de preguntas",
+  systems: "La lista de sistemas",
+};
+
+interface ValidationIssue {
+  keyword: string;
+  instancePath: string;
+  params: Record<string, any>;
+  message?: string;
+}
+
+// Traduce el primer error de validación de Fastify (Ajv) a un mensaje en español para la UI.
+export function validationMessageEs(issues: ValidationIssue[]): string {
+  const issue = issues[0];
+  if (!issue) return "Datos no válidos.";
+  const path = issue.instancePath.split("/").filter(Boolean);
+  const field =
+    issue.keyword === "required" ? issue.params.missingProperty : path[path.length - 1] ?? "";
+  const name = FIELD_ES[field] ?? (field ? `El campo «${field}»` : "La petición");
+  switch (issue.keyword) {
+    case "required":
+      return `${name} es obligatorio.`;
+    case "minLength":
+      return issue.params.limit === 1
+        ? `${name} no puede estar vacío.`
+        : `${name} debe tener al menos ${issue.params.limit} caracteres.`;
+    case "maxLength":
+      return `${name} no puede tener más de ${issue.params.limit} caracteres.`;
+    case "pattern":
+      return field === "username"
+        ? "El usuario debe tener de 3 a 32 caracteres: letras, números, punto, guion o guion bajo (sin espacios)."
+        : `${name} tiene un formato no válido.`;
+    case "minimum":
+      return `${name} debe ser como mínimo ${issue.params.limit}.`;
+    case "maximum":
+      return `${name} debe ser como máximo ${issue.params.limit}.`;
+    case "minItems":
+      return `${name} debe tener al menos ${issue.params.limit} elemento(s).`;
+    case "enum":
+      return `${name} tiene un valor no permitido.`;
+    default:
+      return `Datos no válidos (${issue.message ?? issue.keyword}).`;
+  }
+}
+
+export const changePasswordSchema = {
+  type: "object",
+  required: ["currentPassword", "newPassword"],
+  additionalProperties: false,
+  properties: { currentPassword: { type: "string", maxLength: 128 }, newPassword: password },
+} as const;
+
+export const deleteAccountSchema = {
+  type: "object",
+  required: ["password"],
+  additionalProperties: false,
+  properties: { password: { type: "string", maxLength: 128 } },
+} as const;
+
+export const adminPasswordSchema = {
+  type: "object",
+  required: ["newPassword"],
+  additionalProperties: false,
+  properties: { newPassword: password },
+} as const;
+
+export const updateUserSchema = {
+  type: "object",
+  additionalProperties: false,
+  minProperties: 1,
+  properties: {
+    role: { enum: ["estudiante", "docente", "admin"] },
+    isActive: { type: "boolean" },
+  },
+} as const;
+
+export const visibilitySchema = {
+  type: "object",
+  required: ["isPublic"],
+  additionalProperties: false,
+  properties: { isPublic: { type: "boolean" } },
+} as const;
+
 // Devuelve la lista de errores (vacía si el cuestionario es válido).
 export function checkQuiz(catalog: Catalog, quiz: QuizInput): string[] {
   const errors: string[] = [];

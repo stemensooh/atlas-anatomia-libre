@@ -7,7 +7,7 @@ import type { QuizInput } from "./types.ts";
 const SEED_PATH = path.resolve(import.meta.dirname, "../../web/src/data/defaultQuizzes.json");
 
 // Inserta o reemplaza los cuestionarios iniciales; no toca los creados por el usuario
-// (los intentos de un cuestionario reemplazado se pierden por el ON DELETE CASCADE).
+// (los intentos se conservan: solo se reemplazan título y preguntas).
 export function seedQuizzes(db: store.Db, { replace = false } = {}): number {
   const quizzes = JSON.parse(fs.readFileSync(SEED_PATH, "utf8")) as QuizInput[];
   let n = 0;
@@ -15,7 +15,7 @@ export function seedQuizzes(db: store.Db, { replace = false } = {}): number {
     const exists = store.getQuiz(db, quiz.id!);
     if (exists && !replace) continue;
     if (exists) store.updateQuiz(db, quiz.id!, quiz);
-    else store.createQuiz(db, quiz, "seed");
+    else store.createQuiz(db, quiz, "seed", { userId: null, isPublic: true });
     n++;
   }
   return n;
