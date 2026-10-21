@@ -1,6 +1,6 @@
 # Plan de proyecto: Visor anatómico 3D libre y propio
 
-> Estado: v0.4 · Fase 2 cerrada · Fecha: 2026-10-20
+> Estado: v0.5 · Fases 0 a 4 cerradas (despliegue pospuesto a Fase 6) · Fecha: 2026-10-20
 > Alcance: proyecto de aprendizaje, **no comercial**, con código y contenido abiertos.
 > Aviso: las licencias de este documento son un resumen de lo que conozco. **Verifica la licencia en la página oficial de cada recurso antes de descargarlo**, y registra la verificación en `docs/ATTRIBUTIONS.md` (Fase 0).
 
@@ -276,7 +276,7 @@ web/src/
 - [x] Panel de capas conectado al estado (`web/src/components/LayerPanel.tsx`) + selector de los 87 órganos de HuBMAP y corte axial (plano Y).
 - [x] Panel de información leyendo `metadata.json` (`web/src/components/InfoPanel.tsx`) con buscador en ES/LA/EN/FMA, aislar, ocultar y restablecer.
 - [x] Modal y pie de créditos/licencias generados con las atribuciones verificadas (`web/src/components/CreditsModal.tsx`).
-- [ ] Despliegue de prueba en hosting gratuito.
+- [ ] Despliegue de prueba en hosting gratuito *(pospuesto para la Fase 6 por decisión del usuario D-009, cuando se definan las rutas de archivos procesados/raw en producción)*.
 
 ### Criterio de salida
 Se puede abrir el sitio, navegar el cuerpo, ocultar sistemas y ver la ficha de una estructura con su atribución.
@@ -289,19 +289,28 @@ Se puede abrir el sitio, navegar el cuerpo, ocultar sistemas y ver la ficha de u
 
 | Función | Descripción | Técnica |
 |---|---|---|
-| Búsqueda | Por nombre en ES/LA/EN, con autocompletado | Fuse.js (Apache-2.0) o MiniSearch (MIT) |
-| Jerarquía | Árbol de estructuras (sistema → región → órgano) | `parentId` de FMA |
-| Cortes | Planos de corte axial/sagital/coronal | `clippingPlanes` de three.js |
-| Etiquetas | Líneas guía con texto anclado a 3D | drei `Html` / sprites |
-| Tours | Secuencias de cámara + estructuras resaltadas + texto | JSON de pasos |
-| Cuestionarios | "Haz clic en el fémur", opción múltiple, identificar etiquetas | JSON + lógica propia |
-| Modo oscuro / accesibilidad | Teclado, contraste, lectores de pantalla | ARIA |
-| i18n | ES / EN | i18next (MIT) |
+| Búsqueda | Por nombre en ES/LA/EN, con autocompletado | Filtro reactivo en `InfoPanel.tsx` y en el árbol |
+| Jerarquía | Árbol de estructuras (sistema → estructura) | Pestaña **Árbol** en `LayerPanel.tsx` |
+| Cortes | Planos de corte axial/sagital/coronal | `clippingPlanes` de three.js (Y, X, Z + inversión) |
+| Etiquetas | Líneas guía / pines con texto anclado a 3D | `@react-three/drei` `Html` (`Pines 3D`) |
+| Tours | Secuencias de cámara + estructuras resaltadas + texto | `ANATOMY_TOURS` (4 recorridos guiados en `didacticData.ts`) |
+| Cuestionarios | "Haz clic en el fémur", opción múltiple | `ANATOMY_QUIZZES` (2 cuestionarios interactivos en `didacticData.ts`) |
+| Modo oscuro / accesibilidad | Teclado (`R`, `I`, `H`, `L`, `Esc`), tema claro/oscuro | Variables CSS `[data-theme="light"]` + ARIA |
+| Idioma | 100 % en español con respaldo en latín (TA2) e inglés (FMA/UBERON) | `traductor_es.py` + `actualizar_metadata_es.py` |
 
 ### Contenido
 - Redactar descripciones breves para **al menos 100 estructuras clave** (huesos largos, músculos principales, corazón, pulmones, hígado, riñones, encéfalo...).
 - Fuentes permitidas: redacción propia, OpenStax (CC BY 4.0), Wikipedia (CC BY-SA 4.0, con atribución).
 - Cada texto registra su fuente en `metadata.json` (`descriptionSource`).
+
+### Tareas
+- [x] Redactar descripciones anatómicas y fisiológicas detalladas en español para **115+ estructuras clave** (`DESCRIPCIONES_CLAVE` en `scripts/traductor_es.py`) y registrar `descriptionSource` en `data/processed/metadata.json`.
+- [x] Implementar **3 planos de corte anatómico** simultáneos (**Axial Y**, **Sagital X**, **Coronal Z**) con botón de inversión de semiespacio en `LayerPanel.tsx` y `AnatomyCanvas.tsx`.
+- [x] Incorporar explorador de **Árbol anatómico jerárquico** por sistema con filtro instantáneo y control individual de visibilidad (`LayerPanel.tsx`).
+- [x] Añadir **Pines / etiquetas 3D flotantes** (`@react-three/drei` `<Html>`) sobre puntos anatómicos clave y sobre la estructura seleccionada (`AnatomyCanvas.tsx`).
+- [x] Crear **4 Tours guiados** paso a paso (*1. Corazón y grandes vasos*, *2. Esqueleto axial y apendicular*, *3. Encéfalo y SNC*, *4. Anatomía visceral y pélvica femenina ♀*) en `web/src/data/didacticData.ts` y su reproductor en `InfoPanel.tsx`.
+- [x] Crear **2 Cuestionarios interactivos (Modo Quiz)** combinando preguntas de clic directo sobre el modelo 3D (`find3d`) y opción múltiple (`multipleChoice`) con pistas, explicación y puntuación final.
+- [x] Añadir conmutador de **Tema Oscuro / Claro** y atajos de teclado (`R` restablecer, `I` aislar, `H` ocultar, `L` pines 3D, `Esc` deseleccionar).
 
 ### Criterio de salida
 Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.

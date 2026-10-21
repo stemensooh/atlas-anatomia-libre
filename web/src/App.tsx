@@ -2,8 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Compass,
   Info,
+  MapPin,
+  Moon,
   RotateCcw,
   ShieldCheck,
+  Sun,
 } from "lucide-react";
 import {
   AnatomyStructure,
@@ -21,8 +24,16 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
 
   const bodySex = useViewerStore((s) => s.bodySex);
+  const selectedId = useViewerStore((s) => s.selectedId);
+  const showLabels3D = useViewerStore((s) => s.showLabels3D);
+  const theme = useViewerStore((s) => s.theme);
   const triggerCamera = useViewerStore((s) => s.triggerCamera);
   const resetVisibility = useViewerStore((s) => s.resetVisibility);
+  const toggleIsolate = useViewerStore((s) => s.toggleIsolate);
+  const toggleHide = useViewerStore((s) => s.toggleHide);
+  const selectStructure = useViewerStore((s) => s.selectStructure);
+  const toggleLabels3D = useViewerStore((s) => s.toggleLabels3D);
+  const toggleTheme = useViewerStore((s) => s.toggleTheme);
   const setCreditsOpen = useViewerStore((s) => s.setCreditsOpen);
 
   useEffect(() => {
@@ -34,6 +45,48 @@ export function App() {
       .then((doc: MetadataDoc) => setMetadata(doc))
       .catch((err) => setError(err.message));
   }, []);
+
+  // Aplicar tema claro/oscuro en el elemento raíz
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  // Atajos de teclado globales (R, I, H, L, Escape)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const key = e.key.toLowerCase();
+      if (key === "r") {
+        e.preventDefault();
+        resetVisibility();
+        triggerCamera("reset");
+      } else if (key === "i" && selectedId) {
+        e.preventDefault();
+        toggleIsolate(selectedId);
+      } else if (key === "h" && selectedId) {
+        e.preventDefault();
+        toggleHide(selectedId);
+      } else if (key === "l") {
+        e.preventDefault();
+        toggleLabels3D();
+      } else if (e.key === "Escape") {
+        selectStructure(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    selectedId,
+    resetVisibility,
+    triggerCamera,
+    toggleIsolate,
+    toggleHide,
+    toggleLabels3D,
+    selectStructure,
+  ]);
 
   const {
     activeStructures,
@@ -86,7 +139,16 @@ export function App() {
           <div>
             <h1>Atlas Anatómico 3D Libre</h1>
             <span className="subtitle">
-              STEMENSOFT · {metadata ? `${metadata.structuresCount.toLocaleString("es")} estructuras FMA + ${metadata.hubmapReferenceOrgansCount} órganos HuBMAP` : "Cargando catálogo…"}
+              STEMENSOFT ·{" "}
+              {metadata
+                ? `${metadata.structuresCount.toLocaleString(
+                    "es"
+                  )} estructuras FMA + ${
+                    metadata.femaleStructuresCount?.toLocaleString("es") || 0
+                  } femeninas + ${
+                    metadata.hubmapReferenceOrgansCount
+                  } órganos HuBMAP`
+                : "Cargando catálogo…"}
             </span>
           </div>
         </div>
@@ -114,13 +176,29 @@ export function App() {
               resetVisibility();
               triggerCamera("reset");
             }}
-            title="Restablecer vista y filtros"
+            title="Restablecer vista y filtros (Tecla R)"
           >
             <RotateCcw size={13} /> Centrar
           </button>
         </div>
 
         <div className="topbar-right">
+          <button
+            className={`btn-cam ${showLabels3D ? "active" : ""}`}
+            onClick={toggleLabels3D}
+            title="Mostrar/ocultar etiquetas y pines 3D sobre puntos anatómicos clave (Tecla L)"
+          >
+            <MapPin size={14} />
+            <span>Pines 3D</span>
+          </button>
+          <button
+            className="btn-cam"
+            onClick={toggleTheme}
+            title="Alternar tema oscuro / claro"
+          >
+            {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+            <span>{theme === "dark" ? "Claro" : "Oscuro"}</span>
+          </button>
           <button
             className="btn-credits"
             onClick={() => setCreditsOpen(true)}
@@ -135,6 +213,7 @@ export function App() {
         {metadata && (
           <LayerPanel
             systemsInfo={activeSystemsInfo}
+            structures={activeStructures}
             hubmapOrgans={metadata.hubmapReferenceOrgans}
           />
         )}
@@ -146,6 +225,7 @@ export function App() {
             </div>
           ) : (
             <AnatomyCanvas
+              structureById={structureById}
               structureByMeshName={structureByMeshName}
               hubmapById={hubmapById}
             />

@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { SYSTEM_META, SystemId } from "../data/types";
 
 export type CameraPreset = "front" | "back" | "left" | "right" | "top" | "reset";
+export type BodySex = "male" | "female";
+export type LeftTab = "body" | "tree" | "hubmap";
+export type RightTab = "info" | "tours" | "quiz";
 
 interface LayerState {
   enabled: boolean;
@@ -10,10 +13,18 @@ interface LayerState {
   loaded: boolean;
 }
 
-export type BodySex = "male" | "female";
+export interface ClipPlanesState {
+  axialY: number | null;     // [0.05 .. 1.75] m
+  invertY: boolean;
+  sagittalX: number | null;  // [-0.35 .. 0.35] m
+  invertX: boolean;
+  coronalZ: number | null;   // [-0.25 .. 0.25] m
+  invertZ: boolean;
+}
 
 interface ViewerState {
-  mode: "body" | "hubmap";
+  mode: LeftTab;
+  rightTab: RightTab;
   bodySex: BodySex;
   activeHubmapOrganId: string | null;
   layers: Record<SystemId, LayerState>;
@@ -23,10 +34,16 @@ interface ViewerState {
   hiddenIds: Record<string, boolean>;
   searchQuery: string;
   cameraPreset: { preset: CameraPreset; seq: number };
-  clipY: number | null; // Altura de plano de corte axial en metros (null = desactivado)
+  clip: ClipPlanesState;
+  showLabels3D: boolean;
+  theme: "dark" | "light";
   creditsOpen: boolean;
 
-  setMode: (mode: "body" | "hubmap", hubmapOrganId?: string | null) => void;
+  // Callback opcional cuando hay una pregunta "find3d" activa en el cuestionario
+  quizClickHandler: ((clickedStructureId: string) => void) | null;
+
+  setMode: (mode: LeftTab, hubmapOrganId?: string | null) => void;
+  setRightTab: (tab: RightTab) => void;
   setBodySex: (sex: BodySex) => void;
   toggleLayer: (sys: SystemId) => void;
   setLayerEnabled: (sys: SystemId, enabled: boolean) => void;
@@ -42,8 +59,21 @@ interface ViewerState {
 
   setSearchQuery: (q: string) => void;
   triggerCamera: (preset: CameraPreset) => void;
-  setClipY: (y: number | null) => void;
+  setClipPlane: (patch: Partial<ClipPlanesState>) => void;
+  resetClipPlanes: () => void;
+  toggleLabels3D: () => void;
+  toggleTheme: () => void;
   setCreditsOpen: (open: boolean) => void;
+  setQuizClickHandler: (fn: ((id: string) => void) | null) => void;
+
+  applySceneConfig: (cfg: {
+    bodySex: BodySex;
+    enabledSystems: SystemId[];
+    systemOpacities?: Partial<Record<SystemId, number>>;
+    selectedId?: string | null;
+    cameraPreset?: CameraPreset;
+    isolate?: boolean;
+  }) => void;
 }
 
 const initialLayers = Object.fromEntries(
@@ -58,8 +88,18 @@ const initialLayers = Object.fromEntries(
   ])
 ) as Record<SystemId, LayerState>;
 
+const initialClip: ClipPlanesState = {
+  axialY: null,
+  invertY: false,
+  sagittalX: null,
+  invertX: false,
+  coronalZ: null,
+  invertZ: false,
+};
+
 export const useViewerStore = create<ViewerState>((set) => ({
   mode: "body",
+  rightTab: "info",
   bodySex: "male",
   activeHubmapOrganId: null,
   layers: initialLayers,
@@ -69,26 +109,31 @@ export const useViewerStore = create<ViewerState>((set) => ({
   hiddenIds: {},
   searchQuery: "",
   cameraPreset: { preset: "front", seq: 0 },
-  clipY: null,
+  clip: initialClip,
+  showLabels3D: false,
+  theme: "dark",
   creditsOpen: false,
+  quizClickHandler: null,
 
   setMode: (mode, hubmapOrganId = null) =>
-    set({
+    set((s) => ({
       mode,
-      activeHubmapOrganId: hubmapOrganId,
-      selectedId: null,
-      isolatedId: null,
-    }),
+      activeHubmapOrganId: hubmapOrganId ?? s.activeHubmapOrganId,
+      selectedId: mode === "hubmap" ? null : s.selectedId,
+      isolatedId: mode === "hubmap" ? null : s.isolatedId,
+    })),
+
+  setRightTab: (rightTab) => set({ rightTab }),
 
   setBodySex: (bodySex) =>
-    set({
-      mode: "body",
+    set((s) => ({
+      mode: s.mode === "hubmap" ? "body" : s.mode,
       bodySex,
       selectedId: null,
       hoveredId: null,
       isolatedId: null,
       hiddenIds: {},
-    }),
+    })),
 
   toggleLayer: (sys) =>
     set((s) => ({
@@ -135,7 +180,14 @@ export const useViewerStore = create<ViewerState>((set) => ({
       return { layers: next };
     }),
 
-  selectStructure: (id) => set({ selectedId: id }),
+  selectStructure: (id) =>
+    set((s) => {
+      if (id && s.quizClickHandler) {
+        s.quizClickHandler(id);
+      }
+      return { selectedId: id };
+    }),
+
   hoverStructure: (id) => set({ hoveredId: id }),
 
   toggleIsolate: (id) =>
@@ -159,7 +211,7 @@ export const useViewerStore = create<ViewerState>((set) => ({
       isolatedId: null,
       hiddenIds: {},
       selectedId: null,
-      clipY: null,
+      clip: initialClip,
     }),
 
   setSearchQuery: (searchQuery) => set({ searchQuery }),
@@ -169,6 +221,44 @@ export const useViewerStore = create<ViewerState>((set) => ({
       cameraPreset: { preset, seq: s.cameraPreset.seq + 1 },
     })),
 
-  setClipY: (clipY) => set({ clipY }),
+  setClipPlane: (patch) =>
+    set((s) => ({
+      clip: { ...s.clip, ...patch },
+    })),
+
+  resetClipPlanes: () => set({ clip: initialClip }),
+
+  toggleLabels3D: () => set((s) => ({ showLabels3D: !s.showLabels3D })),
+
+  toggleTheme: () =>
+    set((s) => ({ theme: s.theme === "dark" ? "light" : "dark" })),
+
   setCreditsOpen: (creditsOpen) => set({ creditsOpen }),
+
+  setQuizClickHandler: (quizClickHandler) => set({ quizClickHandler }),
+
+  applySceneConfig: (cfg) =>
+    set((s) => {
+      const nextLayers = { ...s.layers };
+      for (const sys of Object.keys(nextLayers) as SystemId[]) {
+        const isEnabled = cfg.enabledSystems.includes(sys);
+        const op = cfg.systemOpacities?.[sys] ?? 1.0;
+        nextLayers[sys] = {
+          ...nextLayers[sys],
+          enabled: isEnabled,
+          opacity: op,
+        };
+      }
+      return {
+        mode: "body",
+        bodySex: cfg.bodySex,
+        layers: nextLayers,
+        selectedId: cfg.selectedId ?? null,
+        isolatedId: cfg.isolate && cfg.selectedId ? cfg.selectedId : null,
+        hiddenIds: {},
+        cameraPreset: cfg.cameraPreset
+          ? { preset: cfg.cameraPreset, seq: s.cameraPreset.seq + 1 }
+          : s.cameraPreset,
+      };
+    }),
 }));

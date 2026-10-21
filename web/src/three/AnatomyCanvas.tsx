@@ -4,21 +4,38 @@ import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { GLTFLoader } from "three-stdlib";
 import { MeshoptDecoder } from "meshoptimizer";
-import { SYSTEM_META, SystemId, AnatomyStructure, HubmapOrgan } from "../data/types";
+import {
+  SYSTEM_META,
+  SystemId,
+  AnatomyStructure,
+  HubmapOrgan,
+} from "../data/types";
+import { KEY_LANDMARK_IDS } from "../data/didacticData";
 import { useViewerStore } from "../store/useViewerStore";
+
+interface Pin3D {
+  structureId: string;
+  labelEs: string;
+  position: [number, number, number];
+  colorHex: string;
+}
 
 interface SystemLayerProps {
   system: SystemId;
   glbUrl: string;
+  structureById: Map<string, AnatomyStructure>;
   structureByMeshName: Map<string, AnatomyStructure>;
   clippingPlanes: THREE.Plane[];
+  showLabels3D: boolean;
 }
 
 function SystemLayerGroup({
   system,
   glbUrl,
+  structureById,
   structureByMeshName,
   clippingPlanes,
+  showLabels3D,
 }: SystemLayerProps) {
   const layer = useViewerStore((s) => s.layers[system]);
   const selectedId = useViewerStore((s) => s.selectedId);
@@ -30,6 +47,8 @@ function SystemLayerGroup({
   const hoverStructure = useViewerStore((s) => s.hoverStructure);
 
   const [sceneRoot, setSceneRoot] = useState<THREE.Group | null>(null);
+  const [landmarks, setLandmarks] = useState<Pin3D[]>([]);
+  const centerByIdRef = useRef<Map<string, [number, number, number]>>(new Map());
   const meshesRef = useRef<
     Array<{
       mesh: THREE.Mesh;
@@ -38,13 +57,13 @@ function SystemLayerGroup({
     }>
   >([]);
 
-  // Reiniciar escena cuando cambia glbUrl (masculino <-> femenino)
   useEffect(() => {
     setSceneRoot(null);
+    setLandmarks([]);
+    centerByIdRef.current.clear();
     meshesRef.current = [];
   }, [glbUrl]);
 
-  // Carga bajo demanda cuando se activa la capa
   useEffect(() => {
     if (!layer.enabled || sceneRoot) return;
     let cancelled = false;
@@ -58,12 +77,15 @@ function SystemLayerGroup({
       (gltf) => {
         if (cancelled) return;
         const root = gltf.scene;
+        root.updateMatrixWorld(true);
+
         const baseColor = new THREE.Color(SYSTEM_META[system].colorHex);
         const list: Array<{
           mesh: THREE.Mesh;
           structureId: string;
           baseMat: THREE.MeshStandardMaterial;
         }> = [];
+        const centers = new Map<string, THREE.Box3>();
 
         root.traverse((obj) => {
           if ((obj as THREE.Mesh).isMesh) {
@@ -88,9 +110,38 @@ function SystemLayerGroup({
             mesh.userData.structureId = cid;
             mesh.userData.system = system;
             list.push({ mesh, structureId: cid, baseMat: mat });
+
+            const box = new THREE.Box3().setFromObject(mesh);
+            if (!box.isEmpty()) {
+              const prev = centers.get(cid);
+              if (prev) {
+                prev.union(box);
+              } else {
+                centers.set(cid, box);
+              }
+            }
           }
         });
 
+        const pins: Pin3D[] = [];
+        const centerMap = new Map<string, [number, number, number]>();
+        centers.forEach((box, cid) => {
+          const c = box.getCenter(new THREE.Vector3());
+          const pos: [number, number, number] = [c.x, c.y, c.z];
+          centerMap.set(cid, pos);
+          if (KEY_LANDMARK_IDS.has(cid)) {
+            const st = structureById.get(cid);
+            pins.push({
+              structureId: cid,
+              labelEs: st?.nameEs || cid,
+              position: pos,
+              colorHex: SYSTEM_META[system].colorHex,
+            });
+          }
+        });
+
+        centerByIdRef.current = centerMap;
+        setLandmarks(pins);
         meshesRef.current = list;
         setSceneRoot(root);
         setLayerLoading(system, false, true);
@@ -107,7 +158,6 @@ function SystemLayerGroup({
     };
   }, [layer.enabled, sceneRoot, glbUrl]);
 
-  // Actualizar visibilidad, opacidad, resaltado y planos de corte
   useEffect(() => {
     if (!sceneRoot) return;
     const isTransparent = layer.opacity < 0.99;
@@ -131,7 +181,7 @@ function SystemLayerGroup({
 
       if (isSelected) {
         baseMat.emissive.setHex(0x0ea5e9);
-        baseMat.emissiveIntensity = 0.55;
+        baseMat.emissiveIntensity = 0.58;
       } else if (isHovered) {
         baseMat.emissive.setHex(0x38bdf8);
         baseMat.emissiveIntensity = 0.28;
@@ -179,13 +229,64 @@ function SystemLayerGroup({
     document.body.style.cursor = "auto";
   };
 
+  // Pin de la estructura seleccionada (aunque los pines globales estén apagados, si está activo showLabels3D se muestran todos)
+  const selectedCenter =
+    selectedId && centerByIdRef.current.has(selectedId)
+      ? centerByIdRef.current.get(selectedId)!
+      : null;
+  const selectedStruct = selectedId ? structureById.get(selectedId) : null;
+
   return (
-    <primitive
-      object={sceneRoot}
-      onClick={handleClick}
-      onPointerOver={handlePointerOver}
-      onPointerOut={handlePointerOut}
-    />
+    <group>
+      <primitive
+        object={sceneRoot}
+        onClick={handleClick}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      />
+
+      {showLabels3D &&
+        landmarks.map((pin) => {
+          if (hiddenIds[pin.structureId]) return null;
+          if (isolatedId && isolatedId !== pin.structureId) return null;
+          const isSel = selectedId === pin.structureId;
+          return (
+            <Html
+              key={pin.structureId}
+              position={pin.position}
+              center
+              distanceFactor={1.6}
+              zIndexRange={[10, 0]}
+            >
+              <button
+                className={`pin-3d ${isSel ? "selected" : ""}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  selectStructure(pin.structureId);
+                }}
+              >
+                <span
+                  className="pin-dot"
+                  style={{ backgroundColor: pin.colorHex }}
+                />
+                <span>{pin.labelEs}</span>
+              </button>
+            </Html>
+          );
+        })}
+
+      {!showLabels3D && selectedCenter && selectedStruct && (
+        <Html position={selectedCenter} center distanceFactor={1.55}>
+          <div className="pin-3d selected">
+            <span
+              className="pin-dot"
+              style={{ backgroundColor: SYSTEM_META[system].colorHex }}
+            />
+            <span>{selectedStruct.nameEs}</span>
+          </div>
+        </Html>
+      )}
+    </group>
   );
 }
 
@@ -214,14 +315,17 @@ function HubmapOrganScene({
         if (cancelled) return;
         const group = gltf.scene;
 
-        // Centrar y normalizar escala del órgano de HuBMAP para inspección cómoda
         const box = new THREE.Box3().setFromObject(group);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z, 0.001);
         const scale = 0.85 / maxDim;
 
-        group.position.set(-center.x * scale, -center.y * scale + 0.85, -center.z * scale);
+        group.position.set(
+          -center.x * scale,
+          -center.y * scale + 0.85,
+          -center.z * scale
+        );
         group.scale.setScalar(scale);
 
         group.traverse((obj) => {
@@ -256,7 +360,6 @@ function HubmapOrganScene({
     };
   }, [organ.glbFile]);
 
-  // Resaltar nodo seleccionado en HuBMAP
   useEffect(() => {
     if (!root) return;
     root.traverse((obj) => {
@@ -282,7 +385,9 @@ function HubmapOrganScene({
   if (loading) {
     return (
       <Html center>
-        <div className="loading-pill">Cargando órgano 3D ({organ.organ})…</div>
+        <div className="loading-pill">
+          Cargando órgano 3D ({organ.nameEs || organ.organ})…
+        </div>
       </Html>
     );
   }
@@ -346,24 +451,51 @@ function CameraController() {
 }
 
 export function AnatomyCanvas({
+  structureById,
   structureByMeshName,
   hubmapById,
 }: {
+  structureById: Map<string, AnatomyStructure>;
   structureByMeshName: Map<string, AnatomyStructure>;
   hubmapById: Map<string, HubmapOrgan>;
 }) {
   const mode = useViewerStore((s) => s.mode);
   const bodySex = useViewerStore((s) => s.bodySex);
   const activeHubmapOrganId = useViewerStore((s) => s.activeHubmapOrganId);
-  const clipY = useViewerStore((s) => s.clipY);
+  const clip = useViewerStore((s) => s.clip);
+  const showLabels3D = useViewerStore((s) => s.showLabels3D);
+  const theme = useViewerStore((s) => s.theme);
   const selectStructure = useViewerStore((s) => s.selectStructure);
 
   const clippingPlanes = useMemo(() => {
-    if (clipY === null) return [];
-    return [new THREE.Plane(new THREE.Vector3(0, -1, 0), clipY)];
-  }, [clipY]);
+    const planes: THREE.Plane[] = [];
+    if (clip.axialY !== null) {
+      const sign = clip.invertY ? 1 : -1;
+      planes.push(
+        new THREE.Plane(new THREE.Vector3(0, sign, 0), -sign * clip.axialY)
+      );
+    }
+    if (clip.sagittalX !== null) {
+      const sign = clip.invertX ? 1 : -1;
+      planes.push(
+        new THREE.Plane(new THREE.Vector3(sign, 0, 0), -sign * clip.sagittalX)
+      );
+    }
+    if (clip.coronalZ !== null) {
+      const sign = clip.invertZ ? 1 : -1;
+      planes.push(
+        new THREE.Plane(new THREE.Vector3(0, 0, sign), -sign * clip.coronalZ)
+      );
+    }
+    return planes;
+  }, [clip]);
 
-  const activeOrgan = activeHubmapOrganId ? hubmapById.get(activeHubmapOrganId) : null;
+  const activeOrgan = activeHubmapOrganId
+    ? hubmapById.get(activeHubmapOrganId)
+    : null;
+  const bgColor = theme === "light" ? "#f1f5f9" : "#0b1120";
+  const gridColor1 = theme === "light" ? "#cbd5e1" : "#1e293b";
+  const gridColor2 = theme === "light" ? "#e2e8f0" : "#0f172a";
 
   return (
     <Canvas
@@ -371,16 +503,19 @@ export function AnatomyCanvas({
       gl={{ localClippingEnabled: true, antialias: true }}
       onPointerMissed={() => selectStructure(null)}
     >
-      <color attach="background" args={["#0b1120"]} />
-      <ambientLight intensity={0.65} />
+      <color attach="background" args={[bgColor]} />
+      <ambientLight intensity={0.68} />
       <hemisphereLight args={["#e2e8f0", "#1e293b", 0.55]} />
       <directionalLight position={[2.5, 3.5, 3.0]} intensity={1.15} />
       <directionalLight position={[-2.5, 2.0, -2.5]} intensity={0.65} />
       <directionalLight position={[0, -2.0, 1.5]} intensity={0.25} />
 
-      <gridHelper args={[2.4, 24, "#1e293b", "#0f172a"]} position={[0, 0, 0]} />
+      <gridHelper
+        args={[2.4, 24, gridColor1, gridColor2]}
+        position={[0, 0, 0]}
+      />
 
-      {mode === "body" &&
+      {mode !== "hubmap" &&
         (Object.keys(SYSTEM_META) as SystemId[]).map((sys) => {
           const glbUrl =
             bodySex === "female"
@@ -391,14 +526,19 @@ export function AnatomyCanvas({
               key={`${bodySex}-${sys}`}
               system={sys}
               glbUrl={glbUrl}
+              structureById={structureById}
               structureByMeshName={structureByMeshName}
               clippingPlanes={clippingPlanes}
+              showLabels3D={showLabels3D}
             />
           );
         })}
 
       {mode === "hubmap" && activeOrgan && (
-        <HubmapOrganScene organ={activeOrgan} clippingPlanes={clippingPlanes} />
+        <HubmapOrganScene
+          organ={activeOrgan}
+          clippingPlanes={clippingPlanes}
+        />
       )}
 
       <CameraController />

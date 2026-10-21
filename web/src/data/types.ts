@@ -34,6 +34,7 @@ export interface AnatomyStructure {
   license: string;
   elementFiles?: string[];
   descriptionEs: string;
+  descriptionSource?: string;
 }
 
 export interface HubmapNode {

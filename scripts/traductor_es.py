@@ -520,7 +520,25 @@ SINTAGMAS_ES: list[tuple[str, str]] = [
     (r"\broot of\b", "raíz de"),
     (r"\btrunk of\b", "tronco de"),
     (r"\bbranch of\b", "rama de"),
+    (r"\bbranches\b", "ramas"),
+    (r"\bbranch\b", "rama"),
     (r"\btributary of\b", "tributaria de"),
+    (r"\btributaries\b", "tributarias"),
+    (r"\btributary\b", "tributaria"),
+    (r"\bjunction\b", "unión"),
+    (r"\bileocecal\b", "ileocecal"),
+    (r"\bcircumflex\b", "circunfleja"),
+    (r"\bmarginal\b", "marginal"),
+    (r"\bdiagonal\b", "diagonal"),
+    (r"\bconus\b", "del cono arterial"),
+    (r"\bventricular\b", "ventricular"),
+    (r"\batrial\b", "auricular (atrial)"),
+    (r"\bsternocostal\b", "esternocostal"),
+    (r"\bacromial\b", "acromial"),
+    (r"\bhumeral\b", "humeral"),
+    (r"\bureteric\b", "ureteral"),
+    (r"\bcalcaneal\b", "calcánea"),
+    (r"\bset\b", "conjunto"),
     (r"\banterior part\b", "porción anterior"),
     (r"\bposterior part\b", "porción posterior"),
     (r"\bsuperior part\b", "porción superior"),
@@ -805,8 +823,11 @@ def _aplicar_concordancia_lado(base: str, lado_sufijo: str) -> str:
         low.startswith(w)
         for w in (
             "arteria", "vena", "valva", "válvula", "aurícula", "glándula",
-            "falange", "vértebra", "costilla", "clavícula", "escápula",
-            "rótula", "tibia", "fíbula", "mano", "pierna", "rodilla",
+            "falange", "vértebra", "costilla", "primera costilla", "segunda costilla",
+            "tercera costilla", "cuarta costilla", "quinta costilla", "sexta costilla",
+            "séptima costilla", "octava costilla", "novena costilla", "décima costilla",
+            "undécima costilla", "duodécima costilla", "clavícula", "escápula",
+            "rótula", "patela", "tibia", "fíbula", "ulna", "mano", "pierna", "rodilla",
             "muñeca", "pelvis", "cadera", "córnea", "retina", "coroides",
             "esclerótica", "cámara", "párpado", "amígdala", "trompa",
             "cavidad", "pared", "porción", "rama", "tributaria", "raíz",
@@ -907,12 +928,133 @@ DESCRIPCION_SISTEMA: dict[str, str] = {
 }
 
 
+# Banco de +115 descripciones fisiológicas y anatómicas detalladas (redacción propia STEMENSOFT, CC BY-SA 4.0)
+DESCRIPCIONES_CLAVE: list[tuple[str, str]] = [
+    # Sistema esquelético
+    (r"\bfemur\b", "Es el hueso más largo, voluminoso y resistente del esqueleto humano. Forma el esqueleto del muslo: su cabeza esférica se articula proximalmente con el acetábulo del hueso coxal (articulación de la cadera) y sus cóndilos distales se articulan con la tibia y la rótula en la rodilla."),
+    (r"\btibia\b", "Segundo hueso más largo del cuerpo, situado en la parte medial y anterior de la pierna. Soporta la mayor parte del peso corporal transmitido desde el fémur hacia el hueso astrágalo del tobillo."),
+    (r"\bfibula\b", "Hueso largo y delgado situado en la cara lateral de la pierna, paralelo a la tibia. Actúa principalmente como sitio de inserción muscular y estabilizador lateral de la articulación del tobillo (maléolo lateral)."),
+    (r"\bpatella\b", "Mayor hueso sesamoideo del cuerpo humano, alojado en el espesor del tendón del músculo cuádriceps femoral. Protege la cara anterior de la articulación de la rodilla y aumenta el brazo de palanca en la extensión de la pierna."),
+    (r"\bhumerus\b", "Hueso largo del brazo que se extiende desde la articulación glenohumeral (hombro), donde su cabeza se articula con la escápula, hasta el codo, donde su tróclea y capítulo se articulan con el cúbito y el radio."),
+    (r"\bradius\b", "Hueso largo lateral del antebrazo (del lado del pulgar). Su cabeza cilíndrica rota sobre el capítulo humeral y la escotadura radial del cúbito permitiendo los movimientos de pronación y supinación de la mano."),
+    (r"\bulna\b", "Hueso largo medial del antebrazo (del lado del meñique). Su extremo proximal presenta el olécranon y la escotadura troclear, formando la bisagra principal de la articulación del codo con el húmero."),
+    (r"\bclavicle\b", "Hueso alargado en forma de 'S' itálica que conecta el manubrio del esternón con el acromion de la escápula, actuando como puntal que mantiene el hombro separado del tórax y permite la amplitud de movimiento del miembro superior."),
+    (r"\bscapula\b", "Hueso plano y triangular apoyado sobre la cara posterolateral superior de la caja torácica (entre la 2.ª y la 7.ª costilla). Su cavidad glenoidea recibe la cabeza del húmero y presta inserción a 17 músculos."),
+    (r"\bmanubrium\b", "Porción superior y más ancha del esternón. Se articula con ambas clavículas y con los dos primeros pares de cartílagos costales, formando el límite anterior del estrecho torácico superior."),
+    (r"\bsternum\b", "Hueso plano e impar situado en la línea media anterior del tórax. Junto con las costillas y los cartílagos costales conforma la caja torácica que protege el corazón, los grandes vasos y los pulmones."),
+    (r"\bxiphoid\b", "Porción cartilaginosa u ósea inferior y más pequeña del esternón. Sirve como punto de inserción clave para el músculo diafragma, la línea alba y los músculos rectos del abdomen."),
+    (r"\batlas\b|\bfirst cervical vertebra\b", "Primera vértebra cervical (C1), desprovista de cuerpo vertebral y apófisis espinosa. Sostiene el peso del cráneo articulándose con los cóndilos occipitales (permitiendo el movimiento de afirmación de la cabeza)."),
+    (r"\baxis\b|\bsecond cervical vertebra\b", "Segunda vértebra cervical (C2), caracterizada por su apófisis odontoides (diente del axis), que actúa como pivote vertical alrededor del cual rota el atlas junto con la cabeza."),
+    (r"\bcervical vertebra\b", "Vértebra de la región del cuello (C1-C7). Se caracteriza por poseer forámenes transversos por donde ascienden las arterias y venas vertebrales hacia el encéfalo."),
+    (r"\bthoracic vertebra\b", "Vértebra del segmento dorsal o torácico (T1-T12). Presenta carillas costales en el cuerpo y en las apófisis transversas para articularse con las costillas y formar la jaula torácica."),
+    (r"\blumbar vertebra\b", "Vértebra robusta del segmento inferior de la espalda (L1-L5). Su cuerpo voluminoso soporta gran parte del peso del tronco y permite amplios movimientos de flexión y extensión."),
+    (r"\bsacrum\b", "Hueso triangular formado por la fusión de las cinco vértebras sacras (S1-S5). Se encaja como una cuña entre ambos huesos coxales cerrando posteriormente la cintura pélvica y transmitiendo el peso del tronco a los miembros inferiores."),
+    (r"\bcoccyx\b", "Pequeño hueso triangular caudal formado por la fusión de 3 a 5 vértebras coccígeas rudimentarias. Presta inserción a ligamentos sacrococcígeos y a músculos del suelo pélvico."),
+    (r"\bhip bone\b|\bpelvis\b", "Hueso plano y ancho de la cintura pélvica formado por la fusión del ilion, el isquion y el pubis. Aloja los órganos pélvicos y forma el acetábulo para la articulación coxofemoral."),
+    (r"\bmandible\b", "Único hueso móvil del cráneo, con forma de herradura. Aloja los dientes inferiores en su proceso alveolar y se articula con los huesos temporales en la articulación temporomandibular (ATM) para la masticación."),
+    (r"\bmaxilla\b", "Hueso par que forma la parte central del macizo facial, el paladar duro, el piso de la órbita, las paredes laterales de la cavidad nasal y aloja la arcada dentaria superior."),
+    (r"\bvomer\b", "Hueso laminar impar de la línea media que forma la porción posteroinferior del tabique nasal óseo, separando ambas fosas nasales."),
+    (r"\brib\b", "Hueso plano y arqueado que se extiende desde la columna vertebral torácica hacia la pared anterior del tórax, protegiendo los órganos intratorácicos y participando en la mecánica ventilatoria."),
+    (r"\bcostal cartilage\b", "Barra de cartílago hialino que prolonga el extremo anterior de las costillas hacia el esternón, dotando de elasticidad a la caja torácica durante la inspiración y espiración."),
+    (r"\bintervertebral disk\b", "Estructura fibrocartilaginosa interpuesta entre los cuerpos vertebrales adyacentes. Consta de un núcleo pulposo gelatinoso central y un anillo fibroso periférico que amortiguan las cargas axiales."),
+    (r"\bmetacarpal\b", "Uno de los cinco huesos largos que conforman el esqueleto de la palma de la mano, articulándose proximalmente con el carpo y distalmente con las falanges proximales."),
+    (r"\bmetatarsal\b", "Uno de los cinco huesos largos del antepié que conectan el tarso con las falanges de los dedos y forman los arcos longitudinal y transverso del pie."),
+    (r"\bphalanx\b", "Hueso largo miniatura que conforma el esqueleto articulado de los dedos de la mano o del pie (falanges proximal, media y distal)."),
+
+    # Sistema muscular
+    (r"\bdiaphragm\b", "Principal músculo inspiratorio, con forma de doble cúpula musculotendinosa que separa la cavidad torácica de la abdominal. Al contraerse desciende y aumenta el volumen intratorácico permitiendo la entrada de aire a los pulmones."),
+    (r"\bdeltoid\b", "Músculo triangular y voluminoso que envuelve la articulación del hombro (porciones clavicular, acromial y espinal). Es el principal abductor del brazo, además de participar en su flexión, extensión y rotación."),
+    (r"\bpectoralis major\b", "Músculo ancho y superficial de la región anterosuperior del tórax (porciones clavicular, esternocostal y abdominal). Actúa como potente aductor, flexor y rotador medial del húmero."),
+    (r"\bpectoralis minor\b", "Músculo triangular profundo al pectoral mayor que va de la 3.ª-5.ª costilla a la apófisis coracoides de la escápula; desciende y estabiliza la cintura escapular y actúa como músculo inspiratorio accesorio."),
+    (r"\btrapezius\b", "Amplio músculo superficial del dorso superior y nuca. Sus fibras descendentes elevan la escápula, las transversas la retraen hacia la columna y las ascendentes la deprimen, rotando la cavidad glenoidea hacia arriba."),
+    (r"\bsternocleidomastoid\b", "Músculo robusto y oblicuo del cuello que une el manubrio esternal y la clavícula con la apófisis mastoides temporal. Su contracción unilateral inclina la cabeza hacia el mismo lado y la rota hacia el lado opuesto."),
+    (r"\bbiceps brachii\b", "Músculo anterior del brazo con dos cabezas proximales (corta coracoidea y larga supraglenoidea). Es el principal supinador del antebrazo y un potente flexor de la articulación del codo."),
+    (r"\btriceps brachii\b", "Músculo posterior del brazo con tres cabezas (larga, lateral y medial) que se insertan en el olécranon del cúbito. Es el principal extensor del antebrazo en la articulación del codo."),
+    (r"\blatissimus dorsi\b", "Músculo dorsal ancho de la espalda inferior que converge hacia el húmero. Es un potente extensor, aductor y rotador medial del brazo (fundamental al trepar, remar o nadar)."),
+    (r"\bgluteus maximus\b", "El músculo más voluminoso y pesado del cuerpo humano, situado en la región glútea superficial. Es el principal extensor y rotador lateral del muslo, indispensable para ponerse de pie, subir escaleras y mantener la bipedestación."),
+    (r"\bgluteus medius\b|\bgluteus minimus\b", "Músculo abductor y rotador medial de la cadera. Durante la marcha estabiliza la pelvis impidiendo que caiga hacia el lado del miembro que despega del suelo."),
+    (r"\bsartorius\b", "El músculo más largo del cuerpo humano; cruza oblicuamente la cara anterior del muslo desde la espina ilíaca anterosuperior hasta la tibia medial (pata de ganso), flexionando cadera y rodilla."),
+    (r"\bquadriceps\b|\brectus femoris\b|\bvastus\b", "Integrante del cuádriceps femoral en el compartimento anterior del muslo. Es el gran extensor de la articulación de la rodilla, imprescindible para caminar, correr y saltar."),
+    (r"\bbiceps femoris\b", "Músculo isquiotibial posterolateral del muslo con cabeza larga y corta. Flexiona la pierna en la rodilla, la rota lateralmente y extiende el muslo en la cadera."),
+    (r"\bgastrocnemius\b|\bsoleus\b", "Músculo del tríceps sural en la pantorrilla que se inserta en el calcáneo mediante el tendón de Aquiles. Produce la flexión plantar del pie al impulsar el cuerpo durante la marcha y el salto."),
+    (r"\btibialis anterior\b", "Músculo principal del compartimento anterior de la pierna; realiza la dorsiflexión y la inversión del pie, evitando que la punta del pie arrastre durante la fase de balanceo de la marcha."),
+    (r"\bintercostal\b", "Músculo laminar dispuesto en los espacios intercostales que moviliza y estabiliza las costillas durante los movimientos respiratorios de inspiración y espiración."),
+    (r"\bexternal oblique\b|\binternal oblique\b|\brectus abdominis\b|\blinea alba\b", "Estructura de la pared anterolateral del abdomen que comprime y protege las vísceras abdominales, interviene en la espiración forzada y flexiona o rota el tronco."),
+    (r"\blevator ani\b|\biliococcygeus\b|\bpubococcygeus\b|\bpuborectalis\b", "Componente muscular del diafragma pélvico (suelo pélvico) que sostiene las vísceras abdominopélvicas y participa en los mecanismos de continencia urinaria y fecal."),
+
+    # Sistema circulatorio y corazón
+    (r"\bleft ventricle\b", "Cámara cardíaca de paredes gruesas y musculares que recibe sangre oxigenada desde la aurícula izquierda a través de la válvula mitral y la impulsa a alta presión hacia la aorta para irrigar todo el organismo (circulación sistémica)."),
+    (r"\bright ventricle\b", "Cámara cardíaca anteroinferior que recibe sangre venosa desoxigenada desde la aurícula derecha a través de la válvula tricúspide y la bombea a través de la válvula pulmonar hacia los pulmones (circulación menor)."),
+    (r"\bright atrium\b", "Cavidad cardíaca posterosuperior derecha donde desembocan la vena cava superior, la vena cava inferior y el seno coronario, recogiendo el retorno venoso sistémico."),
+    (r"\bleft atrium\b", "Cavidad cardíaca posterior que recibe la sangre recién oxigenada procedente de los pulmones a través de las cuatro venas pulmonares y la conduce hacia el ventrículo izquierdo."),
+    (r"\btricuspid valve\b", "Válvula auriculoventricular derecha formada por tres valvas (anterior, posterior y septal) sujetas por cuerdas tendinosas a los músculos papilares; impide el reflujo de sangre del ventrículo derecho a la aurícula derecha durante la sístole."),
+    (r"\bmitral valve\b", "Válvula auriculoventricular izquierda (bicúspide), provista de las valvas anterior y posterior; garantiza el flujo unidireccional de sangre oxigenada desde la aurícula izquierda al ventrículo izquierdo."),
+    (r"\baortic valve\b", "Válvula semilunar situada a la salida del ventrículo izquierdo en el origen de la aorta ascendente; consta de tres valvas semilunares que se cierran en diástole evitando la regurgitación aórtica."),
+    (r"\bpulmonary valve\b", "Válvula semilunar situada entre el cono arterial del ventrículo derecho y el tronco pulmonar; consta de tres valvas semilunares que impiden el retorno sanguíneo desde la arteria pulmonar."),
+    (r"\bpapillary muscle\b", "Proyección muscular cónica de la pared interna ventricular en la que se insertan las cuerdas tendinosas; se contrae en sístole para evitar el prolapso de las valvas mitral o tricúspide."),
+    (r"\bascending aorta\b", "Primer tramo de la arteria aorta que nace en el ventrículo izquierdo; de sus senos aórticos de Valsalva se originan las arterias coronarias derecha e izquierda que irrigan el miocardio."),
+    (r"\barch of aorta\b", "Segundo segmento curvado de la aorta en el mediastino superior; da origen a los tres grandes troncos arteriales supraaórticos: tronco braquiocefálico, arteria carótida común izquierda y arteria subclavia izquierda."),
+    (r"\bdescending aorta\b|\bthoracic aorta\b|\babdominal aorta\b", "Tramo principal de la arteria aorta que desciende por el tórax y el abdomen distribuyendo ramas parietales y viscerales para todos los órganos toracoabdominales antes de bifurcarse en las arterias ilíacas comunes."),
+    (r"\bcoronary artery\b", "Arteria encargada de la irrigación nutricional del propio músculo cardíaco (miocardio); nace en la raíz de la aorta ascendente."),
+    (r"\bcoronary sinus\b", "Conducto venoso principal del corazón alojado en el surco coronario posterior; recoge la mayor parte de la sangre venosa del miocardio y la drena directamente en la aurícula derecha."),
+    (r"\bsuperior vena cava\b", "Gran tronco venoso del mediastino superior que retorna a la aurícula derecha toda la sangre desoxigenada procedente de la cabeza, el cuello, los miembros superiores y el tórax."),
+    (r"\binferior vena cava\b", "La vena de mayor calibre del cuerpo humano; asciende por el retroperitoneo recogiendo el retorno venoso de los miembros inferiores, la pelvis y el abdomen hasta desembocar en la aurícula derecha."),
+    (r"\bcarotid artery\b", "Arteria principal del cuello encargada de llevar sangre oxigenada hacia las estructuras craneofaciales (carótida externa) y hacia el encéfalo y la órbita (carótida interna)."),
+    (r"\bjugular vein\b", "Vena colectora principal del cuello que drena la sangre venosa del encéfalo, la cara y la región cervical hacia las venas subclavias y braquiocefálicas."),
+
+    # Sistema respiratorio
+    (r"\btrachea\b", "Conducto aéreo fibrocartilaginoso de unos 10-12 cm reforzado por anillos hialinos en forma de 'C'; comunica la laringe con los bronquios principales derecho e izquierdo en la carina traqueal."),
+    (r"\bmain bronchus\b|\bbronchus\b|\bbronchial\b", "Vía aérea de conducción del árbol traqueobronquial que transporta el aire inspirado hacia los lóbulos y segmentos broncopulmonares hasta alcanzar los alvéolos."),
+    (r"\blung\b|\bbronchopulmonary\b", "Órgano esencial del aparato respiratorio alojado en las cavidades pleurales del tórax, donde se produce la hematosis (intercambio de oxígeno y dióxido de carbono entre el aire alveolar y la sangre capilar)."),
+    (r"\blarynx\b|\bcricoid\b|\bthyroid cartilage\b|\bconus elasticus\b|\bthyrohyoid\b", "Estructura cartilaginosa y muscular de la vía aérea superior que conecta la faringe con la tráquea, protege la vía respiratoria durante la deglución y aloja las cuerdas vocales para la fonación."),
+
+    # Sistema digestivo
+    (r"\besophagus\b", "Tubo muscular de unos 25 cm que atraviesa el cuello, el mediastino posterior y el hiato esofágico del diafragma para impulsar el bolo alimenticio desde la faringe hasta el estómago mediante ondas peristálticas."),
+    (r"\bstomach\b", "Porción dilatada en forma de 'J' del tubo digestivo situada entre el esófago y el duodeno; realiza la digestión mecánica y química del bolo alimenticio mediante el jugo gástrico (ácido clorhídrico y pepsina) transformándolo en quimo."),
+    (r"\bduodenum\b", "Primera porción fija del intestino delgado (en forma de 'C' alrededor de la cabeza del páncreas); recibe el quimo ácido del estómago junto con la bilis hepática y las enzimas pancreáticas para iniciar la absorción intestinal."),
+    (r"\bjejunum\b|\bileum\b|\bsmall intestine\b", "Segmento del intestino delgado provisto de pliegues circulares, vellosidades y microvellosidades que multiplican la superficie mucosa para la absorción de nutrientes, agua y electrolitos."),
+    (r"\bcolon\b|\blarge intestine\b|\bappendix\b|\bileocecal\b|\brectum\b", "Tramo del intestino grueso encargado de absorber agua y electrolitos, albergar la microbiota intestinal, sintetizar vitaminas (como la K) y compactar y conducir el bolo fecal hacia su evacuación."),
+    (r"\bliver\b|\bhepatic\b|\bhepatovenous\b", "La glándula más voluminosa del organismo (situada en el hipocondrio derecho); desempeña funciones metabólicas centrales, desintoxicación, almacenamiento de glucógeno, síntesis de proteínas plasmáticas y producción de bilis."),
+    (r"\bgallbladder\b|\bcystic duct\b|\bbiliary\b", "Reservorio piriforme situado en la cara visceral del hígado que almacena y concentra la bilis entre las comidas y la vierte al duodeno a través del conducto cístico y el colédoco para emulsionar las grasas."),
+    (r"\bpancreas\b|\bpancreatic\b", "Glándula mixta retroperitoneal: su porción exocrina secreta jugo pancreático rico en bicarbonato y enzimas digestivas (amilasa, lipasa, tripsina) hacia el duodeno, y sus islotes endocrinos secretan insulina y glucagón a la sangre."),
+    (r"\btongue\b|\bgingiva\b|\btooth\b|\bmouth\b|\bsalivary\b|\bparotid\b|\bsubmandibular\b", "Estructura de la cavidad oral que participa en la masticación, insalivación, articulación del habla, sentido del gusto e inicio de la deglución."),
+
+    # Sistema urinario y reproductor
+    (r"\bkidney\b|\brenal\b", "Órgano par retroperitoneal con forma de habichuela que filtra el plasma sanguíneo a través de más de un millón de nefronas para eliminar desechos metabólicos (urea, creatinina), regular la presión arterial, el pH y el equilibrio hidrosalino."),
+    (r"\bureter\b", "Conducto muscular retroperitoneal de 25-30 cm que transporta la orina desde la pelvis renal hasta la vejiga urinaria mediante contracciones peristálticas rítmicas."),
+    (r"\burinary bladder\b", "Órgano muscular hueco subperitoneal (músculo detrusor) situado en la pelvis menor que actúa como reservorio distensible de la orina procedente de los uréteres hasta el momento de la micción."),
+    (r"\burethra\b", "Conducto fibromuscular terminal de las vías urinarias que evacua la orina desde la vejiga urinaria hacia el exterior (y en el varón conduce además el líquido seminal)."),
+    (r"\btestis\b|\bdeferent\b|\bprostate\b|\bseminal\b", "Órgano del aparato reproductor masculino encargado de la espermatogénesis, la síntesis de andrógenos (testosterona) o la producción y conducción del plasma seminal."),
+    (r"\bovary\b|\buterus\b|\bfallopian\b|\bvagina\b|\bplacenta\b|\bmammary\b", "Órgano del aparato reproductor femenino implicado en la ovogénesis, la secreción de estrógenos y progesterona, la fecundación, la gestación o la lactancia."),
+
+    # Sistema linfático e inmunitario
+    (r"\bspleen\b", "Mayor órgano linfoide del cuerpo, situado en el hipocondrio izquierdo; filtra la sangre eliminando eritrocitos envejecidos (hemocateresis), almacena plaquetas y activa linfocitos T y B en la respuesta inmunitaria."),
+    (r"\bthymus\b|\blymph\b|\bthoracic duct\b|\btonsil\b", "Órgano o conducto del sistema linfoinmunitario responsable de la maduración de linfocitos T, el filtrado de la linfa o su retorno hacia el torrente venoso."),
+
+    # Sistema nervioso y órganos de los sentidos
+    (r"\bcerebellum\b", "Órgano del encéfalo posterior alojado en la fosa craneal posterior; coordina la precisión de los movimientos voluntarios, el equilibrio postural, el tono muscular y el aprendizaje motor."),
+    (r"\bpons\b|\bmedulla oblongata\b|\bmidbrain\b", "División del tronco del encéfalo que conecta el cerebro y el cerebelo con la médula espinal, contiene núcleos de pares craneales y regula funciones vitales automáticas (respiración y ritmo cardíaco)."),
+    (r"\bthalamus\b|\bhypothalamus\b", "Núcleo central del diencéfalo: el tálamo actúa como estación de relevo de las vías sensitivas y motoras hacia la corteza cerebral, mientras que el hipotálamo regula el sistema autónomo, la temperatura y la hipófisis."),
+    (r"\bhippocampus\b|\bamygdala\b|\bfornix\b", "Estructura clave del sistema límbico en el lóbulo temporal medial, esencial para la consolidación de la memoria declarativa, la orientación espacial y el procesamiento emocional."),
+    (r"\bcorpus callosum\b", "Mayor comisura de sustancia blanca del cerebro, formada por más de 200 millones de axones mielinizados que interconectan ambos hemisferios cerebrales derecho e izquierdo coordinando sus funciones."),
+    (r"\bcaudate\b|\bputamen\b|\bpallidum\b", "Núcleo de los ganglios basales del telencéfalo implicado en la planificación, iniciación y modulación fina del movimiento voluntario y hábitos motores."),
+    (r"\bgyrus\b|\bcerebral cortex\b|\bwhite matter\b|\bgray matter\b", "Estructura del telencéfalo involucrada en el procesamiento sensorial, motor, del lenguaje y las funciones cognitivas superiores."),
+    (r"\bspinal cord\b", "Cordón nervioso cilíndrico del sistema nervioso central alojado dentro del conducto vertebral; conduce impulsos aferentes (sensitivos) y eferentes (motores) entre el encéfalo y el resto del cuerpo e integra los arcos reflejos."),
+    (r"\bpituitary\b", "Glándula hipófisis ('glándula maestra' endocrina), situada en la silla turca del hueso esfenoides bajo el control del hipotálamo; secreta hormonas que regulan el crecimiento, la tiroides, la corteza suprarrenal y las gónadas."),
+    (r"\beyeball\b|\bcornea\b|\bretina\b|\blens\b|\bchoroid\b|\bsclera\b|\biris\b|\boptic\b", "Estructura del órgano de la visión: los medios transparentes (córnea y cristalino) enfocan la luz sobre los fotorreceptores de la retina (conos y bastones), que transducen las imágenes en impulsos enviados por el nervio óptico."),
+
+    # Sistema tegumentario
+    (r"\bskin\b|\bintegument\b", "Órgano más extenso del cuerpo humano; constituye una barrera física e inmunológica frente al exterior, regula la temperatura corporal mediante la sudoración y la vasomotricidad y aloja receptores táctiles y térmicos."),
+]
+
+
 def generar_descripcion_es(
     name_es: str,
     name_la: str,
     system: str,
     side: str,
     parent_name_es: str = "",
+    name_en: str = "",
 ) -> str:
     """Genera una descripción anatómica educativa en español para la ficha del visor."""
     desc_sis = DESCRIPCION_SISTEMA.get(system, "el cuerpo humano")
@@ -933,7 +1075,16 @@ def generar_descripcion_es(
         if name_la and name_la.lower() != name_es.lower()
         else ""
     )
+
+    busqueda = f"{name_en} {name_la}".lower()
+    detalle_fisiologico = ""
+    for patron, texto in DESCRIPCIONES_CLAVE:
+        if re.search(patron, busqueda):
+            detalle_fisiologico = f" {texto}"
+            break
+
     return (
         f"{name_es}{la_txt} es una estructura perteneciente a {desc_sis}, "
-        f"{lado_txt}.{padre_txt}"
+        f"{lado_txt}.{padre_txt}{detalle_fisiologico}"
     )
+

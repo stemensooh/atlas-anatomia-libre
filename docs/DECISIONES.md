@@ -2,6 +2,14 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-20 · D-009 · Cierre de Fase 4 (Funciones didácticas) y aplazamiento del hosting a Fase 6
+- **Contexto:** Antes de desplegar en un hosting público es necesario ajustar de dónde se servirán los archivos pesados (`data/processed/` y `data/raw/hubmap/`). Mientras tanto se priorizó completar todas las herramientas didácticas de la Fase 4.
+- **Decisión:**
+  - Posponer el despliegue en hosting gratuito hasta la Fase 6.
+  - Incorporar en `scripts/traductor_es.py` y `data/processed/metadata.json` más de 115 descripciones fisiológicas y morfológicas detalladas de redacción propia (`STEMENSOFT, CC BY-SA 4.0`) con el campo `descriptionSource`.
+  - Implementar en el visor (`web/src/`): 3 planos de corte anatómico (`Axial Y`, `Sagital X`, `Coronal Z` con inversión), árbol jerárquico por sistema, pines 3D flotantes (`@react-three/drei`), 4 tours guiados interactivos, 2 cuestionarios (combinando búsqueda por clic directo en el modelo 3D y opción múltiple), tema claro/oscuro y atajos de teclado (`R`, `I`, `H`, `L`, `Esc`).
+- **Consecuencia:** El visor cuenta ya con todas las funciones de estudio de la Fase 4 listas en local.
+
 ## 2026-10-20 · D-008 · Incorporación del cuerpo femenino por sistemas y traducción íntegra al español
 - **Contexto:** Algunas estructuras compuestas de FMA/UBERON conservaban términos en inglés (como `ventricle` o conectores `of`) cuando no tenían coincidencia literal en `TA2.csv`, y se requería además contar con el cuerpo femenino completo por capas en el visor principal.
 - **Decisión:**

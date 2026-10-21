@@ -1,51 +1,123 @@
-import React from "react";
-import { Eye, EyeOff, Layers, Scissors, Box, User } from "lucide-react";
-import { SYSTEM_META, SystemId, SystemInfo, HubmapOrgan } from "../data/types";
+import React, { useMemo, useState } from "react";
+import {
+  Eye,
+  EyeOff,
+  Layers,
+  Scissors,
+  Box,
+  User,
+  GitBranch,
+  ChevronRight,
+  ChevronDown,
+  FlipHorizontal,
+  RotateCcw,
+} from "lucide-react";
+import {
+  AnatomyStructure,
+  SYSTEM_META,
+  SystemId,
+  SystemInfo,
+  HubmapOrgan,
+} from "../data/types";
 import { useViewerStore } from "../store/useViewerStore";
 
 export function LayerPanel({
   systemsInfo,
+  structures,
   hubmapOrgans,
 }: {
   systemsInfo: SystemInfo[];
+  structures: AnatomyStructure[];
   hubmapOrgans: HubmapOrgan[];
 }) {
   const mode = useViewerStore((s) => s.mode);
   const bodySex = useViewerStore((s) => s.bodySex);
   const activeHubmapOrganId = useViewerStore((s) => s.activeHubmapOrganId);
   const layers = useViewerStore((s) => s.layers);
-  const clipY = useViewerStore((s) => s.clipY);
+  const selectedId = useViewerStore((s) => s.selectedId);
+  const hiddenIds = useViewerStore((s) => s.hiddenIds);
+  const clip = useViewerStore((s) => s.clip);
+
   const setMode = useViewerStore((s) => s.setMode);
   const setBodySex = useViewerStore((s) => s.setBodySex);
   const toggleLayer = useViewerStore((s) => s.toggleLayer);
+  const setLayerEnabled = useViewerStore((s) => s.setLayerEnabled);
   const setLayerOpacity = useViewerStore((s) => s.setLayerOpacity);
   const enableAllLayers = useViewerStore((s) => s.enableAllLayers);
-  const setClipY = useViewerStore((s) => s.setClipY);
+  const selectStructure = useViewerStore((s) => s.selectStructure);
+  const toggleHide = useViewerStore((s) => s.toggleHide);
+  const setClipPlane = useViewerStore((s) => s.setClipPlane);
+  const resetClipPlanes = useViewerStore((s) => s.resetClipPlanes);
+
+  const [expandedSystems, setExpandedSystems] = useState<
+    Partial<Record<SystemId, boolean>>
+  >({
+    skeletal: true,
+    circulatory: true,
+  });
+  const [treeFilter, setTreeFilter] = useState("");
 
   const infoMap = new Map(systemsInfo.map((s) => [s.id, s]));
 
+  // Agrupar estructuras por sistema y ordenarlas alfabéticamente en español
+  const groupedBySystem = useMemo(() => {
+    const map = new Map<SystemId, AnatomyStructure[]>();
+    for (const sys of Object.keys(SYSTEM_META) as SystemId[]) {
+      map.set(sys, []);
+    }
+    const q = treeFilter.trim().toLowerCase();
+    for (const st of structures) {
+      if (
+        q &&
+        !st.nameEs.toLowerCase().includes(q) &&
+        !st.nameLa.toLowerCase().includes(q) &&
+        !st.id.toLowerCase().includes(q)
+      ) {
+        continue;
+      }
+      map.get(st.system)?.push(st);
+    }
+    for (const [, arr] of map) {
+      arr.sort((a, b) => a.nameEs.localeCompare(b.nameEs, "es"));
+    }
+    return map;
+  }, [structures, treeFilter]);
+
+  const hasAnyClip =
+    clip.axialY !== null || clip.sagittalX !== null || clip.coronalZ !== null;
+
   return (
     <aside className="panel panel-left">
-      <div className="mode-tabs">
+      <div className="mode-tabs mode-tabs-3">
         <button
           className={`mode-tab ${mode === "body" ? "active" : ""}`}
           onClick={() => setMode("body", null)}
+          title="Capas por sistema anatómico"
         >
-          <User size={15} />
-          <span>Cuerpo 3D (10 sistemas)</span>
+          <User size={14} />
+          <span>Sistemas</span>
+        </button>
+        <button
+          className={`mode-tab ${mode === "tree" ? "active" : ""}`}
+          onClick={() => setMode("tree", null)}
+          title="Árbol anatómico jerárquico"
+        >
+          <GitBranch size={14} />
+          <span>Árbol</span>
         </button>
         <button
           className={`mode-tab ${mode === "hubmap" ? "active" : ""}`}
           onClick={() =>
             setMode("hubmap", activeHubmapOrganId || hubmapOrgans[0]?.id || null)
           }
+          title="Órganos de referencia HuBMAP"
         >
-          <Box size={15} />
-          <span>Órganos HuBMAP ({hubmapOrgans.length})</span>
+          <Box size={14} />
+          <span>HuBMAP ({hubmapOrgans.length})</span>
         </button>
       </div>
 
-      {mode === "body" && (
+      {mode !== "hubmap" && (
         <div className="sex-switch" role="group" aria-label="Modelo anatómico">
           <button
             className={`sex-switch-btn ${bodySex === "male" ? "active male" : ""}`}
@@ -147,6 +219,115 @@ export function LayerPanel({
             })}
           </div>
         </>
+      ) : mode === "tree" ? (
+        <div className="tree-section">
+          <div className="panel-section-header">
+            <div className="section-title">
+              <GitBranch size={15} />
+              <span>Árbol anatómico ({structures.length})</span>
+            </div>
+          </div>
+
+          <input
+            type="text"
+            className="tree-filter-input"
+            placeholder="Filtrar estructuras en el árbol…"
+            value={treeFilter}
+            onChange={(e) => setTreeFilter(e.target.value)}
+          />
+
+          <div className="tree-scroll">
+            {(Object.keys(SYSTEM_META) as SystemId[]).map((sys) => {
+              const meta = SYSTEM_META[sys];
+              const items = groupedBySystem.get(sys) || [];
+              const isExpanded =
+                Boolean(treeFilter.trim()) || Boolean(expandedSystems[sys]);
+
+              return (
+                <div key={sys} className="tree-group">
+                  <div className="tree-group-header">
+                    <button
+                      className="tree-expand-btn"
+                      onClick={() =>
+                        setExpandedSystems((prev) => ({
+                          ...prev,
+                          [sys]: !prev[sys],
+                        }))
+                      }
+                    >
+                      {isExpanded ? (
+                        <ChevronDown size={14} />
+                      ) : (
+                        <ChevronRight size={14} />
+                      )}
+                      <span
+                        className="color-dot"
+                        style={{ backgroundColor: meta.colorHex }}
+                      />
+                      <span className="tree-sys-label">{meta.labelEs}</span>
+                    </button>
+                    <div className="layer-badges">
+                      <span className="badge-count">{items.length}</span>
+                      <button
+                        className="icon-btn"
+                        onClick={() => toggleLayer(sys)}
+                        title={
+                          layers[sys].enabled
+                            ? "Ocultar sistema"
+                            : "Mostrar sistema"
+                        }
+                      >
+                        {layers[sys].enabled ? (
+                          <Eye size={14} />
+                        ) : (
+                          <EyeOff size={14} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {isExpanded && items.length > 0 && (
+                    <div className="tree-children">
+                      {items.map((st) => {
+                        const isHidden = Boolean(hiddenIds[st.id]);
+                        return (
+                          <div
+                            key={st.id}
+                            className={`tree-node-row ${
+                              selectedId === st.id ? "selected" : ""
+                            } ${isHidden ? "is-hidden" : ""}`}
+                          >
+                            <button
+                              className="tree-node-select"
+                              onClick={() => {
+                                setLayerEnabled(st.system, true);
+                                selectStructure(st.id);
+                              }}
+                            >
+                              <span className="tree-node-name">{st.nameEs}</span>
+                              <small className="tree-node-id">{st.id}</small>
+                            </button>
+                            <button
+                              className="icon-btn"
+                              onClick={() => toggleHide(st.id)}
+                              title={isHidden ? "Mostrar malla" : "Ocultar malla"}
+                            >
+                              {isHidden ? (
+                                <EyeOff size={13} />
+                              ) : (
+                                <Eye size={13} />
+                              )}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       ) : (
         <div className="hubmap-list-section">
           <div className="panel-section-header">
@@ -165,7 +346,9 @@ export function LayerPanel({
                 onClick={() => setMode("hubmap", org.id)}
               >
                 <div className="hubmap-item-top">
-                  <span className="hubmap-name">{org.organ}</span>
+                  <span className="hubmap-name">
+                    {org.nameEs || org.organ}
+                  </span>
                   <span className={`sex-badge ${org.sex}`}>
                     {org.sex === "female" ? "♀" : org.sex === "male" ? "♂" : "•"}
                   </span>
@@ -184,29 +367,145 @@ export function LayerPanel({
         <div className="panel-section-header">
           <div className="section-title">
             <Scissors size={15} />
-            <span>Corte axial (plano Y)</span>
+            <span>Planos de corte (3 ejes)</span>
           </div>
-          <button
-            className="btn-xs"
-            onClick={() => setClipY(clipY === null ? 1.25 : null)}
-          >
-            {clipY === null ? "Activar" : "Quitar"}
-          </button>
+          {hasAnyClip && (
+            <button
+              className="btn-xs"
+              onClick={resetClipPlanes}
+              title="Restablecer los 3 planos de corte"
+            >
+              <RotateCcw size={12} /> Quitar
+            </button>
+          )}
         </div>
-        {clipY !== null && (
-          <div className="opacity-row">
-            <span className="opacity-label">Altura</span>
-            <input
-              type="range"
-              min={0.05}
-              max={1.75}
-              step={0.01}
-              value={clipY}
-              onChange={(e) => setClipY(parseFloat(e.target.value))}
-            />
-            <span className="opacity-val">{clipY.toFixed(2)} m</span>
+
+        {/* Plano Axial (Y) */}
+        <div className="clip-plane-box">
+          <div className="clip-plane-row">
+            <span className="clip-plane-label">Axial (Y · Horizontal)</span>
+            <div className="mini-actions">
+              {clip.axialY !== null && (
+                <button
+                  className={`btn-xs ${clip.invertY ? "active" : ""}`}
+                  onClick={() => setClipPlane({ invertY: !clip.invertY })}
+                  title="Invertir lado cortado"
+                >
+                  <FlipHorizontal size={11} /> Invertir
+                </button>
+              )}
+              <button
+                className="btn-xs"
+                onClick={() =>
+                  setClipPlane({ axialY: clip.axialY === null ? 1.25 : null })
+                }
+              >
+                {clip.axialY === null ? "Activar" : "Off"}
+              </button>
+            </div>
           </div>
-        )}
+          {clip.axialY !== null && (
+            <div className="opacity-row">
+              <input
+                type="range"
+                min={0.05}
+                max={1.75}
+                step={0.01}
+                value={clip.axialY}
+                onChange={(e) =>
+                  setClipPlane({ axialY: parseFloat(e.target.value) })
+                }
+              />
+              <span className="opacity-val">{clip.axialY.toFixed(2)} m</span>
+            </div>
+          )}
+        </div>
+
+        {/* Plano Sagital (X) */}
+        <div className="clip-plane-box">
+          <div className="clip-plane-row">
+            <span className="clip-plane-label">Sagital (X · Izq/Der)</span>
+            <div className="mini-actions">
+              {clip.sagittalX !== null && (
+                <button
+                  className={`btn-xs ${clip.invertX ? "active" : ""}`}
+                  onClick={() => setClipPlane({ invertX: !clip.invertX })}
+                  title="Invertir hemicuerpo cortado"
+                >
+                  <FlipHorizontal size={11} /> Invertir
+                </button>
+              )}
+              <button
+                className="btn-xs"
+                onClick={() =>
+                  setClipPlane({
+                    sagittalX: clip.sagittalX === null ? 0.0 : null,
+                  })
+                }
+              >
+                {clip.sagittalX === null ? "Activar" : "Off"}
+              </button>
+            </div>
+          </div>
+          {clip.sagittalX !== null && (
+            <div className="opacity-row">
+              <input
+                type="range"
+                min={-0.35}
+                max={0.35}
+                step={0.01}
+                value={clip.sagittalX}
+                onChange={(e) =>
+                  setClipPlane({ sagittalX: parseFloat(e.target.value) })
+                }
+              />
+              <span className="opacity-val">{clip.sagittalX.toFixed(2)} m</span>
+            </div>
+          )}
+        </div>
+
+        {/* Plano Coronal (Z) */}
+        <div className="clip-plane-box">
+          <div className="clip-plane-row">
+            <span className="clip-plane-label">Coronal (Z · Ant/Post)</span>
+            <div className="mini-actions">
+              {clip.coronalZ !== null && (
+                <button
+                  className={`btn-xs ${clip.invertZ ? "active" : ""}`}
+                  onClick={() => setClipPlane({ invertZ: !clip.invertZ })}
+                  title="Invertir mitad anterior/posterior"
+                >
+                  <FlipHorizontal size={11} /> Invertir
+                </button>
+              )}
+              <button
+                className="btn-xs"
+                onClick={() =>
+                  setClipPlane({
+                    coronalZ: clip.coronalZ === null ? 0.0 : null,
+                  })
+                }
+              >
+                {clip.coronalZ === null ? "Activar" : "Off"}
+              </button>
+            </div>
+          </div>
+          {clip.coronalZ !== null && (
+            <div className="opacity-row">
+              <input
+                type="range"
+                min={-0.25}
+                max={0.25}
+                step={0.01}
+                value={clip.coronalZ}
+                onChange={(e) =>
+                  setClipPlane({ coronalZ: parseFloat(e.target.value) })
+                }
+              />
+              <span className="opacity-val">{clip.coronalZ.toFixed(2)} m</span>
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   );

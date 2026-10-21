@@ -46,8 +46,9 @@ def main() -> None:
         parent = by_id.get(st.get("parentId") or "")
         parent_es = parent["nameEs"] if parent else ""
         st["descriptionEs"] = generar_descripcion_es(
-            st["nameEs"], st["nameLa"], st["system"], st["side"], parent_es
+            st["nameEs"], st["nameLa"], st["system"], st["side"], parent_es, st["nameEn"]
         )
+        st["descriptionSource"] = "STEMENSOFT — redacción educativa propia (CC BY-SA 4.0)"
 
     # 2. Integrar modelo femenino completo (10 sistemas extraídos de united-female)
     cw_map: dict[str, tuple[str, str]] = {}
@@ -103,6 +104,16 @@ def main() -> None:
         meta["femaleStructures"] = fem_structures
         FEM_NODES_PATH.unlink(missing_ok=True)
 
+    for st in meta.get("femaleStructures", []):
+        side, name_la, name_es = traducir_estructura(st["nameEn"], ta2)
+        st["side"] = side
+        st["nameLa"] = name_la
+        st["nameEs"] = name_es
+        st["descriptionEs"] = generar_descripcion_es(
+            name_es, name_la, st["system"], side, "Cuerpo femenino (HuBMAP)", st["nameEn"]
+        )
+        st["descriptionSource"] = "STEMENSOFT — redacción educativa propia (CC BY-SA 4.0)"
+
     # 3. Traducir todas las subestructuras de los 87 órganos de HuBMAP
     for org in meta.get("hubmapReferenceOrgans", []):
         _, _, org_es = traducir_estructura(org["organ"].replace("-", " "), ta2)
@@ -116,7 +127,7 @@ def main() -> None:
             side, la, es = traducir_estructura(en_lbl, ta2)
             n["nameLa"] = la
             n["nameEs"] = es
-            n["descriptionEs"] = generar_descripcion_es(es, la, org["system"], side, org_es)
+            n["descriptionEs"] = generar_descripcion_es(es, la, org["system"], side, org_es, en_lbl)
 
     META_PATH.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(

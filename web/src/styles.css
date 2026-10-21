@@ -882,3 +882,477 @@ body,
 .credits-table a {
   color: var(--accent);
 }
+
+/* =========================================================
+   FASE 4: Tema Claro, Árbol, Planos de Corte, Pines 3D,
+   Tours Guiados y Cuestionarios (Quiz)
+   ========================================================= */
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-0: #f1f5f9;
+  --bg-1: #ffffff;
+  --bg-2: #e2e8f0;
+  --bg-3: #cbd5e1;
+  --text-0: #0f172a;
+  --text-1: #334155;
+  --text-2: #64748b;
+  --accent: #0284c7;
+  --accent-strong: #0369a1;
+  --border: rgba(15, 23, 42, 0.14);
+}
+
+[data-theme="light"] .topbar,
+[data-theme="light"] .panel,
+[data-theme="light"] .stage-footer {
+  background: rgba(255, 255, 255, 0.94);
+}
+
+[data-theme="light"] .canvas-stage {
+  background: radial-gradient(circle at 50% 35%, #dbeafe 0%, #cbd5e1 80%);
+}
+
+[data-theme="light"] .layer-card,
+[data-theme="light"] .structure-card,
+[data-theme="light"] .hubmap-item,
+[data-theme="light"] .node-row,
+[data-theme="light"] .attribution-mini,
+[data-theme="light"] .meta-grid div,
+[data-theme="light"] .structure-description {
+  background: rgba(241, 245, 249, 0.85);
+}
+
+[data-theme="light"] .btn-credits {
+  color: #0369a1;
+  background: rgba(2, 132, 199, 0.12);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-cam.active {
+  background: rgba(56, 189, 248, 0.22);
+  color: var(--text-0);
+  border-color: var(--accent);
+}
+
+.mode-tabs-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Árbol anatómico jerárquico */
+.tree-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  flex: 1;
+}
+
+.tree-filter-input {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 6px 9px;
+  color: var(--text-0);
+  font-size: 0.76rem;
+  outline: none;
+}
+
+.tree-filter-input:focus {
+  border-color: var(--accent);
+}
+
+.tree-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 2px;
+}
+
+.tree-group {
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: rgba(30, 41, 59, 0.35);
+  overflow: hidden;
+}
+
+[data-theme="light"] .tree-group {
+  background: rgba(241, 245, 249, 0.75);
+}
+
+.tree-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 7px;
+}
+
+.tree-expand-btn {
+  background: none;
+  border: none;
+  color: var(--text-0);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.tree-children {
+  border-top: 1px solid var(--border);
+  max-height: 210px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-node-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 6px 3px 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  gap: 4px;
+}
+
+.tree-node-row.selected {
+  background: rgba(56, 189, 248, 0.18);
+}
+
+.tree-node-row.is-hidden {
+  opacity: 0.45;
+}
+
+.tree-node-select {
+  background: none;
+  border: none;
+  color: var(--text-1);
+  font-size: 0.73rem;
+  text-align: left;
+  cursor: pointer;
+  padding: 2px 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  flex: 1;
+}
+
+.tree-node-select:hover {
+  color: var(--text-0);
+}
+
+.tree-node-id {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: var(--text-2);
+}
+
+/* Planos de corte (3 ejes) */
+.clip-section {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clip-plane-box {
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 8px;
+}
+
+[data-theme="light"] .clip-plane-box {
+  background: rgba(241, 245, 249, 0.8);
+}
+
+.clip-plane-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.clip-plane-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-1);
+}
+
+.btn-xs.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Pines 3D flotantes */
+.pin-3d {
+  background: rgba(15, 23, 42, 0.88);
+  color: #f8fafc;
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  transition: transform 0.12s, background 0.12s;
+}
+
+.pin-3d:hover,
+.pin-3d.selected {
+  background: #0284c7;
+  border-color: #e0f2fe;
+  transform: scale(1.06);
+}
+
+.pin-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #38bdf8;
+}
+
+.pin-3d.selected .pin-dot {
+  background: #ffffff;
+}
+
+/* Tours y Quiz */
+.didactic-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tour-select-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 9px;
+  color: var(--text-1);
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+[data-theme="light"] .tour-select-card {
+  background: rgba(241, 245, 249, 0.85);
+}
+
+.tour-select-card.active,
+.tour-select-card:hover {
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--text-0);
+}
+
+.tour-select-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.tour-select-card small {
+  font-size: 0.69rem;
+  color: var(--text-2);
+}
+
+.tour-player-card,
+.quiz-card {
+  background: rgba(30, 41, 59, 0.65);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+[data-theme="light"] .tour-player-card,
+[data-theme="light"] .quiz-card {
+  background: rgba(241, 245, 249, 0.9);
+}
+
+.tour-step-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.tour-step-title {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--text-0);
+}
+
+.tour-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tour-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.tour-dot.active {
+  background: var(--accent);
+}
+
+.tour-nav-btns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.btn-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.quiz-mode-pill {
+  font-size: 0.71rem;
+  background: rgba(56, 189, 248, 0.13);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: var(--accent);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quiz-option-btn {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  color: var(--text-0);
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.quiz-option-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.quiz-option-btn.correct {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.18);
+}
+
+.quiz-option-btn.wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.quiz-hint-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.hint-text {
+  width: 100%;
+  margin: 4px 0 0;
+  font-size: 0.74rem;
+  color: #fde047;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+[data-theme="light"] .hint-text {
+  color: #854d0e;
+}
+
+.quiz-feedback {
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-feedback.ok {
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+}
+
+.quiz-feedback.fail {
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+}
+
+.quiz-feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quiz-feedback p {
+  margin: 0;
+}
+
+.quiz-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 12px 6px;
+}
+
+.quiz-summary h3 {
+  margin: 0;
+}
+
+.quiz-final-score {
+  margin: 0;
+  font-size: 0.85rem;
+}
+

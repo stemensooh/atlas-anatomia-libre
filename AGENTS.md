@@ -8,9 +8,11 @@ Visor anatómico 3D libre, web, no comercial, hecho por STEMENSOFT para aprender
 ## Estado
 - **Fase 0: cerrada.** Estructura, licencias y registro de atribuciones.
 - **Fase 1: cerrada.** Licencias verificadas, modelos descargados en `data/raw/` (BodyParts3D v4.0 + HuBMAP 3D Reference Organs, ambos CC BY 4.0; `TA2.csv` de Z-Anatomy como referencia) y catalogados en `data/metadata/sources.csv`.
-- **Fase 2: cerrada.** 10 archivos `.glb` optimizados con `meshopt` y validados en `data/processed/` (**34,65 MB** en total, 0 errores en `gltf-validator`) + `data/processed/metadata.json` con 1.658 estructuras FMA y 87 órganos de HuBMAP.
-- **Siguiente: Fase 3 (Visor MVP)** en `web/` (Vite + React + TypeScript + `@react-three/fiber`). Ver `docs/PLAN_PROYECTO.md`.
-- Rama `main`. No hay remoto; se configura en la Fase 6. No hagas push.
+- **Fase 2: cerrada.** 10 archivos `.glb` masculinos y 10 femeninos optimizados con `meshopt` y validados en `data/processed/` + `data/processed/metadata.json` con 1.658 estructuras FMA masculinas, 956 estructuras femeninas y 87 órganos de HuBMAP (100 % traducidos al español).
+- **Fase 3: cerrada** (despliegue pospuesto a la Fase 6 por D-009). Visor 3D en `web/` con capas por sistema, conmutador masculino/femenino, selección por raycasting, buscador y modal de atribuciones.
+- **Fase 4: cerrada.** Funciones didácticas completas: 115+ descripciones anatómicas clave con `descriptionSource`, cortes en 3 ejes (Axial Y, Sagital X, Coronal Z), árbol anatómico jerárquico, pines 3D flotantes, 4 tours guiados, 2 cuestionarios interactivos (clic 3D + opción múltiple), modo claro/oscuro y atajos de teclado.
+- **Siguiente: Fase 5 (Backend y cuentas, opcional) o Fase 6 (Publicación, ajuste de carga de assets y hosting).** Ver `docs/PLAN_PROYECTO.md`.
+- Rama `main` conectada a `origin` (`https://github.com/stemensooh/biodigital.git`).
 
 ## Reglas obligatorias
 1. **Licencias separadas:** código = MIT (`LICENSE-CODE`); contenido = CC BY-SA 4.0 (`LICENSE-CONTENT`). No mezcles carpetas.
