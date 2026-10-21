@@ -51,6 +51,7 @@ export const generateInputSchema = {
     systems: { type: "array", minItems: 1, uniqueItems: true, items: { enum: SYSTEM_IDS } },
     count: { type: "integer", minimum: 3, maximum: 20 },
     mode: { enum: ["mixed", "find3d", "multipleChoice"], default: "mixed" },
+    difficulty: { enum: ["basico", "intermedio", "avanzado"], default: "intermedio" },
     title: { type: "string", maxLength: 200 },
   },
 } as const;
@@ -92,6 +93,8 @@ export function checkQuiz(catalog: Catalog, quiz: QuizInput): string[] {
     const st = catalog.byId[q.bodySex].get(q.targetStructureId);
     if (!st) {
       errors.push(`${n}: la estructura ${q.targetStructureId} no existe en el modelo ${q.bodySex === "female" ? "femenino" : "masculino"}.`);
+    } else if (!st.hasMesh) {
+      errors.push(`${n}: ${st.nameEs} es un grupo sin malla propia y no se puede seleccionar; elige una de sus partes.`);
     } else if (!q.enabledSystems.includes(st.system)) {
       errors.push(`${n}: hay que activar el sistema "${st.system}" para que se vea ${st.nameEs}.`);
     }

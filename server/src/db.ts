@@ -13,8 +13,6 @@ import type {
 
 const DEFAULT_DB_PATH = path.resolve(import.meta.dirname, "../data/biodigital.db");
 
-// Versión del esquema: si se añaden migraciones, se incrementa y se añade un bloque en migrate().
-const SCHEMA_VERSION = 1;
 
 export type Db = DatabaseSync;
 
@@ -28,11 +26,12 @@ export function openDb(dbPath = process.env.BIODIGITAL_DB || DEFAULT_DB_PATH): D
   return db;
 }
 
-function migrate(db: Db) {
-  const { user_version } = db.prepare("PRAGMA user_version").get() as { user_version: number };
-  if (user_version >= SCHEMA_VERSION) return;
-
-  db.exec(`
+// Migraciones en orden; PRAGMA user_version guarda cuántas se han aplicado.
+// Nunca se edita una migración ya publicada: los cambios van en una nueva.
+// SQL estándar en lo posible para facilitar una futura migración a PostgreSQL.
+const MIGRATIONS: string[] = [
+  // v1: cuestionarios, preguntas e intentos
+  `
     CREATE TABLE IF NOT EXISTS quizzes (
       id          TEXT PRIMARY KEY,
       title       TEXT NOT NULL,
@@ -68,9 +67,26 @@ function migrate(db: Db) {
       finished_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
     );
     CREATE INDEX IF NOT EXISTS idx_attempts_quiz ON quiz_attempts(quiz_id, finished_at);
+  `,
+  // v2: propietario de cada cuestionario e intento, preparado para la autenticación.
+  // NULL = sin dueño (cuestionarios incluidos y datos anteriores a las cuentas). La tabla
+  // users y su clave foránea se añadirán con la autenticación.
+  `
+    ALTER TABLE quizzes ADD COLUMN user_id INTEGER;
+    ALTER TABLE quiz_attempts ADD COLUMN user_id INTEGER;
+    CREATE INDEX IF NOT EXISTS idx_quizzes_user ON quizzes(user_id);
+    CREATE INDEX IF NOT EXISTS idx_attempts_user ON quiz_attempts(user_id, finished_at);
+  `,
+];
 
-    PRAGMA user_version = ${SCHEMA_VERSION};
-  `);
+function migrate(db: Db) {
+  const { user_version } = db.prepare("PRAGMA user_version").get() as { user_version: number };
+  for (let v = user_version; v < MIGRATIONS.length; v++) {
+    tx(db, () => {
+      db.exec(MIGRATIONS[v]);
+      db.exec(`PRAGMA user_version = ${v + 1}`);
+    });
+  }
 }
 
 // Ejecuta fn dentro de una transacción; si lanza, se revierte.
@@ -117,7 +133,8 @@ function rowToQuestion(r: QuestionRow): QuizQuestion {
 export function listQuizzes(db: Db): QuizSummary[] {
   return db
     .prepare(
-      `SELECT q.id, q.title, q.subtitle, q.source, q.created_at AS createdAt, q.updated_at AS updatedAt,
+      `SELECT q.id, q.title, q.subtitle, q.source, q.user_id AS userId,
+              q.created_at AS createdAt, q.updated_at AS updatedAt,
               (SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) AS questionCount,
               (SELECT COUNT(*) FROM quiz_attempts WHERE quiz_id = q.id) AS attemptCount,
               (SELECT MAX(CAST(score AS REAL) / total) FROM quiz_attempts WHERE quiz_id = q.id AND total > 0) AS bestRatio
@@ -130,7 +147,7 @@ export function listQuizzes(db: Db): QuizSummary[] {
 export function getQuiz(db: Db, id: string): Quiz | null {
   const quiz = db
     .prepare(
-      `SELECT id, title, subtitle, source, created_at AS createdAt, updated_at AS updatedAt
+      `SELECT id, title, subtitle, source, user_id AS userId, created_at AS createdAt, updated_at AS updatedAt
        FROM quizzes WHERE id = ?`
     )
     .get(id) as Omit<Quiz, "questions"> | undefined;
@@ -172,14 +189,20 @@ function insertQuestions(db: Db, quizId: string, questions: QuizQuestion[]) {
   });
 }
 
-export function createQuiz(db: Db, input: QuizInput, source: QuizSource): Quiz {
+export function createQuiz(
+  db: Db,
+  input: QuizInput,
+  source: QuizSource,
+  userId: number | null = null
+): Quiz {
   const id = input.id || `quiz-${crypto.randomUUID().slice(0, 8)}`;
   tx(db, () => {
-    db.prepare("INSERT INTO quizzes (id, title, subtitle, source) VALUES (?, ?, ?, ?)").run(
+    db.prepare("INSERT INTO quizzes (id, title, subtitle, source, user_id) VALUES (?, ?, ?, ?, ?)").run(
       id,
       input.title,
       input.subtitle ?? "",
-      source
+      source,
+      userId
     );
     insertQuestions(db, id, input.questions);
   });
@@ -204,12 +227,17 @@ export function deleteQuiz(db: Db, id: string): boolean {
   return db.prepare("DELETE FROM quizzes WHERE id = ?").run(id).changes > 0;
 }
 
-export function addAttempt(db: Db, quizId: string, input: QuizAttemptInput): QuizAttempt | null {
+export function addAttempt(
+  db: Db,
+  quizId: string,
+  input: QuizAttemptInput,
+  userId: number | null = null
+): QuizAttempt | null {
   const exists = db.prepare("SELECT 1 FROM quizzes WHERE id = ?").get(quizId);
   if (!exists) return null;
   const { lastInsertRowid } = db
-    .prepare("INSERT INTO quiz_attempts (quiz_id, score, total, answers) VALUES (?, ?, ?, ?)")
-    .run(quizId, input.score, input.total, JSON.stringify(input.answers));
+    .prepare("INSERT INTO quiz_attempts (quiz_id, score, total, answers, user_id) VALUES (?, ?, ?, ?, ?)")
+    .run(quizId, input.score, input.total, JSON.stringify(input.answers), userId);
   return getAttempt(db, Number(lastInsertRowid));
 }
 
@@ -220,6 +248,7 @@ interface AttemptRow {
   total: number;
   answers: string;
   finished_at: string;
+  user_id: number | null;
 }
 
 function rowToAttempt(r: AttemptRow): QuizAttempt {
@@ -230,6 +259,7 @@ function rowToAttempt(r: AttemptRow): QuizAttempt {
     total: r.total,
     answers: JSON.parse(r.answers),
     finishedAt: r.finished_at,
+    userId: r.user_id,
   };
 }
 

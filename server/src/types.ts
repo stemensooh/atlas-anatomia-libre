@@ -35,6 +35,7 @@ export interface Quiz {
   title: string;
   subtitle: string;
   source: QuizSource;
+  userId: number | null; // dueño (null = sin dueño); se usará con la autenticación
   createdAt: string;
   updatedAt: string;
   questions: QuizQuestion[];
@@ -45,6 +46,7 @@ export interface QuizSummary {
   title: string;
   subtitle: string;
   source: QuizSource;
+  userId: number | null;
   createdAt: string;
   updatedAt: string;
   questionCount: number;
@@ -75,14 +77,18 @@ export interface QuizAttemptInput {
 export interface QuizAttempt extends QuizAttemptInput {
   id: number;
   quizId: string;
+  userId: number | null;
   finishedAt: string;
 }
+
+export type Difficulty = "basico" | "intermedio" | "avanzado";
 
 export interface GenerateQuizInput {
   bodySex: BodySex;
   systems: SystemId[];
   count: number;
   mode: "mixed" | "find3d" | "multipleChoice";
+  difficulty?: Difficulty;
   title?: string;
 }
 
@@ -91,5 +97,12 @@ export interface CatalogStructure {
   nameEs: string;
   system: SystemId;
   side: "left" | "right" | "median";
+  parentId: string;
   descriptionEs: string;
+  // Calculados desde los .glb (catalog.ts). Las estructuras sin malla propia son grupos
+  // de otras piezas: no se pueden seleccionar con un clic.
+  hasMesh: boolean;
+  sizeCm: number; // dimensión mayor de la caja envolvente
+  clickSizeCm: number; // dimensión intermedia: indica lo fácil que es acertar con un clic
+  region: string; // cabeza y cuello, tórax, abdomen, pelvis, miembro superior/inferior
 }

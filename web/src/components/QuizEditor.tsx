@@ -108,6 +108,7 @@ function GenerateForm({
     systems: ["skeletal"],
     count: 5,
     mode: "mixed",
+    difficulty: "intermedio",
     title: "",
   });
   const [busy, setBusy] = useState(false);
@@ -129,8 +130,8 @@ function GenerateForm({
     <>
       <p className="editor-help">
         Crea un cuestionario al azar con estructuras del catálogo (BodyParts3D / HuBMAP) y lo
-        guarda en la base de datos. Las preguntas de opción múltiple usan distractores del
-        mismo sistema.
+        guarda en la base de datos. Funciona por reglas, sin IA: la dificultad se calcula con el
+        tamaño real de cada pieza en el modelo 3D y las opciones falsas son del mismo sistema.
       </p>
       <div className="editor-grid">
         <label className="editor-field">
@@ -164,6 +165,22 @@ function GenerateForm({
             <option value="mixed">Mixto</option>
             <option value="find3d">Solo clic en 3D</option>
             <option value="multipleChoice">Solo opción múltiple</option>
+          </select>
+        </label>
+        <label className="editor-field">
+          <span>Dificultad</span>
+          <select
+            value={input.difficulty}
+            onChange={(e) =>
+              setInput({
+                ...input,
+                difficulty: e.target.value as GenerateQuizInput["difficulty"],
+              })
+            }
+          >
+            <option value="basico">Básico: estructuras grandes y conocidas</option>
+            <option value="intermedio">Intermedio: de 1 cm en adelante</option>
+            <option value="avanzado">Avanzado: todas, con distractores parecidos</option>
           </select>
         </label>
         <label className="editor-field">

@@ -25,6 +25,7 @@ export interface GenerateQuizInput {
   systems: SystemId[];
   count: number;
   mode: "mixed" | "find3d" | "multipleChoice";
+  difficulty: "basico" | "intermedio" | "avanzado";
   title?: string;
 }
 

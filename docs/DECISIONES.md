@@ -2,6 +2,22 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-012 · Generador por niveles calculados desde los GLB, columna user_id y SQLite como única BD
+- **Contexto:** El generador de D-011 elegía estructuras al azar con una sola plantilla. Podía tocar piezas diminutas o **grupos sin malla propia**, como los 22 grupos femeninos de HuBMAP (por ejemplo `VH_F_femur_L`), imposibles de acertar con un clic. El usuario pidió mejorarlo sin IA y preparar los cuestionarios para la autenticación. Indicó también que se siga con SQLite y que no se haga nada con PostgreSQL hasta que lo pida.
+- **Decisión:**
+  - `server/src/catalog.ts` lee solo el bloque JSON de cada `.glb`, sin descomprimir la geometría meshopt. Con los `min/max` de los accessors y la escala y traslación de cada nodo calcula, para cada estructura, si tiene malla, su dimensión mayor, su **dimensión intermedia** (lo fácil que es acertar con un clic) y su **región** corporal (según la altura del centro).
+  - Tres niveles de dificultad:
+    - **básico:** dimensión intermedia de 3 cm o más, sin los "Conjunto de…" y sin repetir la estructura simétrica.
+    - **intermedio:** 1 cm o más.
+    - **avanzado:** todas, con distractores parecidos (mismo padre, palabras o región en común).
+  - Varias plantillas de enunciado (5 de clic 3D y 4 de opción múltiple). Las pistas combinan sistema, tamaño, región, lado y estructura padre; en opción múltiple dan la inicial del nombre en lugar de la ubicación.
+  - La validación rechaza preguntas manuales sobre grupos sin malla.
+  - **Migración v2:** columna `user_id INTEGER` (admite NULL) en `quizzes` y `quiz_attempts`, con índices. NULL significa "sin dueño": los cuestionarios incluidos y los datos anteriores a las cuentas. La tabla `users` y la clave foránea se añadirán con la autenticación. Las migraciones van en una lista versionada con `PRAGMA user_version`.
+  - **SQLite sigue siendo la única BD.** No se añade nada de PostgreSQL; el SQL se mantiene estándar en lo posible para facilitar una futura migración.
+- **Consecuencia:** Los cuestionarios generados son jugables y tienen dificultad controlada, y las tablas quedan listas para asociar cuestionarios e intentos a usuarios. Limitaciones conocidas:
+  - La región se calcula desde el centro de la caja, así que las estructuras alargadas o en el límite entre regiones pueden recibir una región aproximada (por ejemplo, cartílagos costales bajos → "abdomen").
+  - Algunos nombres del catálogo siguen sin traducir del todo.
+
 ## 2026-10-21 · D-011 · Fase 5 (parcial): API de cuestionarios con Fastify + SQLite, sin cuentas
 - **Contexto:** El usuario pidió empezar la Fase 5 solo con base de datos: guardar los cuestionarios en SQLite y poder generar nuevos. Las cuentas y la autenticación quedan fuera por ahora. Además, la revisión del quiz encontró que se podían sumar puntos sin acertar: "Mostrar respuesta" contaba como acierto, cualquier selección (buscador, árbol) contaba como clic 3D y se podía volver a contestar una pregunta. También había formas de ver la respuesta antes de contestar: la opción correcta siempre era la primera y las etiquetas de los pines 3D mostraban el nombre.
 - **Decisión:**
