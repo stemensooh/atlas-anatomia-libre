@@ -2,6 +2,18 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-018 · Móvil y tablet: panel deslizante y barra de pestañas sin cambiar el escritorio (Fase 5B, etapa 1)
+- **Contexto:** La interfaz era una rejilla fija de 3 columnas sin reglas para pantallas pequeñas, y en un móvil el visor no cabía. Plan en `docs/PLAN_MOVIL.md`.
+- **Decisión:**
+  - **Tres disposiciones** con `useLayout()` (matchMedia): **móvil** (< 768 px), **tablet** (768–1099 px) y **escritorio** (≥ 1100 px, sin cambios).
+  - **Sin duplicar componentes:** los dos paneles van dentro de un contenedor `.sheet`. En escritorio es `display: contents` y los paneles siguen siendo columnas de la rejilla, con posición explícita. En móvil es un panel que sube desde abajo (oculto, medio o completo); en tablet, un panel lateral de hasta 400 px que estrecha el visor. Los paneles siguen montados aunque no se vean, para conservar el progreso del quiz y del tour.
+  - **Barra de pestañas inferior** (Capas · Ficha · Tours · Quiz), que sustituye a las pestañas internas del panel derecho. Al entrar en Tours se aplica el paso actual, ya sea desde su pestaña o desde la barra.
+  - **Barra superior compacta:** marca recortada con "…", cuenta como icono y menú ☰ con Pines, Tema y Créditos. Botón flotante de **cámara** con las vistas, Centrar y Mis vistas.
+  - **Asa del panel:** sigue al dedo; tocarla alterna medio y completo, y deslizarla amplía, reduce o cierra. Llama a `preventDefault` en `pointerdown` porque, si no, los eventos de ratón de compatibilidad caían sobre el control que quedaba bajo el dedo tras cambiar de altura. Esto se detectó en las pruebas: un slider se movía solo.
+  - `100dvh`, `viewport-fit=cover`, márgenes `safe-area-inset-*` y objetivos táctiles de al menos 44 px.
+  - **Verificación con capturas:** Edge sin ventana, controlado por el DevTools Protocol desde un script de Node sin dependencias, con emulación de dispositivo y toques.
+- **Consecuencia:** En 375, 390 y 768 px la interfaz cabe sin desbordes y el escritorio no cambia. Siguen pendientes, en las etapas 2–5: distinguir tocar de arrastrar en el modelo, el peso de la primera carga, los modales y las tablas.
+
 ## 2026-10-21 · D-017 · Publicación en VPS propio: API en Docker, visor estático en Nginx
 - **Contexto:** El usuario tiene un VPS (Ubuntu 24.04, 1 vCPU, 1 GB de RAM, 25 GB) con Nginx y PostgreSQL ya instalados, y el subdominio `atlas.stemensoft.com`. Sustituye al hosting estático gratuito previsto en la Fase 6, porque desde la Fase 5 hay API y base de datos.
 - **Decisión:**

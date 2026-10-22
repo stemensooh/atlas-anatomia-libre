@@ -38,7 +38,7 @@ export function UserMenu() {
 
   if (!user) {
     return (
-      <button className="btn-cam" onClick={() => openModal("login")}>
+      <button className="btn-cam login-btn" aria-label="Iniciar sesión" onClick={() => openModal("login")}>
         <LogIn size={14} />
         <span>Iniciar sesión</span>
       </button>

@@ -2353,3 +2353,316 @@ body,
   display: block;
   color: var(--text-2);
 }
+
+/* ===== Adaptación a móvil y tablet (Fase 5B, docs/PLAN_MOVIL.md) ===== */
+
+/* La barra del navegador móvil no debe cortar la interfaz. */
+.app-shell {
+  height: 100dvh;
+}
+
+/* Escritorio: el contenedor del panel deslizante es transparente y los paneles siguen siendo
+   columnas de la rejilla (posiciones explícitas porque el visor va antes en el DOM). */
+.sheet {
+  display: contents;
+}
+
+.workspace > .canvas-stage {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.sheet > .panel-left {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.sheet > .panel-right {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+/* ---- Común a móvil y tablet ---- */
+.layout-compact .topbar {
+  height: auto;
+  min-height: 52px;
+  padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+}
+
+.layout-compact .brand .subtitle {
+  display: none;
+}
+
+.layout-compact .workspace {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.layout-compact .canvas-stage {
+  position: absolute;
+  inset: 0;
+  /* width/height automáticos: con 100% se ignoraría "right" al abrir el panel en tablet. */
+  width: auto;
+  height: auto;
+}
+
+/* En móvil y tablet las pestañas Ficha | Tours | Quiz están en la barra inferior. */
+.layout-compact .panel-right > .mode-tabs-3,
+.layout-compact .panel-resizer-edge {
+  display: none;
+}
+
+.layout-compact .sheet {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  z-index: 20;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  box-shadow: 0 -8px 30px rgba(2, 6, 23, 0.35);
+  transition: transform 0.22s ease, height 0.22s ease, visibility 0.22s;
+}
+
+.layout-compact .sheet.is-closed {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.layout-compact .sheet .panel {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  border: none;
+  background: transparent;
+}
+
+.layout-compact .sheet[data-panel="layers"] .panel-right,
+.layout-compact .sheet[data-panel="info"] .panel-left,
+.layout-compact .sheet[data-panel="none"] .panel {
+  display: none;
+}
+
+.mobile-tabbar {
+  display: flex;
+  background: var(--bg-1);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  z-index: 30;
+}
+
+.mobile-tab {
+  flex: 1;
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-tab.active {
+  color: var(--accent);
+}
+
+.mobile-tab.active span {
+  font-weight: 700;
+}
+
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compact-menu {
+  position: relative;
+}
+
+/* Botón flotante de cámara sobre el visor. */
+.camera-fab {
+  position: absolute;
+  top: 10px;
+  right: max(10px, env(safe-area-inset-right));
+  z-index: 15;
+}
+
+.fab-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-1);
+  color: var(--text-0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35);
+  cursor: pointer;
+}
+
+.fab-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
+}
+
+.fab-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-0);
+  font: inherit;
+  font-size: 0.86rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fab-menu button:hover,
+.fab-menu button:active {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.layout-compact .user-dropdown button {
+  min-height: 42px;
+  font-size: 0.86rem;
+}
+
+/* ---- Tablet: panel lateral plegable a la derecha ---- */
+.layout-tablet .sheet {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(400px, 55%);
+  border-width: 0 0 0 1px;
+}
+
+.layout-tablet .sheet.is-closed {
+  transform: translateX(100%);
+}
+
+/* ---- Móvil: panel deslizante desde abajo ---- */
+.layout-mobile .sheet {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 14px 14px 0 0;
+  border-bottom: none;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.layout-mobile .sheet.sheet-half {
+  height: 50%;
+}
+
+.layout-mobile .sheet.sheet-full {
+  height: calc(100% - 12px);
+}
+
+.layout-mobile .sheet.is-closed {
+  height: 50%;
+  transform: translateY(100%);
+}
+
+.sheet-handle {
+  flex: none;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.sheet-grip {
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--bg-3);
+}
+
+.layout-mobile .sheet .panel {
+  padding-top: 2px;
+}
+
+.layout-mobile .topbar .brand h1 {
+  font-size: 0.9rem;
+}
+
+/* La cuenta se muestra solo como icono: no hay sitio para el nombre y el rol. */
+.layout-mobile .user-chip > span,
+.layout-mobile .user-chip > small {
+  display: none;
+}
+
+.layout-mobile .user-chip,
+.layout-mobile .topbar-right > .btn-cam {
+  min-height: 40px;
+}
+
+/* El aviso educativo queda en una línea corta; las atribuciones completas, en Créditos. */
+.layout-compact .stage-footer {
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  padding: 4px 8px;
+  font-size: 0.66rem;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.layout-compact .stage-footer > span:nth-of-type(2) {
+  display: none;
+}
+
+/* Tablet: con el panel abierto, el visor se estrecha para que el modelo no quede debajo. */
+.layout-tablet .workspace.has-open-sheet .canvas-stage {
+  right: min(400px, 55%);
+}
+
+/* Móvil: la marca no se parte en dos líneas; en pantallas muy estrechas, sesión solo con icono. */
+.layout-mobile .brand {
+  min-width: 0;
+  flex: 1;
+}
+
+.layout-mobile .brand > div {
+  min-width: 0;
+}
+
+.layout-mobile .brand h1 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 400px) {
+  .layout-mobile .login-btn > span {
+    display: none;
+  }
+}
