@@ -254,7 +254,7 @@ export function QuizPanel({
           {online === null
             ? "Conectando con la base de datos…"
             : online
-            ? `Base de datos SQLite · ${quizzes.length} cuestionarios`
+            ? `Base de datos conectada · ${quizzes.length} cuestionarios`
             : "Sin servidor: cuestionarios incluidos (los resultados no se guardan)"}
         </span>
       </div>
@@ -532,3 +532,4 @@ export function QuizPanel({
     </div>
   );
 }
+

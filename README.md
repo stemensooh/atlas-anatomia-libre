@@ -1,4 +1,4 @@
-# Visor anatómico 3D libre
+﻿# Visor anatómico 3D libre
 
 Proyecto de aprendizaje para crear un visor de anatomía humana en 3D, abierto y no comercial.
 
@@ -26,6 +26,53 @@ Abre `http://localhost:5173` en el navegador. Si la API no está en marcha, el v
 - Base de datos: SQLite en `server/data/atlas.db` (se crea solo) o **PostgreSQL** con `DATABASE_URL` en `server/.env`. Ver [docs/POSTGRESQL.md](docs/POSTGRESQL.md) (credenciales, migración de datos con `pnpm run migrate-sqlite`). `pnpm run seed` en `server/` restaura los cuestionarios iniciales.
 - Tests de la API: `pnpm test` en `server/`.
 - Primer administrador: `pnpm run create-admin -- <usuario>` en `server/` (pide la contraseña). El resto de cuentas se registran desde la web como estudiantes, y el administrador les cambia el rol en **Administración**.
+
+
+## Despliegue en producción (VPS con Docker y Nginx)
+
+El proyecto está diseñado para desplegarse fácilmente en un VPS modesto (incluso con 1 vCPU y 1 GB de RAM como Ubuntu 24.04):
+- **API (Fastify + Node 24):** Corre en un contenedor Docker (
+ode:24-alpine) con PostgreSQL o SQLite.
+- **Visor (React + Three.js):** Se compila en tu máquina local y se sirve como archivos estáticos con **Nginx** (evitando consumir la RAM del VPS en la compilación).
+- **HTTPS:** Automatizado con Let's Encrypt (Certbot).
+
+### 1. En el VPS
+1. **Configurar el entorno (/etc/atlas/api.env):**
+   `ini
+   HOST=127.0.0.1
+   PORT=3001
+   COOKIE_SECURE=1
+   DB_CLIENT=postgres
+   DATABASE_URL=postgres://usuario:contraseña@127.0.0.1:5432/atlas_db
+   `
+2. **Clonar y levantar la API con Docker:**
+   `ash
+   git clone https://github.com/stemensooh/atlas-anatomia-libre.git /opt/atlas
+   cd /opt/atlas
+   docker compose -f deploy/docker-compose.yml up -d --build
+   `
+3. **Crear el usuario administrador inicial:**
+   `ash
+   docker compose -f deploy/docker-compose.yml run --rm -it api \
+     node --disable-warning=ExperimentalWarning src/create-admin.ts admin
+   `
+4. **Configurar Nginx y HTTPS:**
+   `ash
+   mkdir -p /var/www/atlas/releases
+   cp deploy/nginx/atlas.stemensoft.com.conf /etc/nginx/sites-available/atlas.stemensoft.com
+   ln -s /etc/nginx/sites-available/atlas.stemensoft.com /etc/nginx/sites-enabled/
+   nginx -t && systemctl reload nginx
+   certbot --nginx -d tu-dominio.com
+   `
+
+### 2. Desde tu máquina local (subir el visor web)
+En la raíz de este repositorio, ejecuta el script de publicación:
+`powershell
+.\deploy\publicar-web.ps1 -Servidor root@TU_IP_DEL_VPS
+`
+Compila el frontend con Vite, empaqueta los assets 3D y los sube por SSH de forma atómica.
+
+> Guía detallada con swap, respaldos automáticos de PostgreSQL con cron y solución de problemas en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
 ## Estructura
 ```
