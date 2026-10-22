@@ -1,0 +1,8 @@
+# Exclusiones para server/Dockerfile (BuildKit usa <Dockerfile>.dockerignore).
+# El contexto es la raíz del repositorio: se excluye todo y se permite solo lo que copia la imagen.
+*
+!server/package.json
+!server/pnpm-lock.yaml
+!server/src/
+!data/processed/metadata.json
+!web/src/data/defaultQuizzes.json

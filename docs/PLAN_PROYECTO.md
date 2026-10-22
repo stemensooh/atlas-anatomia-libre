@@ -349,7 +349,12 @@ Un usuario puede registrarse, guardar una vista y recuperar sus resultados. **Cu
 
 ## FASE 6: Publicación y comunidad
 
-- Hosting estático (GitHub Pages / Cloudflare Pages / Netlify) y CDN para los GLB.
+- ~~Hosting estático (GitHub Pages / Cloudflare Pages / Netlify) y CDN para los GLB.~~ Sustituido por **VPS propio** (D-017), porque desde la Fase 5 hay API y base de datos:
+  - [x] Imagen Docker de la API (`server/Dockerfile`) y `deploy/docker-compose.yml`.
+  - [x] Configuración de Nginx para `atlas.stemensoft.com` (`deploy/nginx/`).
+  - [x] Script de publicación del visor (`deploy/publicar-web.ps1`).
+  - [x] Guía `docs/DESPLIEGUE.md` (swap, Docker, `.env`, Nginx, HTTPS, copias de seguridad).
+  - [ ] Primer despliegue en el VPS y verificación en `https://atlas.stemensoft.com`.
 - CI/CD con GitHub Actions: lint, tests, validación de GLB, verificación de que `ATTRIBUTIONS.md` cubra todos los archivos de `data/`.
 - `README.md` con capturas, instrucciones de ejecución y licencias.
 - `CONTRIBUTING.md` con reglas de licencia para aportes de contenido.

@@ -2,6 +2,17 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-017 · Publicación en VPS propio: API en Docker, visor estático en Nginx
+- **Contexto:** El usuario tiene un VPS (Ubuntu 24.04, 1 vCPU, 1 GB de RAM, 25 GB) con Nginx y PostgreSQL ya instalados, y el subdominio `atlas.stemensoft.com`. Sustituye al hosting estático gratuito previsto en la Fase 6, porque desde la Fase 5 hay API y base de datos.
+- **Decisión:**
+  - **API en Docker** (`server/Dockerfile`, `node:24-alpine`, usuario `node`, solo dependencias de producción). Node 24 ejecuta el TypeScript directamente: no hay paso de compilación. El contexto es la raíz del repositorio, porque la API lee `data/processed/metadata.json` y `web/src/data/defaultQuizzes.json`; `server/Dockerfile.dockerignore` deja pasar solo esos archivos y `server/src`.
+  - **`deploy/docker-compose.yml`:** `network_mode: host` (API en `127.0.0.1:3001`; PostgreSQL sigue solo en `localhost`, sin tocar `pg_hba.conf` y sin que Docker abra puertos saltándose UFW), `mem_limit: 256m`, heap de 192 MB, sistema de archivos de solo lectura, healthcheck en `/api/health`, logs rotados.
+  - **Credenciales** solo en el VPS, en `/etc/atlas/api.env` (`600`), pasadas con `env_file`; nunca dentro de la imagen.
+  - **Visor sin Docker:** se compila en el PC del desarrollador (en 1 GB de RAM `tsc -b` + `vite build` puede tumbar el VPS) y `deploy/publicar-web.ps1` lo sube por `scp` a `/var/www/atlas/releases/<fecha>`, con enlace atómico `current` y las 3 últimas versiones.
+  - **Nginx del host** (`deploy/nginx/atlas.stemensoft.com.conf`): estáticos con caché (un año para `/assets`, 7 días para los `.glb`), gzip, proxy de `/api/` con `Host` y `X-Forwarded-Host` (los usa la protección CSRF). HTTPS con `certbot --nginx`; la API corre con `COOKIE_SECURE=1`.
+  - **PostgreSQL** se queda en el host. Swap de 2 GB y copia diaria con `pg_dump` (14 días).
+- **Consecuencia:** Guía completa en `docs/DESPLIEGUE.md`. El agente no se conecta al VPS ni maneja credenciales: los pasos en el servidor los ejecuta el usuario. Pendiente: probar la imagen (Docker Desktop no estaba en marcha al crearla) y hacer el primer despliegue.
+
 ## 2026-10-21 · D-016 · PostgreSQL además de SQLite, con el mismo código
 - **Contexto:** El usuario pidió empezar la migración a PostgreSQL (que D-012 había pospuesto), mantener también SQLite y configurar él mismo las credenciales de su servidor. No las comparte ni se versionan.
 - **Decisión:**

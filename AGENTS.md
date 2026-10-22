@@ -12,7 +12,7 @@ Visor anatómico 3D libre, web, no comercial, hecho por STEMENSOFT para aprender
 - **Fase 3: cerrada** (despliegue pospuesto a la Fase 6 por D-009). Visor 3D en `web/` con capas por sistema, conmutador masculino/femenino, selección por raycasting, buscador y modal de atribuciones.
 - **Fase 4: cerrada.** Funciones didácticas completas: 115+ descripciones anatómicas clave con `descriptionSource`, cortes en 3 ejes (Axial Y, Sagital X, Coronal Z), árbol anatómico jerárquico, pines 3D flotantes, 4 tours guiados, 2 cuestionarios interactivos (clic 3D + opción múltiple), modo claro/oscuro y atajos de teclado.
 - **Fase 5: cerrada (D-011 a D-014).** API `server/` (Fastify + SQLite `node:sqlite`, esquema v4): cuestionarios en BD con generador por niveles sin IA, autenticación propia (roles estudiante/docente/admin), vistas guardadas, notas por estructura y resultados para el docente. Desde D-016 admite **SQLite y PostgreSQL** con el mismo SQL (`server/src/sql.ts`); los tests corren en ambos. **Nunca pidas ni escribas credenciales: van en `server/.env` (no versionado), ver `docs/POSTGRESQL.md`.**
-- **Siguiente:** Fase 6 (publicación y hosting). Ver `docs/PLAN_PROYECTO.md`.
+- **Siguiente:** Fase 6 (publicación y hosting). Ver `docs/PLAN_PROYECTO.md`. **En curso (D-017):** VPS propio en `atlas.stemensoft.com`; API en Docker (`deploy/docker-compose.yml`), visor estático en Nginx. Guía: `docs/DESPLIEGUE.md`. Falta el primer despliegue (lo hace el usuario en el VPS; tú no te conectas a él).
 - Rama `main` conectada a `origin` (`https://github.com/stemensooh/atlas-anatomia-libre.git`; antes `biodigital`, renombrado por riesgo de marca, D-015). Este repo usa la identidad `stemensooh <stemensooh@gmail.com>` en `.git/config`: no hagas commits con otra.
 
 ## Reglas obligatorias
@@ -42,4 +42,5 @@ Windows + PowerShell. Node 24, Python 3.13, pnpm 12. Ejecutar: `pnpm run dev` en
 | `docs/DECISIONES.md` | Registro de decisiones |
 | `docs/ENTORNO.md` | Herramientas instaladas y pendientes |
 | `docs/COMO_AGREGAR_MODELOS_Y_TRADUCCIONES.md` | Guía para añadir nuevos modelos `.glb` y personalizar traducciones/definiciones en español |
+| `docs/DESPLIEGUE.md` | Publicación en el VPS (Docker para la API, Nginx, HTTPS, copias de seguridad) |
 | `CONTRIBUTING.md` | Reglas de aportes |
