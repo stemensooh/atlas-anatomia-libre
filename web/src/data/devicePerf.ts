@@ -19,8 +19,13 @@ const connection: NetworkInformationLike | undefined = hasWindow
 export const SAVE_DATA =
   !!connection?.saveData || ["slow-2g", "2g", "3g"].includes(connection?.effectiveType ?? "");
 
-// Arranque ligero: solo el esqueleto. En móvil (pantalla estrecha) o con ahorro de datos.
-export const LIGHT_START = media(`(max-width: ${MOBILE_MAX}px)`) || SAVE_DATA;
+// Un móvil en horizontal mide más de 768 px de ancho: se reconoce por el lado corto de la
+// pantalla física y el puntero táctil, sea cual sea la orientación al abrir.
+const PHONE_IN_ANY_ORIENTATION =
+  hasWindow && media("(pointer: coarse)") && Math.min(screen.width, screen.height) <= MOBILE_MAX;
+
+// Arranque ligero: solo el esqueleto. En móvil (pantalla estrecha o móvil girado) o con ahorro de datos.
+export const LIGHT_START = media(`(max-width: ${MOBILE_MAX}px)`) || PHONE_IN_ANY_ORIENTATION || SAVE_DATA;
 
 // Render ligero: móvil, tablet o puntero táctil (GPU modesta y batería).
 export const LOW_POWER = media(`(max-width: ${TABLET_MAX}px)`) || media("(pointer: coarse)");

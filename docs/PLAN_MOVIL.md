@@ -65,10 +65,27 @@
 - [x] En móvil y tablet, las listas de tours y cuestionarios se pliegan al elemento activo ("Cambiar de…"), para que el paso o la pregunta queden a la vista.
 - [x] Comprobado con emulación a 390 px (quiz, tours, login y perfil con historial) y sin regresiones a 375, 390 y 1280 px.
 
-### Etapa 5: Verificación
-- [ ] Emulación en Chrome: iPhone SE (375 px), iPhone 14 (390 px), Pixel (412 px), iPad (768 y 1024 px), en vertical y horizontal.
-- [ ] Prueba en un móvil real por la red local (`vite --host`).
-- [ ] Regresión en escritorio.
+### Etapa 5: Verificación (D-022)
+- [x] Emulación (Edge vía DevTools Protocol, con pantalla física y toques): iPhone SE 375×667, iPhone 14 390×844, Pixel 7 412×915, móvil en horizontal 844×390, iPad 768×1024 y 1024×768. Sin desbordes, disposición correcta y arranque ligero en los móviles (1 modelo descargado), también en horizontal.
+- [x] Corregido en esta etapa: el panel de Capas se desplaza en bloque en móvil y tablet (antes, en pantallas bajas, la lista quedaba en una fila), y un móvil abierto en horizontal también arranca en modo ligero.
+- [x] Regresión en escritorio (1280×800): sin cambios.
+- [ ] **Prueba en un móvil real** por la red local (la hace el usuario; ver la lista siguiente).
+
+#### Prueba en un dispositivo real
+1. En el PC: `cd web` y `node ./node_modules/vite/bin/vite.js --host --port 5173`, con la API en marcha. Si Windows pregunta, permite Node.js **solo en redes privadas**.
+2. En el móvil, en la misma Wi-Fi: abre la dirección "Network" que muestra Vite (`http://192.168.x.x:5173`).
+3. Comprueba, en vertical y en horizontal:
+   - [ ] Carga en pocos segundos y solo con el esqueleto (aviso "Modo ligero").
+   - [ ] Girar con un dedo, pellizcar para el zoom y desplazar con dos dedos, todo con fluidez.
+   - [ ] Girar el modelo **no** selecciona nada; tocar una pieza abre su Ficha.
+   - [ ] El asa del panel: tocar (medio ↔ completo) y deslizar (ampliar, reducir, cerrar), sin que se mueva ningún control solo.
+   - [ ] Capas: activar un sistema muestra su tamaño y lo descarga; "Todos" pide confirmación.
+   - [ ] Un tour completo y un cuestionario completo, respondiendo con toques.
+   - [ ] Iniciar sesión (el teclado no pone mayúscula al usuario y no hay zoom al escribir), guardar una vista y volver a abrirla.
+   - [ ] Mi perfil y, con una cuenta de admin, Administración, como tarjetas legibles.
+   - [ ] La barra del navegador y el *notch* no tapan la barra superior ni las pestañas.
+   - [ ] Tras unos minutos de uso, el móvil no se calienta en exceso.
+4. Para terminar, cierra Vite (Ctrl+C) y vuelve a arrancarlo sin `--host`.
 
 ## Criterio de salida
 En un móvil de 375 px se puede, sin hacer zoom ni ver desbordes: abrir el atlas, activar sistemas,

@@ -2836,3 +2836,34 @@ body,
 .layout-compact .quiz-list {
   max-height: none;
 }
+
+/* Etapa 5: en móvil y tablet el panel de Capas se desplaza en bloque (cabecera incluida).
+   Con la cabecera fija, en pantallas bajas (móvil en horizontal o panel a media altura) la
+   lista de sistemas quedaba reducida a una fila con su propia barra de desplazamiento. */
+.layout-compact .sheet .panel-left {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.layout-compact .sheet .panel-left > *,
+.layout-compact .sheet .panel-left .panel-scroll-body,
+.layout-compact .sheet .panel-left .layers-section,
+.layout-compact .sheet .panel-left .tree-section {
+  flex: none;
+}
+
+.layout-compact .sheet .panel-left .panel-scroll-body,
+.layout-compact .sheet .panel-left .layers-section,
+.layout-compact .sheet .panel-left .layers-list,
+.layout-compact .sheet .panel-left .hubmap-list,
+.layout-compact .sheet .panel-left .tree-section,
+.layout-compact .sheet .panel-left .tree-scroll {
+  overflow: visible;
+  max-height: none;
+  min-height: auto;
+}
+
+/* Que el desplazamiento dentro del panel no arrastre la página ni el visor. */
+.layout-compact .sheet .panel-right {
+  overscroll-behavior: contain;
+}

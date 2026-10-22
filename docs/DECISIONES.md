@@ -2,6 +2,14 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-022 · Verificación de la adaptación a móvil y correcciones de pantallas bajas (Fase 5B, etapa 5)
+- **Contexto:** Barrido emulado por 7 dispositivos, con pantalla física y entrada táctil.
+- **Hallazgos y decisión:**
+  - En pantallas bajas (móvil en horizontal, 283 px de visor, o el panel a media altura), la cabecera fija del panel de Capas dejaba la lista de sistemas en una sola fila con su propia barra de desplazamiento. **En móvil y tablet, el panel de Capas se desplaza en bloque**, con `overscroll-behavior: contain` para no arrastrar la página. Tras el cambio, en el Pixel 7 se ven 8 sistemas al bajar (antes 1).
+  - Un móvil que abre el atlas en horizontal (844 px de ancho) descargaba los 6 sistemas. **`LIGHT_START` también se activa con puntero táctil y lado corto de la pantalla física ≤ 767 px.** Las tablets (lado corto ≥ 768) mantienen la carga completa.
+  - Sin desbordes y con la disposición correcta en todos los dispositivos; el escritorio no cambia.
+- **Consecuencia:** Queda solo la prueba en un dispositivo real, con la lista de `docs/PLAN_MOVIL.md`. Si pasa, se cumple el criterio de salida de la Fase 5B.
+
 ## 2026-10-21 · D-021 · Pantallas secundarias en móvil: modales completos, tablas como tarjetas y modelo visible sobre el panel (Fase 5B, etapa 4)
 - **Contexto:**
   - Las ventanas y tablas, pensadas para escritorio, se cortaban en el móvil.
