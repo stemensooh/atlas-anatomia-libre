@@ -31,6 +31,10 @@ import {
   getStructureHierarchyPath,
 } from "../data/hierarchyData";
 import { useViewerStore } from "../store/useViewerStore";
+import { useLayout } from "../hooks/useLayout";
+import { LIGHT_START, SAVE_DATA } from "../data/devicePerf";
+
+const formatMB = (bytes: number) => `${(bytes / 1e6).toFixed(bytes < 1e6 ? 1 : 0)} MB`;
 
 export function LayerPanel({
   systemsInfo,
@@ -65,6 +69,11 @@ export function LayerPanel({
   const resetClipPlanes = useViewerStore((s) => s.resetClipPlanes);
   const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
   const setLeftPanelWidth = useViewerStore((s) => s.setLeftPanelWidth);
+
+  // Móvil, tablet o ahorro de datos: se muestra cuánto pesa cada sistema antes de descargarlo.
+  const layout = useLayout();
+  const showSizes = layout !== "desktop" || LIGHT_START;
+  const [lightNoticeOpen, setLightNoticeOpen] = useState(LIGHT_START);
 
   // Redimensionamiento interactivo arrastrando el borde derecho
   const [isDragging, setIsDragging] = useState(false);
@@ -555,7 +564,20 @@ export function LayerPanel({
               <div className="mini-actions">
                 <button
                   className="btn-xs"
-                  onClick={() => enableAllLayers(true)}
+                  onClick={() => {
+                    // Con datos móviles, activar todo puede suponer decenas de MB: se avisa antes.
+                    const pending = (Object.keys(layers) as SystemId[])
+                      .filter((sys) => !layers[sys].loaded)
+                      .reduce((sum, sys) => sum + (infoMap.get(sys)?.optimizedBytes ?? 0), 0);
+                    if (
+                      showSizes &&
+                      pending > 10e6 &&
+                      !window.confirm(`Activar todos los sistemas descargará unos ${formatMB(pending)}. ¿Continuar?`)
+                    ) {
+                      return;
+                    }
+                    enableAllLayers(true);
+                  }}
                 >
                   Todos
                 </button>
@@ -567,6 +589,19 @@ export function LayerPanel({
                 </button>
               </div>
             </div>
+
+            {lightNoticeOpen && (
+              <div className="light-notice">
+                <span>
+                  {SAVE_DATA ? "Ahorro de datos activo: " : "Modo ligero: "}
+                  se cargó solo el esqueleto. Activa otros sistemas cuando los
+                  necesites; junto a cada uno se indica lo que se descargará.
+                </span>
+                <button className="icon-btn" aria-label="Cerrar aviso" onClick={() => setLightNoticeOpen(false)}>
+                  ×
+                </button>
+              </div>
+            )}
 
             <div className="layers-list">
               {(Object.keys(SYSTEM_META) as SystemId[]).map((sys) => {
@@ -602,6 +637,11 @@ export function LayerPanel({
                         {st.loading && (
                           <span className="badge-loading">cargando…</span>
                         )}
+                        {showSizes && !st.loaded && !st.loading && info?.optimizedBytes ? (
+                          <span className="badge-size" title="Se descargará al activarlo">
+                            {formatMB(info.optimizedBytes)}
+                          </span>
+                        ) : null}
                         {info && (
                           <span className="badge-count" title={mb}>
                             {info.structuresCount}

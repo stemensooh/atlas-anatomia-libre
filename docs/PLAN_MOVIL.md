@@ -49,11 +49,13 @@
 - [x] El resultado del quiz se desplaza a la vista al responder (también en escritorio).
 - [x] Comprobado con toques y arrastres emulados (DevTools Protocol) en 390 px y con ratón en 1280 px.
 
-### Etapa 3: Rendimiento y datos
-- [ ] En móvil, arrancar solo con el esqueleto; los demás sistemas se cargan al activarlos y se avisa del tamaño.
-- [ ] `dpr` limitado a 1,5, sin antialias en móvil y menos resolución durante la interacción.
-- [ ] Respetar el ahorro de datos (`navigator.connection.saveData`) y las conexiones lentas.
-- [ ] Caché de los `.glb` entre visitas.
+### Etapa 3: Rendimiento y datos ✅ (D-020)
+- [x] En móvil, arrancar solo con el esqueleto; los demás sistemas se cargan al activarlos, cada uno indica su tamaño y "Todos" pide confirmación si va a descargar más de 10 MB.
+- [x] `dpr` limitado a 1,5, sin antialias y `AdaptiveDpr` (menos resolución mientras se gira) en móvil, tablet o puntero táctil.
+- [x] Render a demanda (`frameloop="demand"`) en esos dispositivos: 0 fotogramas en reposo frente al bucle continuo.
+- [x] Ahorro de datos (`saveData`) y conexiones 2G/3G activan el arranque ligero en cualquier dispositivo.
+- [x] Caché de los `.glb` entre visitas: la da la configuración de Nginx de producción (7 días, D-017); no hace falta un service worker.
+- [x] Medido: primera carga en móvil de **unos 4,1 MB con gzip** (antes, unos 20 MB solo de modelos); escritorio sin cambios (20,9 MB, render continuo).
 
 ### Etapa 4: Pantallas secundarias
 - [ ] Modales a pantalla completa en móvil.

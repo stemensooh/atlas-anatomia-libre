@@ -2,6 +2,17 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-020 · Arranque ligero y render a demanda en dispositivos de bajo consumo (Fase 5B, etapa 3)
+- **Contexto:** Al abrir el atlas se descargaban 6 sistemas (19,9 MB en el modelo masculino, 52 MB en el femenino) y el visor dibujaba 60 fotogramas por segundo con resolución de hasta 2× y antialias, incluso sin moverse nada. En un móvil eso supone datos, espera, calor y batería.
+- **Decisión:**
+  - **`web/src/data/devicePerf.ts`** calcula el perfil al cargar la página:
+    - `LIGHT_START`: pantalla < 768 px, o ahorro de datos / 2G / 3G según `navigator.connection`.
+    - `LOW_POWER`: pantalla < 1100 px o `pointer: coarse`.
+  - **Arranque ligero:** solo el esqueleto. En móvil o con ahorro de datos, la lista de capas muestra el tamaño de cada sistema aún no descargado y un aviso que se puede cerrar. "Todos" pide confirmación si va a descargar más de 10 MB.
+  - **Render ligero** (`LOW_POWER`): `dpr` [1, 1,5], sin antialias, `AdaptiveDpr` + `regress` en OrbitControls, y `frameloop="demand"`. Para que el render a demanda no se quede congelado, los efectos que modifican materiales o la cámara fuera de React llaman a `invalidate()`.
+  - **Caché:** los `.glb` ya se cachean 7 días en producción con la configuración de Nginx (D-017). No se añade service worker.
+- **Consecuencia:** Primera carga en móvil de unos 4,1 MB con gzip y 0 fotogramas en reposo. Comprobado con emulación: la selección, la activación de sistemas y los cambios de vista se dibujan correctamente. El escritorio con ratón no cambia.
+
 ## 2026-10-21 · D-019 · Interacción táctil: tocar frente a arrastrar y apertura de la ficha (Fase 5B, etapa 2)
 - **Contexto:** Al girar el modelo con el dedo, el gesto terminaba sobre una malla y se seleccionaba. En el modo clic 3D del cuestionario, eso contaba como una respuesta. Con ratón pasaba lo mismo al soltar tras girar. Además, el hover se quedaba pegado con el dedo, y las ayudas hablaban de ratón y teclado.
 - **Decisión:**

@@ -2671,3 +2671,33 @@ body,
 .layout-compact .desktop-only {
   display: none;
 }
+
+/* Etapa 3 (datos): tamaño de descarga de los sistemas aún no cargados y aviso de modo ligero. */
+.badge-size {
+  font-size: 0.66rem;
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  padding: 0 5px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.light-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--text-1);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  background: rgba(234, 179, 8, 0.08);
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.light-notice .icon-btn {
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 4px;
+}

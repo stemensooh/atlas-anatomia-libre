@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { SYSTEM_META, SystemId } from "../data/types";
 import type { Vec3, ViewStateV1 } from "../data/viewState";
+import { LIGHT_START, LIGHT_START_SYSTEMS } from "../data/devicePerf";
 
 export type CameraPreset = "front" | "back" | "left" | "right" | "top" | "reset";
 export type BodySex = "male" | "female";
@@ -105,7 +106,10 @@ const initialLayers = Object.fromEntries(
   (Object.keys(SYSTEM_META) as SystemId[]).map((sys) => [
     sys,
     {
-      enabled: SYSTEM_META[sys].defaultEnabled,
+      // En arranque ligero (móvil o ahorro de datos) solo se descarga el esqueleto al abrir.
+      enabled: LIGHT_START
+        ? (LIGHT_START_SYSTEMS as readonly SystemId[]).includes(sys)
+        : SYSTEM_META[sys].defaultEnabled,
       opacity: SYSTEM_META[sys].defaultOpacity,
       depth: 1.0,
       loading: false,

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
-import { OrbitControls, Html } from "@react-three/drei";
+import { AdaptiveDpr, OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { GLTFLoader } from "three-stdlib";
 import { MeshoptDecoder } from "meshoptimizer";
@@ -12,6 +12,7 @@ import {
 } from "../data/types";
 import { KEY_LANDMARK_IDS } from "../data/didacticData";
 import { cameraBridge, Vec3 } from "../data/viewState";
+import { LOW_POWER } from "../data/devicePerf";
 import { useViewerStore } from "../store/useViewerStore";
 
 // Un clic (o toque) solo selecciona si el puntero apenas se movió entre pulsar y soltar: al
@@ -56,6 +57,9 @@ function SystemLayerGroup({
   const selectStructure = useViewerStore((s) => s.selectStructure);
   const pickStructure3D = useViewerStore((s) => s.pickStructure3D);
   const hoverStructure = useViewerStore((s) => s.hoverStructure);
+  // Con frameloop="demand" (dispositivos de bajo consumo) hay que pedir un fotograma tras
+  // modificar materiales u objetos directamente, fuera de React.
+  const invalidate = useThree((s) => s.invalidate);
 
   const [sceneRoot, setSceneRoot] = useState<THREE.Group | null>(null);
   const [landmarks, setLandmarks] = useState<Pin3D[]>([]);
@@ -232,7 +236,9 @@ function SystemLayerGroup({
       }
       baseMat.needsUpdate = true;
     }
+    invalidate();
   }, [
+    invalidate,
     sceneRoot,
     layer.enabled,
     layer.opacity,
@@ -333,6 +339,7 @@ function HubmapOrganScene({
   const [loading, setLoading] = useState(false);
   const selectedId = useViewerStore((s) => s.selectedId);
   const selectStructure = useViewerStore((s) => s.selectStructure);
+  const invalidate = useThree((s) => s.invalidate);
 
   useEffect(() => {
     let cancelled = false;
@@ -412,7 +419,8 @@ function HubmapOrganScene({
         }
       }
     });
-  }, [root, selectedId, clippingPlanes]);
+    invalidate();
+  }, [root, selectedId, clippingPlanes, invalidate]);
 
   if (loading) {
     return (
@@ -442,7 +450,7 @@ function HubmapOrganScene({
 function CameraController() {
   const cameraPreset = useViewerStore((s) => s.cameraPreset);
   const cameraView = useViewerStore((s) => s.cameraView);
-  const { camera } = useThree();
+  const { camera, invalidate } = useThree();
   const controlsRef = useRef<any>(null);
 
   // Permite leer la cámara desde fuera del Canvas para guardar vistas.
@@ -464,7 +472,8 @@ function CameraController() {
       controlsRef.current.target.set(...cameraView.target);
       controlsRef.current.update();
     }
-  }, [cameraView, camera]);
+    invalidate();
+  }, [cameraView, camera, invalidate]);
 
   useEffect(() => {
     const target = new THREE.Vector3(0, 0.88, 0);
@@ -491,13 +500,16 @@ function CameraController() {
       controlsRef.current.target.copy(target);
       controlsRef.current.update();
     }
-  }, [cameraPreset, camera]);
+    invalidate();
+  }, [cameraPreset, camera, invalidate]);
 
   return (
     <OrbitControls
       ref={controlsRef}
       // Táctil: un dedo gira; dos dedos pellizcan para el zoom y arrastran para desplazar.
       touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
+      // Mientras se gira, AdaptiveDpr baja la resolución en los dispositivos de bajo consumo.
+      regress={LOW_POWER}
       target={[0, 0.88, 0]}
       enableDamping
       dampingFactor={0.08}
@@ -559,9 +571,14 @@ export function AnatomyCanvas({
   return (
     <Canvas
       camera={{ position: [0, 0.92, 2.05], fov: 42, near: 0.01, far: 25 }}
-      gl={{ localClippingEnabled: true, antialias: true }}
+      gl={{ localClippingEnabled: true, antialias: !LOW_POWER }}
+      // Bajo consumo: resolución máxima 1,5× y solo se dibuja cuando algo cambia (no 60 fps fijos).
+      dpr={LOW_POWER ? [1, 1.5] : [1, 2]}
+      frameloop={LOW_POWER ? "demand" : "always"}
+      performance={{ min: 0.5 }}
       onPointerMissed={() => selectStructure(null)}
     >
+      {LOW_POWER && <AdaptiveDpr />}
       <color attach="background" args={[bgColor]} />
       <ambientLight intensity={0.68} />
       <hemisphereLight args={["#e2e8f0", "#1e293b", 0.55]} />
