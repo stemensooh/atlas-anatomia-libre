@@ -2916,3 +2916,65 @@ body,
   gap: 6px;
   margin-left: auto;
 }
+
+/* ===== PWA etapa 3: uso sin conexión ===== */
+.offline-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.06);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  font-size: 0.76rem;
+}
+
+.offline-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.offline-head small,
+.offline-storage {
+  color: var(--text-2);
+  font-size: 0.7rem;
+}
+
+.offline-head small {
+  margin-left: auto;
+}
+
+.offline-actions,
+.offline-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.offline-bar {
+  flex: 1;
+  min-width: 120px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  overflow: hidden;
+}
+
+.offline-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.2s;
+}
+
+.badge-offline {
+  font-size: 0.64rem;
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  padding: 0 5px;
+  border-radius: 999px;
+  white-space: nowrap;
+}

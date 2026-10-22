@@ -87,13 +87,13 @@
 - [x] Verificado con un perfil limpio y la caché HTTP desactivada: primera visita → caché; sin red → app,
       esqueleto y cuestionarios incluidos; versión nueva → aviso y actualización.
 
-### Etapa 3: Modelos sin conexión
+### Etapa 3: Modelos sin conexión ✅ (D-027)
 - [x] *Cache-first* para los `.glb` ya cargados, con caducidad y límite (adelantado en la etapa 2).
-- [ ] (Si se elige B) **"Descargar para usar sin conexión"** por cuerpo: tamaño, progreso, cancelar,
-      `navigator.storage.estimate()` antes de empezar y `navigator.storage.persist()` para que el
-      navegador no borre la caché.
-- [ ] En Capas: marca de "disponible sin conexión" por sistema; opción para liberar espacio.
-- **Hecho cuando:** sin red se pueden activar todos los sistemas descargados del cuerpo elegido.
+- [x] Tarjeta **"Uso sin conexión"** en Capas, para el cuerpo que se está viendo: sistemas guardados y lo que ocupan, botón **"Descargar / Completar cuerpo …"** con su tamaño, barra de progreso con **Cancelar**, y **"Liberar espacio"**.
+- [x] Antes de descargar: espacio libre (`navigator.storage.estimate()`), almacenamiento persistente (`navigator.storage.persist()`) y confirmación con datos móviles o ahorro de datos. También se guarda `metadata.json`.
+- [x] Marca **"sin red ✓"** por sistema en la lista de capas (también para los guardados al verlos).
+- [x] Solo se muestra con un *service worker* controlando la página (en desarrollo no se usaría).
+- [x] Verificado: descargar el cuerpo masculino (30 MB pendientes, progreso visible) → 10 de 10; **sin red, "Todos" carga los 10 sistemas** sin errores; liberar espacio → caché vacía.
 
 ### Etapa 4: Instalación y experiencia de app
 - [ ] Botón **"Instalar app"** (evento `beforeinstallprompt` en Android, Chrome y Edge) en el menú ☰.

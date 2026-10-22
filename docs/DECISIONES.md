@@ -2,6 +2,22 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-22 · D-027 · PWA etapa 3: descargar un cuerpo para usarlo sin conexión
+- **Contexto:** Decisión 3B del plan de la PWA: además de guardar lo que se ve, un botón para descargar un cuerpo completo (35 MB el masculino, 63 MB el femenino).
+- **Decisión:**
+  - **`web/src/data/offlineModels.ts`** descarga los sistemas que faltan de ese cuerpo, más `metadata.json`, en las **mismas cachés del service worker** (`atlas-modelos` y `atlas-metadatos`). El service worker los sirve con *cache-first* sin red.
+    - La descarga se hace desde la página y se guarda con la Cache API, para poder leer el progreso por partes y cancelarla con `AbortController` conservando lo ya guardado.
+  - **Antes de empezar:** se comprueba el espacio con `navigator.storage.estimate()` (hace falta el tamaño más un 10 %), se pide `navigator.storage.persist()` y, con `saveData` o red móvil, se pide confirmación.
+  - **`OfflinePanel`** en la pestaña Capas:
+    - estado (N de 10 sistemas y lo que ocupan);
+    - descargar o completar con el tamaño, progreso y cancelar;
+    - liberar espacio;
+    - espacio libre y si el almacenamiento es persistente.
+  - **Marca "sin red ✓"** en cada sistema guardado. El estado se vuelve a consultar al cambiar de cuerpo o al terminar de cargarse un sistema.
+  - **Solo aparece si hay un service worker controlando la página:** en desarrollo, lo descargado no se usaría.
+  - **Los órganos HuBMAP quedan fuera** del botón por su tamaño (566 MB). Los vistos sí se guardan un tiempo (D-026).
+- **Consecuencia:** Verificado con un perfil limpio: descarga con progreso, **los 10 sistemas cargan sin red** y liberar espacio vacía la caché. Siguen la etapa 4 (instalación y Privacidad) y la 5 (verificación en Android e iPhone reales).
+
 ## 2026-10-22 · D-026 · PWA etapa 2: arranque sin conexión, aviso de versión nueva y estado sin conexión
 - **Contexto:** Etapa 2 de `docs/PLAN_PWA.md`. Criterio: con la red cortada la app abre, muestra el esqueleto y los cuestionarios incluidos, y avisa de las versiones nuevas sin cortar lo que se está haciendo.
 - **Decisión:**

@@ -34,6 +34,7 @@ import { useViewerStore } from "../store/useViewerStore";
 import { useLayout } from "../hooks/useLayout";
 import { LIGHT_START, SAVE_DATA } from "../data/devicePerf";
 import { hubmapGlbBytes } from "../data/hubmap";
+import { OfflinePanel, useOfflineSystems } from "./OfflinePanel";
 
 const formatMB = (bytes: number) => `${(bytes / 1e6).toFixed(bytes < 1e6 ? 1 : 0)} MB`;
 
@@ -75,6 +76,10 @@ export function LayerPanel({
   const layout = useLayout();
   const showSizes = layout !== "desktop" || LIGHT_START;
   const [lightNoticeOpen, setLightNoticeOpen] = useState(LIGHT_START);
+
+  // PWA: sistemas guardados para usar sin conexión (se refresca cuando termina de cargar uno).
+  const loadedKey = (Object.keys(layers) as SystemId[]).map((k) => (layers[k].loaded ? 1 : 0)).join("");
+  const { cached: offlineCached, refresh: refreshOffline } = useOfflineSystems(bodySex, systemsInfo, loadedKey);
 
   // Redimensionamiento interactivo arrastrando el borde derecho
   const [isDragging, setIsDragging] = useState(false);
@@ -591,6 +596,13 @@ export function LayerPanel({
               </div>
             </div>
 
+            <OfflinePanel
+              sex={bodySex}
+              systems={systemsInfo}
+              cached={offlineCached}
+              onChange={refreshOffline}
+            />
+
             {lightNoticeOpen && (
               <div className="light-notice">
                 <span>
@@ -638,7 +650,12 @@ export function LayerPanel({
                         {st.loading && (
                           <span className="badge-loading">cargando…</span>
                         )}
-                        {showSizes && !st.loaded && !st.loading && info?.optimizedBytes ? (
+                        {offlineCached.has(sys) && (
+                          <span className="badge-offline" title="Disponible sin conexión">
+                            sin red ✓
+                          </span>
+                        )}
+                        {showSizes && !st.loaded && !st.loading && !offlineCached.has(sys) && info?.optimizedBytes ? (
                           <span className="badge-size" title="Se descargará al activarlo">
                             {formatMB(info.optimizedBytes)}
                           </span>
