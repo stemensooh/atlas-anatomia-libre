@@ -44,6 +44,9 @@ export function App() {
   const setCreditsOpen = useViewerStore((s) => s.setCreditsOpen);
   const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
   const sheet = useViewerStore((s) => s.sheet);
+  const pick3DSeq = useViewerStore((s) => s.pick3DSeq);
+  const openSheet = useViewerStore((s) => s.openSheet);
+  const setRightTab = useViewerStore((s) => s.setRightTab);
   const layout = useLayout();
   const compact = layout !== "desktop";
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -56,6 +59,14 @@ export function App() {
   useEffect(() => {
     loadSession();
   }, [loadSession]);
+
+  // Móvil/tablet: al tocar una estructura con el panel cerrado se abre su ficha a media altura.
+  // Durante un cuestionario se abre el cuestionario, para ver si el toque fue la respuesta correcta.
+  useEffect(() => {
+    if (!pick3DSeq || !compact || useViewerStore.getState().sheet.panel) return;
+    if (useViewerStore.getState().rightTab !== "quiz") setRightTab("info");
+    openSheet("info", "half");
+  }, [pick3DSeq, compact, openSheet, setRightTab]);
 
   // Las notas son del usuario: se cargan al iniciar sesión y se vacían al cerrarla.
   useEffect(() => {

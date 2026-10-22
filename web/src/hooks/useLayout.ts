@@ -28,3 +28,16 @@ export function useLayout(): Layout {
   }, []);
   return layout;
 }
+
+// ¿El puntero principal es el dedo? (independiente del ancho: hay tablets grandes y portátiles táctiles)
+export function useCoarsePointer(): boolean {
+  const query = "(pointer: coarse)";
+  const [coarse, setCoarse] = useState(() => typeof window !== "undefined" && window.matchMedia(query).matches);
+  useEffect(() => {
+    const m = window.matchMedia(query);
+    const update = () => setCoarse(m.matches);
+    m.addEventListener("change", update);
+    return () => m.removeEventListener("change", update);
+  }, []);
+  return coarse;
+}

@@ -49,6 +49,8 @@ interface ViewerState {
   creditsOpen: boolean;
   leftPanelWidth: number;
   sheet: { panel: SheetPanel | null; size: SheetSize };
+  // Cuenta las selecciones hechas tocando el modelo 3D (para abrir la Ficha en móvil).
+  pick3DSeq: number;
 
   // Callback opcional cuando hay una pregunta "find3d" activa en el cuestionario
   quizClickHandler: ((clickedStructureId: string) => void) | null;
@@ -155,6 +157,7 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   quizClickHandler: null,
   leftPanelWidth: getStoredLeftWidth(),
   sheet: { panel: null, size: "half" },
+  pick3DSeq: 0,
 
   setMode: (mode, hubmapOrganId = null) =>
     set((s) => ({
@@ -269,7 +272,7 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   selectStructure: (id) => set({ selectedId: id }),
 
   pickStructure3D: (id) => {
-    set({ selectedId: id });
+    set((s) => ({ selectedId: id, pick3DSeq: s.pick3DSeq + 1 }));
     get().quizClickHandler?.(id);
   },
 

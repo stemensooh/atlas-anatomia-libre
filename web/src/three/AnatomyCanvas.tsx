@@ -14,6 +14,15 @@ import { KEY_LANDMARK_IDS } from "../data/didacticData";
 import { cameraBridge, Vec3 } from "../data/viewState";
 import { useViewerStore } from "../store/useViewerStore";
 
+// Un clic (o toque) solo selecciona si el puntero apenas se movió entre pulsar y soltar: al
+// girar el modelo con el dedo el gesto termina sobre una malla y no debe contar como selección
+// (ni como respuesta en el modo clic 3D del cuestionario). R3F da esa distancia en event.delta.
+const TAP_TOLERANCE_PX = 8;
+const isTap = (e: ThreeEvent<MouseEvent>) => e.delta <= TAP_TOLERANCE_PX;
+
+// Con el dedo no hay "pasar por encima": el resaltado de hover solo se usa con ratón o lápiz.
+const isTouch = (e: ThreeEvent<PointerEvent>) => e.pointerType === "touch";
+
 interface Pin3D {
   structureId: string;
   labelEs: string;
@@ -240,6 +249,7 @@ function SystemLayerGroup({
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
+    if (!isTap(e)) return;
     const hit = e.object as THREE.Mesh;
     const cid = hit.userData?.structureId as string | undefined;
     if (cid) {
@@ -249,6 +259,7 @@ function SystemLayerGroup({
 
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
+    if (isTouch(e)) return;
     const hit = e.object as THREE.Mesh;
     const cid = hit.userData?.structureId as string | undefined;
     if (cid) {
@@ -420,6 +431,7 @@ function HubmapOrganScene({
       object={root}
       onClick={(e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation();
+        if (!isTap(e)) return;
         const id = e.object.userData?.structureId;
         if (id) selectStructure(id);
       }}
@@ -484,6 +496,8 @@ function CameraController() {
   return (
     <OrbitControls
       ref={controlsRef}
+      // Táctil: un dedo gira; dos dedos pellizcan para el zoom y arrastran para desplazar.
+      touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
       target={[0, 0.88, 0]}
       enableDamping
       dampingFactor={0.08}

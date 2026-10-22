@@ -21,6 +21,7 @@ import {
 import { ANATOMY_TOURS } from "../data/didacticData";
 import { QuizPanel } from "./QuizPanel";
 import { StructureNotes } from "./StructureNotes";
+import { useCoarsePointer } from "../hooks/useLayout";
 import { useViewerStore } from "../store/useViewerStore";
 
 export function InfoPanel({
@@ -34,6 +35,7 @@ export function InfoPanel({
   hubmapById: Map<string, HubmapOrgan>;
   catalogBySex: Record<"male" | "female", AnatomyStructure[]>;
 }) {
+  const coarse = useCoarsePointer();
   const mode = useViewerStore((s) => s.mode);
   const rightTab = useViewerStore((s) => s.rightTab);
   const activeHubmapOrganId = useViewerStore((s) => s.activeHubmapOrganId);
@@ -303,7 +305,7 @@ export function InfoPanel({
                     <span>
                       {isolatedId === selectedStructure.id
                         ? "Salir de aislar"
-                        : "Aislar (I)"}
+                        : coarse ? "Aislar" : "Aislar (I)"}
                     </span>
                   </button>
                   <button
@@ -315,8 +317,8 @@ export function InfoPanel({
                     <EyeOff size={15} />
                     <span>
                       {hiddenIds[selectedStructure.id]
-                        ? "Mostrar (H)"
-                        : "Ocultar (H)"}
+                        ? coarse ? "Mostrar" : "Mostrar (H)"
+                        : coarse ? "Ocultar" : "Ocultar (H)"}
                     </span>
                   </button>
                   <button className="btn-action" onClick={resetVisibility}>
@@ -376,19 +378,38 @@ export function InfoPanel({
                   órgano en el visor para inspeccionar su ficha anatómica
                   completa en español.
                 </p>
-                <ul className="tips-list">
-                  <li>
-                    <strong>Clic izquierdo + arrastrar:</strong> rotar cámara
-                  </li>
-                  <li>
-                    <strong>Rueda del ratón:</strong> acercar / alejar (zoom)
-                  </li>
-                  <li>
-                    <strong>Atajos de teclado:</strong> <code>I</code> aislar ·{" "}
-                    <code>H</code> ocultar · <code>L</code> pines 3D ·{" "}
-                    <code>R</code> restablecer
-                  </li>
-                </ul>
+                {coarse ? (
+                  <ul className="tips-list">
+                    <li>
+                      <strong>Toca</strong> una estructura para ver su ficha
+                    </li>
+                    <li>
+                      <strong>Un dedo + arrastrar:</strong> girar el modelo
+                    </li>
+                    <li>
+                      <strong>Dos dedos:</strong> pellizca para acercar o alejar
+                      y arrastra para desplazar
+                    </li>
+                    <li>
+                      <strong>Brújula</strong> (arriba a la derecha): vistas de
+                      cámara y Centrar
+                    </li>
+                  </ul>
+                ) : (
+                  <ul className="tips-list">
+                    <li>
+                      <strong>Clic izquierdo + arrastrar:</strong> rotar cámara
+                    </li>
+                    <li>
+                      <strong>Rueda del ratón:</strong> acercar / alejar (zoom)
+                    </li>
+                    <li>
+                      <strong>Atajos de teclado:</strong> <code>I</code> aislar ·{" "}
+                      <code>H</code> ocultar · <code>L</code> pines 3D ·{" "}
+                      <code>R</code> restablecer
+                    </li>
+                  </ul>
+                )}
               </div>
             )
           ) : activeHubmap ? (

@@ -2666,3 +2666,8 @@ body,
     display: none;
   }
 }
+
+/* Controles que solo tienen sentido con el panel lateral de escritorio (p. ej. su ancho). */
+.layout-compact .desktop-only {
+  display: none;
+}

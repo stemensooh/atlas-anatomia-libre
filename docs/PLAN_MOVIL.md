@@ -40,11 +40,14 @@
 - [x] El escritorio no cambia (se comprueba a 1280 px y más).
 - [x] Comprobado con emulación de dispositivo (Edge vía DevTools Protocol): sin desbordes a 375 y 390 px; asa probada con toques y deslizamientos táctiles; panel lateral en 768 px; escritorio sin cambios a 1280 px.
 
-### Etapa 2: Interacción táctil
-- [ ] Distinguir tocar de arrastrar: solo se selecciona si el dedo apenas se movió (corrige el quiz).
-- [ ] Gestos de OrbitControls: un dedo gira; dos dedos hacen zoom y desplazan.
-- [ ] Ayudas visibles en lugar de `title`; pulsación larga donde haga falta.
-- [ ] Al tocar una estructura con el panel oculto, abrir la Ficha en tamaño medio.
+### Etapa 2: Interacción táctil ✅ (D-019)
+- [x] Distinguir tocar de arrastrar: solo se selecciona si el puntero se movió 8 px o menos (`event.delta` de R3F). Corrige el quiz y también el escritorio con ratón.
+- [x] Gestos de OrbitControls explícitos: un dedo gira; dos dedos hacen zoom y desplazan.
+- [x] Sin hover con el dedo (el resaltado podía quedarse pegado).
+- [x] Ayudas táctiles en la Ficha según `(pointer: coarse)`; sin atajos de teclado en los textos y sin el control de ancho del panel. Las acciones ya tienen texto visible (los iconos de ojo son estándar), así que no hace falta la pulsación larga.
+- [x] Al tocar una estructura con el panel cerrado se abre la Ficha a media altura; durante un cuestionario se abre el cuestionario.
+- [x] El resultado del quiz se desplaza a la vista al responder (también en escritorio).
+- [x] Comprobado con toques y arrastres emulados (DevTools Protocol) en 390 px y con ratón en 1280 px.
 
 ### Etapa 3: Rendimiento y datos
 - [ ] En móvil, arrancar solo con el esqueleto; los demás sistemas se cargan al activarlos y se avisa del tamaño.

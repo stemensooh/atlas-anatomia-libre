@@ -2,6 +2,16 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-019 · Interacción táctil: tocar frente a arrastrar y apertura de la ficha (Fase 5B, etapa 2)
+- **Contexto:** Al girar el modelo con el dedo, el gesto terminaba sobre una malla y se seleccionaba. En el modo clic 3D del cuestionario, eso contaba como una respuesta. Con ratón pasaba lo mismo al soltar tras girar. Además, el hover se quedaba pegado con el dedo, y las ayudas hablaban de ratón y teclado.
+- **Decisión:**
+  - `onClick` de las mallas (sistemas y órganos HuBMAP) solo actúa si `event.delta` ≤ 8 px. La deselección al tocar el vacío ya la filtra R3F.
+  - Sin hover con `pointerType === "touch"`. Gestos táctiles de OrbitControls explícitos: `ONE: ROTATE`, `TWO: DOLLY_PAN`.
+  - El store cuenta las selecciones hechas en 3D (`pick3DSeq`). En móvil y tablet, con el panel cerrado, se abre la Ficha a media altura, o el cuestionario si es la pestaña activa.
+  - `useCoarsePointer()`: ayudas táctiles en la Ficha y textos sin atajos de teclado. El control de ancho del panel lleva la clase `desktop-only`.
+  - El resultado del cuestionario se desplaza a la vista cuando ya es visible: si el panel estaba cerrado, después de abrirse.
+- **Consecuencia:** Se puede girar el modelo y responder el cuestionario con el dedo sin falsos positivos, y el escritorio gana el mismo filtro. Siguen las etapas 3 (peso y rendimiento), 4 (modales y tablas) y 5 (verificación en dispositivo real).
+
 ## 2026-10-21 · D-018 · Móvil y tablet: panel deslizante y barra de pestañas sin cambiar el escritorio (Fase 5B, etapa 1)
 - **Contexto:** La interfaz era una rejilla fija de 3 columnas sin reglas para pantallas pequeñas, y en un móvil el visor no cabía. Plan en `docs/PLAN_MOVIL.md`.
 - **Decisión:**

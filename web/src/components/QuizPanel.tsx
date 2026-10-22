@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Award,
   BarChart3,
@@ -97,6 +97,22 @@ export function QuizPanel({
   const currentQuestion: QuizQuestion | null =
     activeQuiz?.questions[questionIdx] || null;
   const currentAnswer = currentQuestion ? answers[currentQuestion.id] : undefined;
+  const feedbackRef = useRef<HTMLDivElement>(null);
+
+  // En móvil el panel puede estar cerrado al responder (se abre justo después).
+  const sheetPanel = useViewerStore((s) => s.sheet.panel);
+
+  // Al responder, el resultado puede quedar fuera de la vista (debajo de la lista de
+  // cuestionarios, o del panel a media altura en móvil): se desplaza el panel hasta él en
+  // cuanto es visible (un elemento oculto no se puede desplazar a la vista).
+  useEffect(() => {
+    if (!currentAnswer) return;
+    const frame = requestAnimationFrame(() => {
+      const el = feedbackRef.current;
+      if (el && el.offsetParent !== null) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [currentAnswer, sheetPanel]);
   const score = Object.values(answers).filter((a) => a.correct).length;
   const total = activeQuiz?.questions.length ?? 0;
 
@@ -434,7 +450,7 @@ export function QuizPanel({
           )}
 
           {currentAnswer && (
-            <div className={`quiz-feedback ${currentAnswer.correct ? "ok" : "fail"}`}>
+            <div ref={feedbackRef} className={`quiz-feedback ${currentAnswer.correct ? "ok" : "fail"}`}>
               <div className="quiz-feedback-header">
                 {currentAnswer.correct ? (
                   <>

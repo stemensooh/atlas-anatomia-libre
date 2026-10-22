@@ -707,7 +707,7 @@ export function LayerPanel({
                 </button>
                 <div className="tree-toolbar-group">
                   <button
-                    className="btn-xs"
+                    className="btn-xs desktop-only"
                     onClick={() => {
                       if (leftPanelWidth < 420) setLeftPanelWidth(480);
                       else if (leftPanelWidth < 560) setLeftPanelWidth(620);
