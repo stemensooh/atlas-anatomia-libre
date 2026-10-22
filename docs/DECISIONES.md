@@ -2,6 +2,27 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-016 · PostgreSQL además de SQLite, con el mismo código
+- **Contexto:** El usuario pidió empezar la migración a PostgreSQL (que D-012 había pospuesto), mantener también SQLite y configurar él mismo las credenciales de su servidor. No las comparte ni se versionan.
+- **Decisión:**
+  - **Driver** `pg` (node-postgres, MIT). Para los tests, **PGlite** (`@electric-sql/pglite`, Apache-2.0): un PostgreSQL real que corre dentro de Node, sin servidor ni credenciales.
+  - **Capa `server/src/sql.ts`** con una interfaz común (`query`, `one`, `execute`, `exec`, `tx`) para SQLite, pg y PGlite. El SQL de la app se escribe una vez, con marcadores `$n` (en SQLite pasan a `?n`) y reglas comunes:
+    - fechas como texto ISO;
+    - `TRUE`/`FALSE`;
+    - JSON serializado;
+    - `CAST(COUNT(*) AS INTEGER)`;
+    - `RETURNING`;
+    - `lower(username)` para que el nombre no distinga mayúsculas.
+  - Toda la capa de datos (`db.ts`, `users.ts`, `library.ts`) pasa a ser asíncrona. En SQLite, un cerrojo impide que otra petición se cuele en una transacción abierta.
+  - **Esquemas separados:**
+    - `schema-sqlite.ts`: las migraciones v1–v4, sin cambios.
+    - `schema-postgres.ts`: v1 equivalente a la v4 de SQLite, con `timestamptz`, `jsonb`, `boolean` e `identity`. Se registra en la tabla `schema_migrations` y se aplica bajo un bloqueo consultivo.
+  - **Selección del motor:** `DB_CLIENT=sqlite|postgres`; por defecto, PostgreSQL si existe `DATABASE_URL`. Los scripts leen `server/.env` con `node --env-file-if-exists`, sin dependencias nuevas. En los logs, la conexión se muestra sin la contraseña.
+  - **`pnpm run migrate-sqlite`** copia los datos de SQLite a un PostgreSQL sin usuarios, conserva ids y hashes, ajusta las secuencias y verifica los recuentos. No copia las sesiones ni modifica el archivo SQLite.
+  - **`pnpm test`** ejecuta toda la batería con los dos motores (`test/run.ts`).
+  - **Guía `docs/POSTGRESQL.md`:** usuario `atlas_app` con permisos mínimos, `.env`, TLS (`sslmode=require`) y qué hacer si se filtra la contraseña. `.gitignore` excluye `.env.*` salvo `.env.example`.
+- **Consecuencia:** El mismo servidor funciona con los dos motores y los tests cubren ambos. El hosting podrá usar cualquiera de los dos.
+
 ## 2026-10-21 · D-015 · Renombrado a atlas-anatomia-libre, historial sin datos corporativos y atribución de Z-Anatomy corregida
 - **Contexto:** Antes de hacer público el repositorio (Fase 6) se revisaron los riesgos legales. "biodigital" coincide con la marca de BioDigital, Inc., que tiene un visor anatómico 3D comercial (BioDigital Human); usarla en el mismo campo puede crear confusión de marca. Además, 5 commits tenían el nombre y el correo corporativos del autor. Por último, `ATTRIBUTIONS.md` decía que de Z-Anatomy solo se "consultaban" términos, pero `metadata.json` incluye nombres derivados de `TA2.csv` (D-006).
 - **Decisión:**

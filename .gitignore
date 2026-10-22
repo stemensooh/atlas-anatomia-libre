@@ -23,7 +23,13 @@ data/raw/**
 Thumbs.db
 .idea/
 .vscode/
+
+# Variables de entorno y credenciales: nunca se versionan (solo la plantilla .env.example)
 .env
+.env.*
+!.env.example
+*.pem
+*.key
 
 # Base de datos SQLite local (Fase 5)
 server/data/

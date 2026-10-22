@@ -43,15 +43,16 @@ if (password.length < 8 || password.length > 128) {
   process.exit(1);
 }
 
-const db = openDb();
-const existing = findUserByName(db, username);
+const db = await openDb();
+console.log(`Base de datos: ${db.description}`);
+const existing = await findUserByName(db, username);
 if (existing) {
   await setPassword(db, existing.id, password);
-  updateUser(db, existing.id, { role: "admin", isActive: true });
-  deleteUserSessions(db, existing.id);
+  await updateUser(db, existing.id, { role: "admin", isActive: true });
+  await deleteUserSessions(db, existing.id);
   console.log(`Usuario "${existing.username}" ahora es administrador (contraseña actualizada).`);
 } else {
   await createUser(db, username, password, "admin");
   console.log(`Administrador "${username}" creado.`);
 }
-db.close();
+await db.close();

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 import { findQuestion, setup } from "./helpers.ts";
 
-const { db, app, loginAs } = setup();
+const { db, app, loginAs, count } = await setup();
 let ana = "";
 let beto = "";
 let profe = "";
@@ -14,7 +14,7 @@ before(async () => {
 });
 after(async () => {
   await app.close();
-  db.close();
+  await db.close();
 });
 
 const sampleState = {
@@ -151,6 +151,6 @@ test("borrar la cuenta borra también sus vistas y notas", async () => {
   await app.inject({ method: "POST", url: "/api/views", headers: { cookie }, payload: { name: "v", state: sampleState } });
   await app.inject({ method: "PUT", url: "/api/notes/FMA24474", headers: { cookie }, payload: { note: "n" } });
   await app.inject({ method: "DELETE", url: "/api/auth/me", headers: { cookie }, payload: { password: "contraseña-segura" } });
-  assert.equal((db.prepare("SELECT COUNT(*) AS n FROM saved_views WHERE name = 'v'").get() as any).n, 0);
-  assert.equal((db.prepare("SELECT COUNT(*) AS n FROM structure_notes WHERE note = 'n'").get() as any).n, 0);
+  assert.equal(await count("saved_views", "name = 'v'"), 0);
+  assert.equal(await count("structure_notes", "note = 'n'"), 0);
 });

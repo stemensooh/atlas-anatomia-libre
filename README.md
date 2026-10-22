@@ -23,7 +23,7 @@ pnpm run dev
 ```
 Abre `http://localhost:5173` en el navegador. Si la API no está en marcha, el visor funciona igual con los cuestionarios incluidos, pero no guarda resultados ni permite crear o generar cuestionarios.
 
-- Base de datos: `server/data/atlas.db` (se crea sola). `pnpm run seed` en `server/` restaura los cuestionarios iniciales.
+- Base de datos: SQLite en `server/data/atlas.db` (se crea solo) o **PostgreSQL** con `DATABASE_URL` en `server/.env`. Ver [docs/POSTGRESQL.md](docs/POSTGRESQL.md) (credenciales, migración de datos con `pnpm run migrate-sqlite`). `pnpm run seed` en `server/` restaura los cuestionarios iniciales.
 - Tests de la API: `pnpm test` en `server/`.
 - Primer administrador: `pnpm run create-admin -- <usuario>` en `server/` (pide la contraseña). El resto de cuentas se registran desde la web como estudiantes, y el administrador les cambia el rol en **Administración**.
 

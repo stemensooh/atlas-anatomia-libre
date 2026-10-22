@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
-import { openDb } from "../src/db.ts";
-import { catalog, findQuestion, setup } from "./helpers.ts";
+import { openSqlite } from "../src/db.ts";
+import { catalog, findQuestion, setup, TEST_ENGINE } from "./helpers.ts";
 
-const { db, app, loginAs } = setup();
+const { db, app, loginAs, count } = await setup();
 let docente = "";
 let estudiante = "";
 
@@ -13,7 +13,7 @@ before(async () => {
 });
 after(async () => {
   await app.close();
-  db.close();
+  await db.close();
 });
 
 test("lista los cuestionarios iniciales públicos sin iniciar sesión", async () => {
@@ -241,7 +241,8 @@ test("rechaza preguntas manuales sobre grupos sin malla", async () => {
   assert.match(res.json().details[0], /sin malla propia/);
 });
 
-test("migra una base de datos v1 existente hasta la última versión sin perder datos", async () => {
+// Solo SQLite: las migraciones v1–v4 son propias de ese motor (en PostgreSQL el esquema nace en v4).
+test("migra una base de datos SQLite v1 existente hasta la última versión sin perder datos", { skip: TEST_ENGINE !== "sqlite" }, async () => {
   const { DatabaseSync } = await import("node:sqlite");
   const fs = await import("node:fs");
   const os = await import("node:os");
@@ -265,7 +266,7 @@ test("migra una base de datos v1 existente hasta la última versión sin perder 
   `);
   v1.close();
 
-  const migrated = openDb(file);
+  const migrated = openSqlite(file);
   const version = migrated.prepare("PRAGMA user_version").get() as { user_version: number };
   assert.equal(version.user_version, 4);
   const row = migrated.prepare("SELECT title, user_id, is_public FROM quizzes WHERE id = 'viejo'").get() as any;

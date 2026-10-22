@@ -1,15 +1,30 @@
+import { PGlite } from "@electric-sql/pglite";
 import { buildApp, SESSION_COOKIE } from "../src/app.ts";
 import { loadCatalog } from "../src/catalog.ts";
-import { openDb } from "../src/db.ts";
+import { migratePostgres, openSqlite, type Db } from "../src/db.ts";
 import { seedQuizzes } from "../src/seed.ts";
+import { pgliteSql, sqliteSql, type PgliteLike } from "../src/sql.ts";
 import { createUser } from "../src/users.ts";
 import type { Role } from "../src/types.ts";
 
 export const catalog = loadCatalog();
 
-export function setup() {
-  const db = openDb(":memory:");
-  seedQuizzes(db);
+// Motor de los tests: TEST_DB=sqlite (en memoria) o TEST_DB=postgres (PGlite en memoria).
+// test/run.ts ejecuta toda la batería con los dos.
+export const TEST_ENGINE = process.env.TEST_DB === "postgres" ? "postgres" : "sqlite";
+
+export async function openTestDb(): Promise<Db> {
+  if (TEST_ENGINE === "postgres") {
+    const sql = pgliteSql((await PGlite.create()) as unknown as PgliteLike);
+    await migratePostgres(sql);
+    return sql;
+  }
+  return sqliteSql(openSqlite(":memory:"));
+}
+
+export async function setup() {
+  const db = await openTestDb();
+  await seedQuizzes(db);
   const app = buildApp(db, catalog);
 
   // Crea un usuario con el rol pedido, inicia sesión y devuelve la cabecera Cookie.
@@ -20,7 +35,11 @@ export function setup() {
     return cookieFrom(res.headers["set-cookie"]);
   };
 
-  return { db, app, loginAs };
+  // Recuento rápido para comprobar el contenido de la BD desde los tests.
+  const count = async (table: string, where = "TRUE", params: unknown[] = []) =>
+    (await db.one<{ n: number }>(`SELECT CAST(COUNT(*) AS INTEGER) AS n FROM ${table} WHERE ${where}`, params))!.n;
+
+  return { db, app, loginAs, count };
 }
 
 export function cookieFrom(header: string | string[] | number | undefined): string {

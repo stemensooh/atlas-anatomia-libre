@@ -1,10 +1,9 @@
 import type { Db } from "./db.ts";
+import { fromJson, nowIso } from "./sql.ts";
 import type { QuizQuestion } from "./types.ts";
 
 // Datos personales de estudio: vistas guardadas y notas por estructura (privados del usuario),
 // y el informe de resultados de un cuestionario para su docente.
-
-const NOW = "strftime('%Y-%m-%dT%H:%M:%fZ', 'now')";
 
 export const MAX_VIEWS_PER_USER = 100;
 export const MAX_NOTES_PER_USER = 2000;
@@ -20,7 +19,7 @@ export interface SavedView {
 interface ViewRow {
   id: number;
   name: string;
-  state: string;
+  state: unknown;
   created_at: string;
   updated_at: string;
 }
@@ -28,58 +27,50 @@ interface ViewRow {
 const rowToView = (r: ViewRow): SavedView => ({
   id: r.id,
   name: r.name,
-  state: JSON.parse(r.state),
+  state: fromJson(r.state),
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 });
 
-export function listViews(db: Db, userId: number): SavedView[] {
-  const rows = db
-    .prepare("SELECT * FROM saved_views WHERE user_id = ? ORDER BY updated_at DESC, id DESC")
-    .all(userId) as unknown as ViewRow[];
+export async function listViews(db: Db, userId: number): Promise<SavedView[]> {
+  const rows = await db.query<ViewRow>(
+    "SELECT * FROM saved_views WHERE user_id = $1 ORDER BY updated_at DESC, id DESC",
+    [userId]
+  );
   return rows.map(rowToView);
 }
 
-export function countViews(db: Db, userId: number): number {
-  return (db.prepare("SELECT COUNT(*) AS n FROM saved_views WHERE user_id = ?").get(userId) as { n: number }).n;
+export async function countViews(db: Db, userId: number): Promise<number> {
+  const row = await db.one<{ n: number }>("SELECT CAST(COUNT(*) AS INTEGER) AS n FROM saved_views WHERE user_id = $1", [userId]);
+  return row!.n;
 }
 
-export function createView(db: Db, userId: number, name: string, state: unknown): SavedView {
-  const { lastInsertRowid } = db
-    .prepare("INSERT INTO saved_views (user_id, name, state) VALUES (?, ?, ?)")
-    .run(userId, name, JSON.stringify(state));
-  return getView(db, userId, Number(lastInsertRowid))!;
+export async function createView(db: Db, userId: number, name: string, state: unknown): Promise<SavedView> {
+  const now = nowIso();
+  const row = await db.one<ViewRow>(
+    "INSERT INTO saved_views (user_id, name, state, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) RETURNING *",
+    [userId, name, JSON.stringify(state), now]
+  );
+  return rowToView(row!);
 }
 
-// Solo devuelve la vista si es del usuario: así las rutas no pueden tocar vistas ajenas.
-export function getView(db: Db, userId: number, id: number): SavedView | null {
-  const r = db.prepare("SELECT * FROM saved_views WHERE id = ? AND user_id = ?").get(id, userId) as
-    | ViewRow
-    | undefined;
-  return r ? rowToView(r) : null;
-}
-
-export function updateView(
+// Todas las consultas filtran por user_id: las rutas no pueden tocar vistas ajenas.
+export async function updateView(
   db: Db,
   userId: number,
   id: number,
   patch: { name?: string; state?: unknown }
-): SavedView | null {
-  if (!getView(db, userId, id)) return null;
-  if (patch.name !== undefined) {
-    db.prepare(`UPDATE saved_views SET name = ?, updated_at = ${NOW} WHERE id = ?`).run(patch.name, id);
-  }
-  if (patch.state !== undefined) {
-    db.prepare(`UPDATE saved_views SET state = ?, updated_at = ${NOW} WHERE id = ?`).run(
-      JSON.stringify(patch.state),
-      id
-    );
-  }
-  return getView(db, userId, id);
+): Promise<SavedView | null> {
+  const row = await db.one<ViewRow>(
+    `UPDATE saved_views SET name = COALESCE($1, name), state = COALESCE($2, state), updated_at = $3
+     WHERE id = $4 AND user_id = $5 RETURNING *`,
+    [patch.name ?? null, patch.state === undefined ? null : JSON.stringify(patch.state), nowIso(), id, userId]
+  );
+  return row ? rowToView(row) : null;
 }
 
-export function deleteView(db: Db, userId: number, id: number): boolean {
-  return db.prepare("DELETE FROM saved_views WHERE id = ? AND user_id = ?").run(id, userId).changes > 0;
+export async function deleteView(db: Db, userId: number, id: number): Promise<boolean> {
+  return (await db.execute("DELETE FROM saved_views WHERE id = $1 AND user_id = $2", [id, userId])) > 0;
 }
 
 // ---- Notas ----
@@ -90,46 +81,41 @@ export interface StructureNote {
   updatedAt: string;
 }
 
-export function listNotes(db: Db, userId: number): StructureNote[] {
-  return db
-    .prepare(
-      `SELECT structure_id AS structureId, note, updated_at AS updatedAt
-       FROM structure_notes WHERE user_id = ? ORDER BY updated_at DESC`
-    )
-    .all(userId) as unknown as StructureNote[];
+const NOTE_COLUMNS = `structure_id AS "structureId", note, updated_at AS "updatedAt"`;
+
+export async function listNotes(db: Db, userId: number): Promise<StructureNote[]> {
+  return db.query<StructureNote>(
+    `SELECT ${NOTE_COLUMNS} FROM structure_notes WHERE user_id = $1 ORDER BY updated_at DESC`,
+    [userId]
+  );
 }
 
-export function countNotes(db: Db, userId: number): number {
-  return (db.prepare("SELECT COUNT(*) AS n FROM structure_notes WHERE user_id = ?").get(userId) as { n: number }).n;
+export async function countNotes(db: Db, userId: number): Promise<number> {
+  const row = await db.one<{ n: number }>("SELECT CAST(COUNT(*) AS INTEGER) AS n FROM structure_notes WHERE user_id = $1", [userId]);
+  return row!.n;
 }
 
-export function hasNote(db: Db, userId: number, structureId: string): boolean {
-  return !!db.prepare("SELECT 1 FROM structure_notes WHERE user_id = ? AND structure_id = ?").get(userId, structureId);
+export async function hasNote(db: Db, userId: number, structureId: string): Promise<boolean> {
+  return !!(await db.one("SELECT 1 AS x FROM structure_notes WHERE user_id = $1 AND structure_id = $2", [userId, structureId]));
 }
 
 // Guarda (o reemplaza) la nota; una nota vacía la borra. Devuelve null si quedó borrada.
-export function saveNote(db: Db, userId: number, structureId: string, note: string): StructureNote | null {
+export async function saveNote(db: Db, userId: number, structureId: string, note: string): Promise<StructureNote | null> {
   if (!note.trim()) {
-    deleteNote(db, userId, structureId);
+    await deleteNote(db, userId, structureId);
     return null;
   }
-  db.prepare(
-    `INSERT INTO structure_notes (user_id, structure_id, note) VALUES (?, ?, ?)
-     ON CONFLICT (user_id, structure_id) DO UPDATE SET note = excluded.note, updated_at = ${NOW}`
-  ).run(userId, structureId, note);
-  return db
-    .prepare(
-      `SELECT structure_id AS structureId, note, updated_at AS updatedAt
-       FROM structure_notes WHERE user_id = ? AND structure_id = ?`
-    )
-    .get(userId, structureId) as unknown as StructureNote;
+  const row = await db.one<StructureNote>(
+    `INSERT INTO structure_notes (user_id, structure_id, note, updated_at) VALUES ($1, $2, $3, $4)
+     ON CONFLICT (user_id, structure_id) DO UPDATE SET note = excluded.note, updated_at = excluded.updated_at
+     RETURNING ${NOTE_COLUMNS}`,
+    [userId, structureId, note, nowIso()]
+  );
+  return row!;
 }
 
-export function deleteNote(db: Db, userId: number, structureId: string): boolean {
-  return (
-    db.prepare("DELETE FROM structure_notes WHERE user_id = ? AND structure_id = ?").run(userId, structureId)
-      .changes > 0
-  );
+export async function deleteNote(db: Db, userId: number, structureId: string): Promise<boolean> {
+  return (await db.execute("DELETE FROM structure_notes WHERE user_id = $1 AND structure_id = $2", [userId, structureId])) > 0;
 }
 
 // ---- Resultados de un cuestionario (para su docente) ----
@@ -172,19 +158,18 @@ interface ResultRow {
   username: string;
   score: number;
   total: number;
-  answers: string;
+  answers: unknown;
   finished_at: string;
 }
 
 // Solo cuenta intentos de usuarios registrados (los anónimos no se guardan).
-export function quizResults(db: Db, quizId: string, questions: QuizQuestion[]): QuizResults {
-  const rows = db
-    .prepare(
-      `SELECT a.id, a.user_id, u.username, a.score, a.total, a.answers, a.finished_at
-       FROM quiz_attempts a JOIN users u ON u.id = a.user_id
-       WHERE a.quiz_id = ? ORDER BY a.finished_at DESC, a.id DESC`
-    )
-    .all(quizId) as unknown as ResultRow[];
+export async function quizResults(db: Db, quizId: string, questions: QuizQuestion[]): Promise<QuizResults> {
+  const rows = await db.query<ResultRow>(
+    `SELECT a.id, a.user_id, u.username, a.score, a.total, a.answers, a.finished_at
+     FROM quiz_attempts a JOIN users u ON u.id = a.user_id
+     WHERE a.quiz_id = $1 ORDER BY a.finished_at DESC, a.id DESC`,
+    [quizId]
+  );
 
   const byStudent = new Map<number, StudentResult & { ratioSum: number }>();
   const byQuestion = new Map<string, QuestionResult & { wrong: Map<string, number> }>(
@@ -224,7 +209,7 @@ export function quizResults(db: Db, quizId: string, questions: QuizQuestion[]): 
       s.bestScore = Math.max(s.bestScore, r.score);
       s.ratioSum += ratio;
     }
-    for (const a of JSON.parse(r.answers) as Array<{ questionId: string; correct: boolean; answer: string | null; revealed: boolean }>) {
+    for (const a of fromJson(r.answers) as Array<{ questionId: string; correct: boolean; answer: string | null; revealed: boolean }>) {
       const q = byQuestion.get(a.questionId);
       if (!q) continue; // pregunta borrada al editar el cuestionario
       q.answered++;

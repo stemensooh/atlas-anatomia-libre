@@ -340,7 +340,7 @@ Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.
 - [x] Guardar vistas (cámara y estado de la escena) y notas privadas por estructura (D-014).
 - [x] Página de privacidad (qué datos se guardan) y borrado de cuenta desde Mi perfil (D-013).
 - [x] Que un docente vea los resultados de sus alumnos en sus cuestionarios: por alumno y por pregunta (D-014).
-- [ ] Migración a PostgreSQL *(pospuesta: se sigue con SQLite hasta que el usuario lo indique, D-012)*.
+- [x] Soporte de PostgreSQL además de SQLite, con script de migración de datos y tests en ambos motores (D-016).
 
 ### Criterio de salida
 Un usuario puede registrarse, guardar una vista y recuperar sus resultados. **Cumplido (D-014).**

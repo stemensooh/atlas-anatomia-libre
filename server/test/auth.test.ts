@@ -3,10 +3,10 @@ import { after, test } from "node:test";
 import { hashPassword, verifyPassword } from "../src/users.ts";
 import { cookieFrom, setup } from "./helpers.ts";
 
-const { db, app, loginAs } = setup();
+const { db, app, loginAs, count } = await setup();
 after(async () => {
   await app.close();
-  db.close();
+  await db.close();
 });
 
 const register = (username: string, password = "contraseña-segura") =>
@@ -17,8 +17,8 @@ test("las contraseñas se guardan con scrypt y se verifican", async () => {
   assert.match(hash, /^scrypt\$\d+\$8\$1\$/);
   assert.equal(await verifyPassword("secreto-123", hash), true);
   assert.equal(await verifyPassword("otro", hash), false);
-  const row = db.prepare("SELECT password_hash FROM users").all();
-  assert.ok(row.every((r: any) => !String(r.password_hash).includes("contraseña")));
+  const rows = await db.query<{ password_hash: string }>("SELECT password_hash FROM users");
+  assert.ok(rows.every((r) => r.password_hash.startsWith("scrypt$") && !r.password_hash.includes("contraseña")));
 });
 
 test("registro libre como estudiante con cookie de sesión segura", async () => {
@@ -133,8 +133,8 @@ test("borrar la cuenta elimina sus cuestionarios e intentos", async () => {
   assert.equal(wrong.statusCode, 400);
   const ok = await app.inject({ method: "DELETE", url: "/api/auth/me", headers: { cookie }, payload: { password: "contraseña-segura" } });
   assert.equal(ok.statusCode, 204);
-  assert.equal((db.prepare("SELECT COUNT(*) AS n FROM quizzes WHERE id = ?").get(quiz.id) as any).n, 0);
-  assert.equal((db.prepare("SELECT COUNT(*) AS n FROM quiz_attempts WHERE quiz_id = ?").get(quiz.id) as any).n, 0);
+  assert.equal(await count("quizzes", "id = $1", [quiz.id]), 0);
+  assert.equal(await count("quiz_attempts", "quiz_id = $1", [quiz.id]), 0);
   assert.equal((await app.inject({ url: "/api/auth/me", headers: { cookie } })).json().user, null);
 });
 
