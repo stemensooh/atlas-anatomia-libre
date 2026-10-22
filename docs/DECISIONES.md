@@ -2,6 +2,18 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-015 · Renombrado a atlas-anatomia-libre, historial sin datos corporativos y atribución de Z-Anatomy corregida
+- **Contexto:** Antes de hacer público el repositorio (Fase 6) se revisaron los riesgos legales. "biodigital" coincide con la marca de BioDigital, Inc., que tiene un visor anatómico 3D comercial (BioDigital Human); usarla en el mismo campo puede crear confusión de marca. Además, 5 commits tenían el nombre y el correo corporativos del autor. Por último, `ATTRIBUTIONS.md` decía que de Z-Anatomy solo se "consultaban" términos, pero `metadata.json` incluye nombres derivados de `TA2.csv` (D-006).
+- **Decisión:**
+  - **Nombre nuevo:** `atlas-anatomia-libre`, coherente con el título visible "Atlas Anatómico 3D Libre".
+    - En el código: `server/data/atlas.db`, con renombrado automático del `biodigital.db` anterior y sus `-wal` y `-shm`.
+    - Variables `ATLAS_DB` y `ATLAS_ADMIN_PASSWORD`.
+    - Clave `atlas_left_width` en el navegador, leyendo también la anterior.
+    - Se conservan las menciones a BioDigital que dicen que **no** se usan sus recursos.
+  - **Historial:** se reescribió con `git filter-branch` (autor y committer `stemensooh <stemensooh@gmail.com>`) y se subió con `push --force-with-lease`. Este repositorio tiene esa identidad en su `.git/config`; la configuración global del equipo no se toca.
+  - **Z-Anatomy:** `ATTRIBUTIONS.md` y el modal de Créditos indican que sus términos se usaron para `nameLa`/`nameEs` y que `metadata.json` va bajo CC BY-SA 4.0 (ShareAlike).
+- **Consecuencia:** Los hashes de todos los commits cambiaron y cualquier copia anterior debe volver a clonarse. **Pendiente del usuario:** confirmar con su empleador la titularidad del código antes de publicarlo, porque se desarrolló en un equipo corporativo.
+
 ## 2026-10-21 · D-014 · Vistas guardadas, notas por estructura y resultados para el docente (cierre de la Fase 5)
 - **Contexto:** Faltaban, de la Fase 5: guardar vistas, notas por estructura y que un docente vea los resultados de sus alumnos.
 - **Decisión:**
@@ -42,7 +54,7 @@ Formato: una entrada corta por decisión, la más reciente arriba.
     - **CSRF:** las peticiones que cambian datos deben traer un `Origin` igual al host (o a `X-Forwarded-Host` detrás de un proxy). El proxy de Vite usa `changeOrigin: false` para conservar el `Host`.
     - Cambiar o restablecer la contraseña cierra las otras sesiones.
     - Nunca se queda el sistema sin un admin activo.
-  - **Primer administrador:** `pnpm run create-admin -- <usuario>` pide la contraseña sin mostrarla (o la lee de `BIODIGITAL_ADMIN_PASSWORD`).
+  - **Primer administrador:** `pnpm run create-admin -- <usuario>` pide la contraseña sin mostrarla (o la lee de `ATLAS_ADMIN_PASSWORD`).
   - **Pantallas:**
     - Iniciar sesión / Crear cuenta.
     - Menú de usuario en la barra superior.

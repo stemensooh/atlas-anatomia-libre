@@ -246,7 +246,7 @@ test("migra una base de datos v1 existente hasta la última versión sin perder 
   const fs = await import("node:fs");
   const os = await import("node:os");
   const path = await import("node:path");
-  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "biodigital-")), "v1.db");
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "atlas-")), "v1.db");
   const v1 = new DatabaseSync(file);
   v1.exec(`
     CREATE TABLE quizzes (id TEXT PRIMARY KEY, title TEXT NOT NULL, subtitle TEXT NOT NULL DEFAULT '',

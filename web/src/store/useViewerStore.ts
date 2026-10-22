@@ -116,7 +116,9 @@ const initialClip: ClipPlanesState = {
 
 function getStoredLeftWidth(): number {
   try {
-    const val = localStorage.getItem("biodigital_left_width");
+    // Se lee también la clave anterior al cambio de nombre del proyecto (D-015).
+    const val =
+      localStorage.getItem("atlas_left_width") ?? localStorage.getItem("biodigital_left_width");
     if (val) {
       const n = parseInt(val, 10);
       if (!isNaN(n) && n >= 280 && n <= 700) return n;
@@ -171,7 +173,7 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   setLeftPanelWidth: (width) => {
     const clamped = Math.max(280, Math.min(700, Math.round(width)));
     try {
-      localStorage.setItem("biodigital_left_width", String(clamped));
+      localStorage.setItem("atlas_left_width", String(clamped));
     } catch {}
     set({ leftPanelWidth: clamped });
   },

@@ -23,7 +23,7 @@ pnpm run dev
 ```
 Abre `http://localhost:5173` en el navegador. Si la API no está en marcha, el visor funciona igual con los cuestionarios incluidos, pero no guarda resultados ni permite crear o generar cuestionarios.
 
-- Base de datos: `server/data/biodigital.db` (se crea sola). `pnpm run seed` en `server/` restaura los cuestionarios iniciales.
+- Base de datos: `server/data/atlas.db` (se crea sola). `pnpm run seed` en `server/` restaura los cuestionarios iniciales.
 - Tests de la API: `pnpm test` en `server/`.
 - Primer administrador: `pnpm run create-admin -- <usuario>` en `server/` (pide la contraseña). El resto de cuentas se registran desde la web como estudiantes, y el administrador les cambia el rol en **Administración**.
 

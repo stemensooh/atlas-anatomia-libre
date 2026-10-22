@@ -4,7 +4,7 @@ import { createUser, deleteUserSessions, findUserByName, setPassword, updateUser
 
 // Crea un administrador, o asciende a admin a un usuario existente y le cambia la contraseña.
 // Uso: pnpm run create-admin -- <usuario>
-// La contraseña se pide por teclado sin mostrarla (o en BIODIGITAL_ADMIN_PASSWORD, p. ej. en CI).
+// La contraseña se pide por teclado sin mostrarla (o en ATLAS_ADMIN_PASSWORD, p. ej. en CI).
 
 function askHidden(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true });
@@ -29,7 +29,7 @@ if (!username || !/^[A-Za-z0-9._-]{3,32}$/.test(username)) {
   process.exit(1);
 }
 
-let password = process.env.BIODIGITAL_ADMIN_PASSWORD ?? "";
+let password = process.env.ATLAS_ADMIN_PASSWORD ?? "";
 if (!password) {
   password = await askHidden(`Contraseña para ${username} (mínimo 8 caracteres): `);
   const again = await askHidden("Repite la contraseña: ");

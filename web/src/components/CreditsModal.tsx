@@ -135,9 +135,11 @@ export function CreditsModal() {
                   </a>
                 </td>
                 <td>
-                  Consulta de correspondencias terminológicas en español y latín
-                  (no se utilizan sus mallas 3D ni se redistribuye la tabla TA2
-                  completa).
+                  Nombres en latín y correspondencias terminológicas usados para
+                  nombrar y traducir al español (con adaptación propia) las
+                  estructuras de <code>metadata.json</code>, que por ello se
+                  publica bajo CC BY-SA 4.0. No se utilizan sus mallas 3D ni se
+                  redistribuye la tabla TA2 completa.
                 </td>
               </tr>
             </tbody>

@@ -11,11 +11,22 @@ import type {
   Viewer,
 } from "./types.ts";
 
-const DEFAULT_DB_PATH = path.resolve(import.meta.dirname, "../data/biodigital.db");
+const DEFAULT_DB_PATH = path.resolve(import.meta.dirname, "../data/atlas.db");
+// Nombre anterior del archivo (antes de renombrar el proyecto a atlas-anatomia-libre, D-015).
+const LEGACY_DB_PATH = path.resolve(import.meta.dirname, "../data/biodigital.db");
+
+// Si solo existe la BD con el nombre antiguo, se renombra (con sus archivos -wal y -shm).
+function renameLegacyDb() {
+  if (fs.existsSync(DEFAULT_DB_PATH) || !fs.existsSync(LEGACY_DB_PATH)) return;
+  for (const suffix of ["", "-wal", "-shm"]) {
+    if (fs.existsSync(LEGACY_DB_PATH + suffix)) fs.renameSync(LEGACY_DB_PATH + suffix, DEFAULT_DB_PATH + suffix);
+  }
+}
 
 export type Db = DatabaseSync;
 
-export function openDb(dbPath = process.env.BIODIGITAL_DB || DEFAULT_DB_PATH): Db {
+export function openDb(dbPath = process.env.ATLAS_DB || DEFAULT_DB_PATH): Db {
+  if (dbPath === DEFAULT_DB_PATH) renameLegacyDb();
   if (dbPath !== ":memory:") {
     fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   }
