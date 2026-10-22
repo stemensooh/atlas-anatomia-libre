@@ -10,11 +10,22 @@ Proyecto de aprendizaje para crear un visor de anatomía humana en 3D, abierto y
 - Ver el plan completo en [docs/PLAN_PROYECTO.md](docs/PLAN_PROYECTO.md) y la guía para ampliar contenido en [docs/COMO_AGREGAR_MODELOS_Y_TRADUCCIONES.md](docs/COMO_AGREGAR_MODELOS_Y_TRADUCCIONES.md).
 
 ## Cómo ejecutar el visor en local
+La primera vez, instala las dependencias (`pnpm install` en `web/` y en `server/`). Después, en dos terminales:
+
 ```powershell
+# Terminal 1: API de cuestionarios con SQLite (puerto 3001)
+cd server
+pnpm run dev
+
+# Terminal 2: visor web (puerto 5173)
 cd web
 pnpm run dev
 ```
-Abre `http://localhost:5173` en el navegador.
+Abre `http://localhost:5173` en el navegador. Si la API no está en marcha, el visor funciona igual con los cuestionarios incluidos, pero no guarda resultados ni permite crear o generar cuestionarios.
+
+- Base de datos: SQLite en `server/data/atlas.db` (se crea solo) o **PostgreSQL** con `DATABASE_URL` en `server/.env`. Ver [docs/POSTGRESQL.md](docs/POSTGRESQL.md) (credenciales, migración de datos con `pnpm run migrate-sqlite`). `pnpm run seed` en `server/` restaura los cuestionarios iniciales.
+- Tests de la API: `pnpm test` en `server/`.
+- Primer administrador: `pnpm run create-admin -- <usuario>` en `server/` (pide la contraseña). El resto de cuentas se registran desde la web como estudiantes, y el administrador les cambia el rol en **Administración**.
 
 ## Estructura
 ```

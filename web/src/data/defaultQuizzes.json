@@ -1,0 +1,171 @@
+[
+  {
+    "id": "quiz-locomotor",
+    "title": "Cuestionario 1: Aparato locomotor (Huesos y músculos)",
+    "subtitle": "Combina búsqueda directa en el modelo 3D y preguntas de opción múltiple (5 preguntas)",
+    "questions": [
+      {
+        "id": "q-loc-1",
+        "type": "find3d",
+        "prompt": "Haz clic directamente en el modelo 3D sobre el FÉMUR DERECHO.",
+        "hint": "Es el hueso largo del muslo derecho (a la izquierda de tu pantalla en vista frontal).",
+        "bodySex": "male",
+        "enabledSystems": [
+          "skeletal"
+        ],
+        "targetStructureId": "FMA24474",
+        "targetNameEs": "Hueso Fémur derecho",
+        "explanation": "¡Correcto! El fémur (FMA24474) es el hueso más largo, fuerte y voluminoso del cuerpo humano."
+      },
+      {
+        "id": "q-loc-2",
+        "type": "multipleChoice",
+        "prompt": "¿Cómo se llama la estructura ósea resaltada en azul brillante en el centro superior del tórax?",
+        "hint": "Se articula con ambas clavículas y el primer par de cartílagos costales.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "skeletal"
+        ],
+        "targetStructureId": "FMA7486",
+        "targetNameEs": "Manubrio del esternón",
+        "options": [
+          "Manubrio del esternón",
+          "Hueso sacro",
+          "Escápula derecha",
+          "Primera vértebra cervical (Atlas)"
+        ],
+        "explanation": "El manubrio del esternón (FMA7486) es la porción superior ancha del esternón que cierra por delante el estrecho torácico superior."
+      },
+      {
+        "id": "q-loc-3",
+        "type": "find3d",
+        "prompt": "Haz clic en el modelo 3D sobre la ESCÁPULA DERECHA (omóplato derecho).",
+        "hint": "Rota la cámara hacia la vista posterior (espalda superior derecha).",
+        "bodySex": "male",
+        "enabledSystems": [
+          "skeletal"
+        ],
+        "targetStructureId": "FMA13395",
+        "targetNameEs": "Escápula derecha",
+        "explanation": "¡Muy bien! La escápula derecha (FMA13395) es un hueso plano triangular apoyado sobre la cara posterolateral de la caja torácica."
+      },
+      {
+        "id": "q-loc-4",
+        "type": "multipleChoice",
+        "prompt": "¿Qué músculo respiratorio en forma de cúpula se encuentra resaltado separando el tórax del abdomen?",
+        "hint": "Es el principal músculo inspiratorio del cuerpo humano.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "muscular",
+          "skeletal"
+        ],
+        "targetStructureId": "FMA13295",
+        "targetNameEs": "Diafragma",
+        "options": [
+          "Diafragma",
+          "Músculo glúteo mayor derecho",
+          "Músculo sartorio derecho",
+          "Músculo esternocleidomastoideo derecho"
+        ],
+        "explanation": "El diafragma (FMA13295) se contrae y desciende durante la inspiración para expandir los pulmones."
+      },
+      {
+        "id": "q-loc-5",
+        "type": "find3d",
+        "prompt": "Haz clic en el modelo 3D sobre el HUESO SACRO.",
+        "hint": "Se encuentra en la base de la columna vertebral, encajado entre los dos huesos coxales de la pelvis.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "skeletal"
+        ],
+        "targetStructureId": "FMA16202",
+        "targetNameEs": "Hueso sacro",
+        "explanation": "¡Exacto! El hueso sacro (FMA16202) está formado por la fusión de las cinco vértebras sacras (S1-S5)."
+      }
+    ]
+  },
+  {
+    "id": "quiz-organos-vitales",
+    "title": "Cuestionario 2: Órganos toracoabdominales y encéfalo",
+    "subtitle": "Identificación 3D de órganos digestivos, respiratorios, urinarios y del SNC (5 preguntas)",
+    "questions": [
+      {
+        "id": "q-org-1",
+        "type": "find3d",
+        "prompt": "Haz clic en el modelo 3D sobre el ESTÓMAGO.",
+        "hint": "Órgano en forma de 'J' del sistema digestivo situado en el cuadrante superior izquierdo del abdomen.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "digestive"
+        ],
+        "targetStructureId": "FMA7148",
+        "targetNameEs": "Estómago",
+        "explanation": "¡Correcto! El estómago (FMA7148) recibe el bolo alimenticio desde el esófago y lo transforma en quimo."
+      },
+      {
+        "id": "q-org-2",
+        "type": "multipleChoice",
+        "prompt": "¿Qué gran vaso arterial en forma de cayado aparece resaltado saliendo del corazón?",
+        "hint": "Da origen a los troncos arteriales que van a la cabeza y los brazos.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "circulatory"
+        ],
+        "targetStructureId": "FMA3768",
+        "targetNameEs": "Arco de la aorta (cayado aórtico)",
+        "options": [
+          "Arco de la aorta (cayado aórtico)",
+          "Vena cava superior",
+          "Seno coronario",
+          "Vena yugular interna derecha"
+        ],
+        "explanation": "El arco de la aorta (FMA3768) distribuye la sangre oxigenada impulsada por el ventrículo izquierdo."
+      },
+      {
+        "id": "q-org-3",
+        "type": "find3d",
+        "prompt": "Haz clic en el modelo 3D sobre el RIÑÓN DERECHO.",
+        "hint": "Órgano retroperitoneal del sistema urinario con forma de habichuela en el lado derecho.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "urinary"
+        ],
+        "targetStructureId": "FMA7204",
+        "targetNameEs": "Riñón derecho",
+        "explanation": "¡Excelente! El riñón derecho (FMA7204) filtra la sangre para formar la orina que desciende por el uréter derecho."
+      },
+      {
+        "id": "q-org-4",
+        "type": "multipleChoice",
+        "prompt": "¿Qué estructura del encéfalo posterior aparece resaltada en la base posterior del cráneo?",
+        "hint": "Es el centro encargado de la coordinación motora, la postura y el equilibrio.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "nervous"
+        ],
+        "targetStructureId": "FMA67944",
+        "targetNameEs": "Cerebelo",
+        "options": [
+          "Cerebelo",
+          "Cuerpo calloso",
+          "Tálamo derecho",
+          "Hipocampo izquierdo"
+        ],
+        "explanation": "El cerebelo (FMA67944) integra las vías sensitivas y motoras para coordinar con precisión los movimientos."
+      },
+      {
+        "id": "q-org-5",
+        "type": "find3d",
+        "prompt": "Haz clic en el modelo 3D sobre la TRÁQUEA.",
+        "hint": "Conducto aéreo vertical situado en la línea media del cuello y mediastino superior.",
+        "bodySex": "male",
+        "enabledSystems": [
+          "respiratory"
+        ],
+        "targetStructureId": "FMA7394",
+        "targetNameEs": "Tráquea",
+        "explanation": "¡Muy bien! La tráquea (FMA7394) conduce el aire desde la laringe hacia los bronquios principales."
+      }
+    ]
+  }
+]

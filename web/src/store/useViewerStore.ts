@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { SYSTEM_META, SystemId } from "../data/types";
+import type { Vec3, ViewStateV1 } from "../data/viewState";
 
 export type CameraPreset = "front" | "back" | "left" | "right" | "top" | "reset";
 export type BodySex = "male" | "female";
@@ -36,6 +37,8 @@ interface ViewerState {
   hiddenIds: Record<string, boolean>;
   searchQuery: string;
   cameraPreset: { preset: CameraPreset; seq: number };
+  // Posición de cámara concreta pedida al abrir una vista guardada (seq para repetirla).
+  cameraView: { position: Vec3; target: Vec3; seq: number } | null;
   clip: ClipPlanesState;
   showLabels3D: boolean;
   theme: "dark" | "light";
@@ -60,6 +63,8 @@ interface ViewerState {
   enableAllLayers: (enabled: boolean) => void;
 
   selectStructure: (id: string | null) => void;
+  // Selección hecha con clic directo en el modelo 3D: además avisa al cuestionario activo.
+  pickStructure3D: (id: string) => void;
   hoverStructure: (id: string | null) => void;
   toggleIsolate: (id: string) => void;
   toggleHide: (id: string) => void;
@@ -74,6 +79,8 @@ interface ViewerState {
   toggleTheme: () => void;
   setCreditsOpen: (open: boolean) => void;
   setQuizClickHandler: (fn: ((id: string) => void) | null) => void;
+
+  applySavedView: (view: ViewStateV1) => void;
 
   applySceneConfig: (cfg: {
     bodySex: BodySex;
@@ -109,7 +116,9 @@ const initialClip: ClipPlanesState = {
 
 function getStoredLeftWidth(): number {
   try {
-    const val = localStorage.getItem("biodigital_left_width");
+    // Se lee también la clave anterior al cambio de nombre del proyecto (D-015).
+    const val =
+      localStorage.getItem("atlas_left_width") ?? localStorage.getItem("biodigital_left_width");
     if (val) {
       const n = parseInt(val, 10);
       if (!isNaN(n) && n >= 280 && n <= 700) return n;
@@ -118,7 +127,7 @@ function getStoredLeftWidth(): number {
   return 380;
 }
 
-export const useViewerStore = create<ViewerState>((set) => ({
+export const useViewerStore = create<ViewerState>((set, get) => ({
   mode: "body",
   rightTab: "info",
   bodySex: "male",
@@ -130,6 +139,7 @@ export const useViewerStore = create<ViewerState>((set) => ({
   hiddenIds: {},
   searchQuery: "",
   cameraPreset: { preset: "front", seq: 0 },
+  cameraView: null,
   clip: initialClip,
   showLabels3D: false,
   theme: "dark",
@@ -163,7 +173,7 @@ export const useViewerStore = create<ViewerState>((set) => ({
   setLeftPanelWidth: (width) => {
     const clamped = Math.max(280, Math.min(700, Math.round(width)));
     try {
-      localStorage.setItem("biodigital_left_width", String(clamped));
+      localStorage.setItem("atlas_left_width", String(clamped));
     } catch {}
     set({ leftPanelWidth: clamped });
   },
@@ -244,13 +254,12 @@ export const useViewerStore = create<ViewerState>((set) => ({
       };
     }),
 
-  selectStructure: (id) =>
-    set((s) => {
-      if (id && s.quizClickHandler) {
-        s.quizClickHandler(id);
-      }
-      return { selectedId: id };
-    }),
+  selectStructure: (id) => set({ selectedId: id }),
+
+  pickStructure3D: (id) => {
+    set({ selectedId: id });
+    get().quizClickHandler?.(id);
+  },
 
   hoverStructure: (id) => set({ hoveredId: id }),
 
@@ -313,6 +322,36 @@ export const useViewerStore = create<ViewerState>((set) => ({
   setCreditsOpen: (creditsOpen) => set({ creditsOpen }),
 
   setQuizClickHandler: (quizClickHandler) => set({ quizClickHandler }),
+
+  applySavedView: (view) =>
+    set((s) => {
+      const layers = { ...s.layers };
+      for (const sys of Object.keys(layers) as SystemId[]) {
+        const saved = view.layers[sys];
+        layers[sys] = saved
+          ? { ...layers[sys], enabled: saved.enabled, opacity: saved.opacity, depth: saved.depth }
+          : { ...layers[sys], enabled: false };
+      }
+      return {
+        mode: view.mode,
+        bodySex: view.bodySex,
+        activeHubmapOrganId: view.activeHubmapOrganId,
+        layers,
+        sliderMode: view.sliderMode,
+        selectedId: view.selectedId,
+        isolatedId: view.isolatedId,
+        hiddenIds: Object.fromEntries(view.hiddenIds.map((id) => [id, true])),
+        clip: { ...initialClip, ...view.clip },
+        showLabels3D: view.showLabels3D,
+        hoveredId: null,
+        cameraView: view.camera
+          ? { ...view.camera, seq: (s.cameraView?.seq ?? 0) + 1 }
+          : s.cameraView,
+        cameraPreset: view.camera
+          ? s.cameraPreset
+          : { preset: "front", seq: s.cameraPreset.seq + 1 },
+      };
+    }),
 
   applySceneConfig: (cfg) =>
     set((s) => {

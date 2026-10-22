@@ -2,6 +2,116 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-016 · PostgreSQL además de SQLite, con el mismo código
+- **Contexto:** El usuario pidió empezar la migración a PostgreSQL (que D-012 había pospuesto), mantener también SQLite y configurar él mismo las credenciales de su servidor. No las comparte ni se versionan.
+- **Decisión:**
+  - **Driver** `pg` (node-postgres, MIT). Para los tests, **PGlite** (`@electric-sql/pglite`, Apache-2.0): un PostgreSQL real que corre dentro de Node, sin servidor ni credenciales.
+  - **Capa `server/src/sql.ts`** con una interfaz común (`query`, `one`, `execute`, `exec`, `tx`) para SQLite, pg y PGlite. El SQL de la app se escribe una vez, con marcadores `$n` (en SQLite pasan a `?n`) y reglas comunes:
+    - fechas como texto ISO;
+    - `TRUE`/`FALSE`;
+    - JSON serializado;
+    - `CAST(COUNT(*) AS INTEGER)`;
+    - `RETURNING`;
+    - `lower(username)` para que el nombre no distinga mayúsculas.
+  - Toda la capa de datos (`db.ts`, `users.ts`, `library.ts`) pasa a ser asíncrona. En SQLite, un cerrojo impide que otra petición se cuele en una transacción abierta.
+  - **Esquemas separados:**
+    - `schema-sqlite.ts`: las migraciones v1–v4, sin cambios.
+    - `schema-postgres.ts`: v1 equivalente a la v4 de SQLite, con `timestamptz`, `jsonb`, `boolean` e `identity`. Se registra en la tabla `schema_migrations` y se aplica bajo un bloqueo consultivo.
+  - **Selección del motor:** `DB_CLIENT=sqlite|postgres`; por defecto, PostgreSQL si existe `DATABASE_URL`. Los scripts leen `server/.env` con `node --env-file-if-exists`, sin dependencias nuevas. En los logs, la conexión se muestra sin la contraseña.
+  - **`pnpm run migrate-sqlite`** copia los datos de SQLite a un PostgreSQL sin usuarios, conserva ids y hashes, ajusta las secuencias y verifica los recuentos. No copia las sesiones ni modifica el archivo SQLite.
+  - **`pnpm test`** ejecuta toda la batería con los dos motores (`test/run.ts`).
+  - **Guía `docs/POSTGRESQL.md`:** usuario `atlas_app` con permisos mínimos, `.env`, TLS (`sslmode=require`) y qué hacer si se filtra la contraseña. `.gitignore` excluye `.env.*` salvo `.env.example`.
+- **Consecuencia:** El mismo servidor funciona con los dos motores y los tests cubren ambos. El hosting podrá usar cualquiera de los dos.
+
+## 2026-10-21 · D-015 · Renombrado a atlas-anatomia-libre, historial sin datos corporativos y atribución de Z-Anatomy corregida
+- **Contexto:** Antes de hacer público el repositorio (Fase 6) se revisaron los riesgos legales. "biodigital" coincide con la marca de BioDigital, Inc., que tiene un visor anatómico 3D comercial (BioDigital Human); usarla en el mismo campo puede crear confusión de marca. Además, 5 commits tenían el nombre y el correo corporativos del autor. Por último, `ATTRIBUTIONS.md` decía que de Z-Anatomy solo se "consultaban" términos, pero `metadata.json` incluye nombres derivados de `TA2.csv` (D-006).
+- **Decisión:**
+  - **Nombre nuevo:** `atlas-anatomia-libre`, coherente con el título visible "Atlas Anatómico 3D Libre".
+    - En el código: `server/data/atlas.db`, con renombrado automático del `biodigital.db` anterior y sus `-wal` y `-shm`.
+    - Variables `ATLAS_DB` y `ATLAS_ADMIN_PASSWORD`.
+    - Clave `atlas_left_width` en el navegador, leyendo también la anterior.
+    - Se conservan las menciones a BioDigital que dicen que **no** se usan sus recursos.
+  - **Historial:** se reescribió con `git filter-branch` (autor y committer `stemensooh <stemensooh@gmail.com>`) y se subió con `push --force-with-lease`. Este repositorio tiene esa identidad en su `.git/config`; la configuración global del equipo no se toca.
+  - **Z-Anatomy:** `ATTRIBUTIONS.md` y el modal de Créditos indican que sus términos se usaron para `nameLa`/`nameEs` y que `metadata.json` va bajo CC BY-SA 4.0 (ShareAlike).
+- **Consecuencia:** Los hashes de todos los commits cambiaron y cualquier copia anterior debe volver a clonarse. **Pendiente del usuario:** confirmar con su empleador la titularidad del código antes de publicarlo, porque se desarrolló en un equipo corporativo.
+
+## 2026-10-21 · D-014 · Vistas guardadas, notas por estructura y resultados para el docente (cierre de la Fase 5)
+- **Contexto:** Faltaban, de la Fase 5: guardar vistas, notas por estructura y que un docente vea los resultados de sus alumnos.
+- **Decisión:**
+  - **Migración v4.**
+    - `saved_views` (id, user_id, nombre, `state` JSON y fechas).
+    - `structure_notes` (clave primaria `(user_id, structure_id)`; los ids de estructura no se repiten entre los dos modelos).
+    - Ambas con `ON DELETE CASCADE` hacia `users`, así que borrar la cuenta borra también vistas y notas.
+  - **Vistas:**
+    - El estado lo define la web (`web/src/data/viewState.ts`, `version: 1`): modo, sexo del modelo, órgano HuBMAP, capas (activa, opacidad y profundidad), modo de los sliders, selección, aislado, ocultos, cortes, pines, y posición y punto de mira de la cámara.
+    - La cámara se lee desde fuera del Canvas con un puente (`cameraBridge`) y se aplica con `cameraView` en el store.
+    - El servidor solo limita el tamaño (20 KB) y el número (100 por usuario).
+    - Las vistas son privadas: las consultas filtran siempre por `user_id`.
+  - **Notas:**
+    - Una por estructura y usuario (máximo 5.000 caracteres y 2.000 notas). Una nota vacía se borra.
+    - El servidor comprueba que la estructura exista en el catálogo.
+    - Se editan en la Ficha y se listan en Mi perfil, desde donde se puede saltar a la estructura.
+  - **Resultados:**
+    - Nuevo permiso `results`: el docente dueño del cuestionario o un admin.
+    - `GET /api/quizzes/:id/results` devuelve el resumen, una fila por alumno (intentos, mejor, último y media) y el porcentaje de aciertos por pregunta con los 3 errores más comunes.
+    - Solo cuenta intentos de usuarios registrados.
+    - Se actualiza la pantalla de Privacidad para explicar que el docente ve los resultados en sus cuestionarios.
+- **Consecuencia:** Se cumple el criterio de salida de la Fase 5. La migración a PostgreSQL sigue pospuesta hasta que el usuario lo indique (D-012).
+
+## 2026-10-21 · D-013 · Autenticación propia con sesiones en SQLite, tres roles y cuestionarios privados
+- **Contexto:** Fase 5. El usuario eligió: roles admin, docente y estudiante; sin sesión se puede ver y jugar pero no guardar; registro libre solo con usuario y contraseña; los cuestionarios de los usuarios son privados hasta que un docente o admin los publica. Se sigue con SQLite (D-012).
+- **Decisión:**
+  - **Sin dependencias nuevas.** Contraseñas con `scrypt` de `node:crypto` (N=2^15, r=8, p=1, sal de 16 bytes; los parámetros se guardan en el hash). Sesiones con un token aleatorio de 32 bytes en una cookie `bd_session` `HttpOnly` + `SameSite=Strict` (+ `Secure` con `COOKIE_SECURE=1`), de 30 días. En la BD solo se guarda el SHA-256 del token.
+  - **Migración v3:** tablas `users` (nombre sin distinguir mayúsculas, rol, activo, alta y último acceso) y `sessions`. `quizzes` y `quiz_attempts` se reconstruyen para que `user_id` sea clave foránea con `ON DELETE CASCADE` (borrar una cuenta borra sus datos), y se añade `is_public`. Lo anterior a las cuentas queda sin dueño y público. Las migraciones se ejecutan con las claves foráneas desactivadas y `PRAGMA foreign_key_check` al final.
+  - **Accesos** (`server/src/access.ts`):
+    - **Sin sesión:** ve y juega los cuestionarios públicos.
+    - **Estudiante:** además guarda intentos, genera cuestionarios privados y borra los suyos.
+    - **Docente:** además crea y edita a mano, y publica u oculta los suyos.
+    - **Admin:** todo sobre cualquier cuestionario y gestión de usuarios.
+    - El servidor envía `permissions` en cada cuestionario y la web solo muestra lo permitido. Cada usuario ve solo su historial.
+  - **Seguridad:**
+    - Bloqueo tras 5 fallos de login por IP y usuario en 15 min.
+    - Se verifica siempre un hash, aunque el usuario no exista, para que el tiempo de respuesta no lo delate.
+    - **CSRF:** las peticiones que cambian datos deben traer un `Origin` igual al host (o a `X-Forwarded-Host` detrás de un proxy). El proxy de Vite usa `changeOrigin: false` para conservar el `Host`.
+    - Cambiar o restablecer la contraseña cierra las otras sesiones.
+    - Nunca se queda el sistema sin un admin activo.
+  - **Primer administrador:** `pnpm run create-admin -- <usuario>` pide la contraseña sin mostrarla (o la lee de `ATLAS_ADMIN_PASSWORD`).
+  - **Pantallas:**
+    - Iniciar sesión / Crear cuenta.
+    - Menú de usuario en la barra superior.
+    - Mi perfil: historial, cambiar contraseña y borrar la cuenta.
+    - Administración de usuarios: rol, activar/desactivar, restablecer contraseña y borrar.
+    - Privacidad: qué se guarda y qué no.
+  - Sin recuperación por correo (no se pide email): la contraseña la restablece un admin.
+- **Consecuencia:** Se cumple el criterio de salida de la Fase 5 salvo "guardar una vista": un usuario puede registrarse y recuperar sus resultados. Pendiente: vistas y notas por estructura, y que un docente vea los resultados de sus alumnos.
+
+## 2026-10-21 · D-012 · Generador por niveles calculados desde los GLB, columna user_id y SQLite como única BD
+- **Contexto:** El generador de D-011 elegía estructuras al azar con una sola plantilla. Podía tocar piezas diminutas o **grupos sin malla propia**, como los 22 grupos femeninos de HuBMAP (por ejemplo `VH_F_femur_L`), imposibles de acertar con un clic. El usuario pidió mejorarlo sin IA y preparar los cuestionarios para la autenticación. Indicó también que se siga con SQLite y que no se haga nada con PostgreSQL hasta que lo pida.
+- **Decisión:**
+  - `server/src/catalog.ts` lee solo el bloque JSON de cada `.glb`, sin descomprimir la geometría meshopt. Con los `min/max` de los accessors y la escala y traslación de cada nodo calcula, para cada estructura, si tiene malla, su dimensión mayor, su **dimensión intermedia** (lo fácil que es acertar con un clic) y su **región** corporal (según la altura del centro).
+  - Tres niveles de dificultad:
+    - **básico:** dimensión intermedia de 3 cm o más, sin los "Conjunto de…" y sin repetir la estructura simétrica.
+    - **intermedio:** 1 cm o más.
+    - **avanzado:** todas, con distractores parecidos (mismo padre, palabras o región en común).
+  - Varias plantillas de enunciado (5 de clic 3D y 4 de opción múltiple). Las pistas combinan sistema, tamaño, región, lado y estructura padre; en opción múltiple dan la inicial del nombre en lugar de la ubicación.
+  - La validación rechaza preguntas manuales sobre grupos sin malla.
+  - **Migración v2:** columna `user_id INTEGER` (admite NULL) en `quizzes` y `quiz_attempts`, con índices. NULL significa "sin dueño": los cuestionarios incluidos y los datos anteriores a las cuentas. La tabla `users` y la clave foránea se añadirán con la autenticación. Las migraciones van en una lista versionada con `PRAGMA user_version`.
+  - **SQLite sigue siendo la única BD.** No se añade nada de PostgreSQL; el SQL se mantiene estándar en lo posible para facilitar una futura migración.
+- **Consecuencia:** Los cuestionarios generados son jugables y tienen dificultad controlada, y las tablas quedan listas para asociar cuestionarios e intentos a usuarios. Limitaciones conocidas:
+  - La región se calcula desde el centro de la caja, así que las estructuras alargadas o en el límite entre regiones pueden recibir una región aproximada (por ejemplo, cartílagos costales bajos → "abdomen").
+  - Algunos nombres del catálogo siguen sin traducir del todo.
+
+## 2026-10-21 · D-011 · Fase 5 (parcial): API de cuestionarios con Fastify + SQLite, sin cuentas
+- **Contexto:** El usuario pidió empezar la Fase 5 solo con base de datos: guardar los cuestionarios en SQLite y poder generar nuevos. Las cuentas y la autenticación quedan fuera por ahora. Además, la revisión del quiz encontró que se podían sumar puntos sin acertar: "Mostrar respuesta" contaba como acierto, cualquier selección (buscador, árbol) contaba como clic 3D y se podía volver a contestar una pregunta. También había formas de ver la respuesta antes de contestar: la opción correcta siempre era la primera y las etiquetas de los pines 3D mostraban el nombre.
+- **Decisión:**
+  - Nuevo paquete `server/` (MIT): **Node 24 + Fastify 5** (MIT) y el módulo integrado **`node:sqlite`** (SQLite, dominio público). No necesita compilar módulos nativos ni instalar software global. Node ejecuta el TypeScript directamente, sin paso de compilación.
+  - BD en `server/data/biodigital.db` (no se versiona). Tres tablas: `quizzes`, `questions` y `quiz_attempts`; el esquema se versiona con `PRAGMA user_version`. Si la BD está vacía, al arrancar se cargan los cuestionarios de `web/src/data/defaultQuizzes.json`, que la web también usa como respaldo sin servidor.
+  - API REST bajo `/api` (Vite la reenvía al puerto 3001). Permite listar, crear, editar y borrar cuestionarios, generarlos y guardar y consultar intentos. Cada pregunta se valida contra `data/processed/metadata.json` y el servidor rechaza intentos cuya puntuación no cuadre con las respuestas.
+  - **Generador:** elige N estructuras al azar de los sistemas y del sexo escogidos, sin nombres repetidos. Las preguntas pueden ser de clic 3D, de opción múltiple o mixtas, con 3 distractores del mismo sistema. La pista indica sistema y lado; la explicación sale de `descriptionEs`.
+  - **Editor manual** en la web (`QuizEditor.tsx`) y nuevo panel `QuizPanel.tsx` separado de `InfoPanel.tsx`.
+  - **Correcciones:** solo cuenta el clic directo en el modelo 3D (`pickStructure3D`); se guarda una respuesta por pregunta; las opciones se muestran desordenadas; los pines se ocultan durante el cuestionario.
+- **Consecuencia:** Los cuestionarios y su historial de intentos se guardan en SQLite y la web sigue funcionando sin servidor. Para pasar a PostgreSQL o añadir cuentas basta con cambiar la capa `server/src/db.ts`.
+
 ## 2026-10-21 · D-010 · Subnodos jerárquicos multinivel en el árbol anatómico con cascada estricta de visibilidad
 - **Contexto:** En el árbol anatómico, la navegación plana de cientos de estructuras por sistema resultaba poco didáctica. Se requería una jerarquía multinivel análoga a Z-Anatomy (`Sistema → Regiones/Subnodos → Subgrupos → Estructuras`), preservando la regla estricta de que un nodo padre desmarcado desmarca a todos sus descendientes, y que la selección de un hijo desmarcado aísla ese único elemento sin activar a sus hermanos.
 - **Decisión:**

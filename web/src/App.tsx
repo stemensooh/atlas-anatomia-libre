@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  Bookmark,
   Compass,
   Info,
   MapPin,
@@ -18,6 +19,10 @@ import { AnatomyCanvas } from "./three/AnatomyCanvas";
 import { LayerPanel } from "./components/LayerPanel";
 import { InfoPanel } from "./components/InfoPanel";
 import { CreditsModal } from "./components/CreditsModal";
+import { AccountModals, UserMenu } from "./components/UserMenu";
+import { useAuthStore } from "./store/useAuthStore";
+import { useNotesStore } from "./store/useNotesStore";
+import { LocateStructure } from "./components/ProfileModal";
 
 export function App() {
   const [metadata, setMetadata] = useState<MetadataDoc | null>(null);
@@ -36,6 +41,21 @@ export function App() {
   const toggleTheme = useViewerStore((s) => s.toggleTheme);
   const setCreditsOpen = useViewerStore((s) => s.setCreditsOpen);
   const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
+  const loadSession = useAuthStore((s) => s.loadSession);
+  const user = useAuthStore((s) => s.user);
+  const openModal = useAuthStore((s) => s.openModal);
+  const loadNotes = useNotesStore((s) => s.load);
+  const clearNotes = useNotesStore((s) => s.clear);
+
+  useEffect(() => {
+    loadSession();
+  }, [loadSession]);
+
+  // Las notas son del usuario: se cargan al iniciar sesión y se vacían al cerrarla.
+  useEffect(() => {
+    if (user) loadNotes(user.id).catch(() => clearNotes());
+    else clearNotes();
+  }, [user, loadNotes, clearNotes]);
 
   useEffect(() => {
     fetch("/data/processed/metadata.json")
@@ -95,6 +115,7 @@ export function App() {
     structureById,
     structureByMeshName,
     hubmapById,
+    catalogBySex,
   } = useMemo(() => {
     const byId = new Map<string, AnatomyStructure>();
     const byMesh = new Map<string, AnatomyStructure>();
@@ -129,8 +150,19 @@ export function App() {
       structureById: byId,
       structureByMeshName: byMesh,
       hubmapById: byHubmap,
+      catalogBySex: {
+        male: metadata?.structures || [],
+        female: metadata?.femaleStructures || [],
+      },
     };
   }, [metadata, bodySex]);
+
+  const locateStructure = useMemo<LocateStructure>(() => {
+    const index = new Map<string, ReturnType<LocateStructure>>();
+    for (const st of catalogBySex.male) index.set(st.id, { structure: st, bodySex: "male" });
+    for (const st of catalogBySex.female) index.set(st.id, { structure: st, bodySex: "female" });
+    return (id) => index.get(id) ?? null;
+  }, [catalogBySex]);
 
   return (
     <div className="app-shell">
@@ -181,6 +213,13 @@ export function App() {
           >
             <RotateCcw size={13} /> Centrar
           </button>
+          <button
+            className="btn-cam"
+            onClick={() => openModal(user ? "views" : "login")}
+            title={user ? "Guardar o abrir vistas de la escena" : "Inicia sesión para guardar vistas"}
+          >
+            <Bookmark size={13} /> Vistas
+          </button>
         </div>
 
         <div className="topbar-right">
@@ -207,6 +246,7 @@ export function App() {
             <ShieldCheck size={15} />
             <span>Créditos y Licencias</span>
           </button>
+          <UserMenu />
         </div>
       </header>
 
@@ -259,11 +299,13 @@ export function App() {
             structures={activeStructures}
             structureById={structureById}
             hubmapById={hubmapById}
+            catalogBySex={catalogBySex}
           />
         )}
       </main>
 
       <CreditsModal />
+      <AccountModals locate={locateStructure} />
     </div>
   );
 }

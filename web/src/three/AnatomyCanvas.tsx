@@ -11,6 +11,7 @@ import {
   HubmapOrgan,
 } from "../data/types";
 import { KEY_LANDMARK_IDS } from "../data/didacticData";
+import { cameraBridge, Vec3 } from "../data/viewState";
 import { useViewerStore } from "../store/useViewerStore";
 
 interface Pin3D {
@@ -44,6 +45,7 @@ function SystemLayerGroup({
   const hiddenIds = useViewerStore((s) => s.hiddenIds);
   const setLayerLoading = useViewerStore((s) => s.setLayerLoading);
   const selectStructure = useViewerStore((s) => s.selectStructure);
+  const pickStructure3D = useViewerStore((s) => s.pickStructure3D);
   const hoverStructure = useViewerStore((s) => s.hoverStructure);
 
   const [sceneRoot, setSceneRoot] = useState<THREE.Group | null>(null);
@@ -241,7 +243,7 @@ function SystemLayerGroup({
     const hit = e.object as THREE.Mesh;
     const cid = hit.userData?.structureId as string | undefined;
     if (cid) {
-      selectStructure(cid);
+      pickStructure3D(cid);
     }
   };
 
@@ -427,8 +429,30 @@ function HubmapOrganScene({
 
 function CameraController() {
   const cameraPreset = useViewerStore((s) => s.cameraPreset);
+  const cameraView = useViewerStore((s) => s.cameraView);
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
+
+  // Permite leer la cámara desde fuera del Canvas para guardar vistas.
+  useEffect(() => {
+    cameraBridge.read = () => ({
+      position: camera.position.toArray() as Vec3,
+      target: (controlsRef.current?.target ?? new THREE.Vector3(0, 0.88, 0)).toArray() as Vec3,
+    });
+    return () => {
+      cameraBridge.read = null;
+    };
+  }, [camera]);
+
+  // Vista guardada: posición y punto de mira exactos.
+  useEffect(() => {
+    if (!cameraView) return;
+    camera.position.set(...cameraView.position);
+    if (controlsRef.current) {
+      controlsRef.current.target.set(...cameraView.target);
+      controlsRef.current.update();
+    }
+  }, [cameraView, camera]);
 
   useEffect(() => {
     const target = new THREE.Vector3(0, 0.88, 0);
@@ -483,6 +507,8 @@ export function AnatomyCanvas({
   const activeHubmapOrganId = useViewerStore((s) => s.activeHubmapOrganId);
   const clip = useViewerStore((s) => s.clip);
   const showLabels3D = useViewerStore((s) => s.showLabels3D);
+  // En el cuestionario los pines se ocultan: sus etiquetas revelarían las respuestas.
+  const quizActive = useViewerStore((s) => s.rightTab === "quiz");
   const theme = useViewerStore((s) => s.theme);
   const selectStructure = useViewerStore((s) => s.selectStructure);
 
@@ -548,7 +574,7 @@ export function AnatomyCanvas({
               structureById={structureById}
               structureByMeshName={structureByMeshName}
               clippingPlanes={clippingPlanes}
-              showLabels3D={showLabels3D}
+              showLabels3D={showLabels3D && !quizActive}
             />
           );
         })}

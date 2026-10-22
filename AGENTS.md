@@ -11,8 +11,9 @@ Visor anatómico 3D libre, web, no comercial, hecho por STEMENSOFT para aprender
 - **Fase 2: cerrada.** 10 archivos `.glb` masculinos y 10 femeninos optimizados con `meshopt` y validados en `data/processed/` + `data/processed/metadata.json` con 1.658 estructuras FMA masculinas, 956 estructuras femeninas y 87 órganos de HuBMAP (100 % traducidos al español).
 - **Fase 3: cerrada** (despliegue pospuesto a la Fase 6 por D-009). Visor 3D en `web/` con capas por sistema, conmutador masculino/femenino, selección por raycasting, buscador y modal de atribuciones.
 - **Fase 4: cerrada.** Funciones didácticas completas: 115+ descripciones anatómicas clave con `descriptionSource`, cortes en 3 ejes (Axial Y, Sagital X, Coronal Z), árbol anatómico jerárquico, pines 3D flotantes, 4 tours guiados, 2 cuestionarios interactivos (clic 3D + opción múltiple), modo claro/oscuro y atajos de teclado.
-- **Siguiente: Fase 5 (Backend y cuentas, opcional) o Fase 6 (Publicación, ajuste de carga de assets y hosting).** Ver `docs/PLAN_PROYECTO.md`.
-- Rama `main` conectada a `origin` (`https://github.com/stemensooh/atlas-anatomia-libre.git`).
+- **Fase 5: cerrada (D-011 a D-014).** API `server/` (Fastify + SQLite `node:sqlite`, esquema v4): cuestionarios en BD con generador por niveles sin IA, autenticación propia (roles estudiante/docente/admin), vistas guardadas, notas por estructura y resultados para el docente. Desde D-016 admite **SQLite y PostgreSQL** con el mismo SQL (`server/src/sql.ts`); los tests corren en ambos. **Nunca pidas ni escribas credenciales: van en `server/.env` (no versionado), ver `docs/POSTGRESQL.md`.**
+- **Siguiente:** Fase 6 (publicación y hosting). Ver `docs/PLAN_PROYECTO.md`.
+- Rama `main` conectada a `origin` (`https://github.com/stemensooh/atlas-anatomia-libre.git`; antes `biodigital`, renombrado por riesgo de marca, D-015). Este repo usa la identidad `stemensooh <stemensooh@gmail.com>` en `.git/config`: no hagas commits con otra.
 
 ## Reglas obligatorias
 1. **Licencias separadas:** código = MIT (`LICENSE-CODE`); contenido = CC BY-SA 4.0 (`LICENSE-CONTENT`). No mezcles carpetas.
@@ -25,7 +26,7 @@ Visor anatómico 3D libre, web, no comercial, hecho por STEMENSOFT para aprender
 8. No uses licencias comerciales: el proyecto es de aprendizaje y libre.
 
 ## Entorno
-Windows + PowerShell. Node 24, Python 3.13, pnpm. Blender y uv no están instalados. Ver `docs/ENTORNO.md`.
+Windows + PowerShell. Node 24, Python 3.13, pnpm 12. Ejecutar: `pnpm run dev` en `server/` (API, :3001) y en `web/` (visor, :5173). Blender y uv no están instalados. Ver `docs/ENTORNO.md`.
 
 ## Cómo trabajar con el usuario
 - Responder en español, de forma concisa.

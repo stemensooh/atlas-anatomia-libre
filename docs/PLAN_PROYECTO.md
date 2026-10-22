@@ -327,8 +327,23 @@ Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.
 - Funciones: guardar vistas, notas por estructura, historial de cuestionarios.
 - Privacidad: guarda lo mínimo, explica qué datos almacenas, sin analítica invasiva.
 
+### Avance
+- [x] API **Node + Fastify** en `server/` con **SQLite** (`node:sqlite`) (D-011).
+- [x] Cuestionarios guardados en BD: listar, crear, editar y borrar desde la web (editor manual).
+- [x] Generador automático de cuestionarios a partir de `metadata.json` (clic 3D, opción múltiple o mixto).
+- [x] Generador por niveles (básico, intermedio y avanzado) con el tamaño y la región calculados desde los GLB, varias plantillas y distractores parecidos (D-012).
+- [x] Columna `user_id` en cuestionarios e intentos, preparada para las cuentas (migración v2, D-012).
+- [x] Historial de intentos por cuestionario (sin cuentas todavía).
+- [x] Corrección de los errores del quiz: puntos indebidos y respuestas visibles antes de contestar.
+- [x] Autenticación y cuentas de usuario: registro, login, sesiones, roles admin/docente/estudiante y panel de administración (D-013).
+- [x] Cuestionarios privados por usuario; docentes y administradores publican (D-013).
+- [x] Guardar vistas (cámara y estado de la escena) y notas privadas por estructura (D-014).
+- [x] Página de privacidad (qué datos se guardan) y borrado de cuenta desde Mi perfil (D-013).
+- [x] Que un docente vea los resultados de sus alumnos en sus cuestionarios: por alumno y por pregunta (D-014).
+- [x] Soporte de PostgreSQL además de SQLite, con script de migración de datos y tests en ambos motores (D-016).
+
 ### Criterio de salida
-Un usuario puede registrarse, guardar una vista y recuperar sus resultados.
+Un usuario puede registrarse, guardar una vista y recuperar sus resultados. **Cumplido (D-014).**
 
 ---
 

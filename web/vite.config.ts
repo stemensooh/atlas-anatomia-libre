@@ -55,6 +55,12 @@ export default defineConfig({
   plugins: [react(), serveAnatomyDataPlugin()],
   server: {
     port: 5173,
+    // API de cuestionarios con SQLite (server/, Fase 5)
+    // changeOrigin: false conserva la cabecera Host del navegador, que el servidor compara
+    // con Origin para rechazar peticiones de otros sitios (CSRF).
+    proxy: {
+      "/api": { target: "http://127.0.0.1:3001", changeOrigin: false },
+    },
     fs: {
       allow: [".."],
     },
