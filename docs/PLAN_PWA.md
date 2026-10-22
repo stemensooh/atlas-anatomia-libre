@@ -109,12 +109,45 @@
       de iPhone sin el evento; atrás → cierra login → cierra panel → la página sigue.
 
 ### Etapa 5: Verificación
-- [ ] Automática (DevTools Protocol, como en la Fase 5B): manifiesto sin errores
-      (`Page.getAppManifest`), *service worker* activo, arranque con la red cortada y actualización a una versión nueva.
-- [ ] Auditoría de Lighthouse (PWA, rendimiento y accesibilidad) en móvil.
-- [ ] Dispositivos reales: **Android (Chrome)** e **iPhone (Safari)**. En cada uno: instalar,
-      abrir sin red, descargar un cuerpo, actualizar y desinstalar.
-- [ ] Regresión: escritorio y navegador normal sin cambios de comportamiento.
+- [x] Automática (DevTools Protocol, perfiles limpios, caché HTTP desactivada), hecha en cada etapa:
+      manifiesto sin errores y criterios de instalación (D-025); primera visita → caché, arranque sin red,
+      aviso y aplicación de una versión nueva (D-026); descarga de un cuerpo y los 10 sistemas sin red
+      (D-027); instalar, instrucciones de iOS y botón atrás (D-028).
+- [ ] Auditoría de Lighthouse (PWA, rendimiento y accesibilidad) en móvil. Opcional; necesita
+      `npx lighthouse` o las DevTools de Chrome/Edge (pestaña *Lighthouse*) contra producción.
+- [ ] **Dispositivos reales (la hace el usuario):** Android (Chrome) e iPhone (Safari), con la lista siguiente.
+- [ ] Regresión en escritorio con el navegador normal.
+
+#### Despliegue para la prueba (requiere HTTPS)
+Un *service worker* solo funciona con HTTPS (o en `localhost`): la prueba con `vite --host` por la IP
+local de la Fase 5B **no sirve** para la PWA. Se prueba en `https://atlas.stemensoft.com`.
+
+1. **Nginx:** añade al sitio los bloques nuevos de `deploy/nginx/atlas.stemensoft.com.conf` (`sw.js`,
+   `registerSW.js` y `manifest.webmanifest` sin caché) **sin pisar** lo que añadió certbot, y luego
+   `sudo nginx -t && sudo systemctl reload nginx`.
+2. **Web desde esta rama:** `git switch feat/pwa` y `.deploypublicar-web.ps1 -Servidor usuario@tu-vps`
+   (compila y sube `web/dist`). La API no cambia en esta fase.
+3. **Comprobación rápida en el PC:** abre la web en Chrome o Edge → DevTools → *Application* →
+   *Manifest* (sin errores) y *Service workers* (activado).
+4. Si algo sale mal, se vuelve a publicar desde `main`. Los usuarios recibirán el aviso "Hay una versión
+   nueva" o la verán al recargar. Para quitar del todo el *service worker* de un navegador:
+   DevTools → *Application* → *Service workers* → *Unregister*.
+
+#### Lista de comprobación en cada dispositivo (Android Chrome e iPhone Safari)
+- [ ] **Instalar:** Android, ☰ → *Instalar app* (diálogo del sistema); iPhone, ☰ → *Instalar app* → seguir
+      las instrucciones. Aparece el icono del atlas en la pantalla de inicio.
+- [ ] **Abrir la app instalada:** a pantalla completa, sin barra del navegador, con la barra de estado
+      bien integrada (sin tapar la barra superior).
+- [ ] **Sin red tras la primera visita:** activa el modo avión y abre la app → se ve el esqueleto, el aviso
+      "Sin conexión" y los cuestionarios incluidos.
+- [ ] **Descargar un cuerpo:** con red, Capas → *Uso sin conexión* → *Descargar* (progreso visible) → modo
+      avión → *Todos* → se cargan los 10 sistemas.
+- [ ] **Botón atrás** (Android): con un panel abierto, atrás lo cierra y no sale de la app.
+- [ ] **Actualización:** publica de nuevo (por ejemplo con un cambio mínimo); al abrir la app aparece
+      "Hay una versión nueva" → *Actualizar* → se recarga sin perder la sesión.
+- [ ] **Liberar espacio** en Capas, y **desinstalar** la app (mantener pulsado el icono → *Desinstalar* o
+      *Eliminar app*).
+- [ ] **Anotar** el modelo del dispositivo, la versión del sistema y del navegador, y cualquier fallo (con captura).
 
 ## Riesgos y limitaciones conocidas
 
