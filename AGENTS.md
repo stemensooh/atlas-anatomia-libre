@@ -12,7 +12,7 @@ Visor anatómico 3D libre, web, no comercial, hecho por STEMENSOFT para aprender
 - **Fase 3: cerrada** (despliegue pospuesto a la Fase 6 por D-009). Visor 3D en `web/` con capas por sistema, conmutador masculino/femenino, selección por raycasting, buscador y modal de atribuciones.
 - **Fase 4: cerrada.** Funciones didácticas completas: 115+ descripciones anatómicas clave con `descriptionSource`, cortes en 3 ejes (Axial Y, Sagital X, Coronal Z), árbol anatómico jerárquico, pines 3D flotantes, 4 tours guiados, 2 cuestionarios interactivos (clic 3D + opción múltiple), modo claro/oscuro y atajos de teclado.
 - **Siguiente: Fase 5 (Backend y cuentas, opcional) o Fase 6 (Publicación, ajuste de carga de assets y hosting).** Ver `docs/PLAN_PROYECTO.md`.
-- Rama `main` conectada a `origin` (`https://github.com/stemensooh/biodigital.git`).
+- Rama `main` conectada a `origin` (`https://github.com/stemensooh/atlas-anatomia-libre.git`).
 
 ## Reglas obligatorias
 1. **Licencias separadas:** código = MIT (`LICENSE-CODE`); contenido = CC BY-SA 4.0 (`LICENSE-CONTENT`). No mezcles carpetas.
