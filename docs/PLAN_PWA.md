@@ -95,12 +95,18 @@
 - [x] Solo se muestra con un *service worker* controlando la página (en desarrollo no se usaría).
 - [x] Verificado: descargar el cuerpo masculino (30 MB pendientes, progreso visible) → 10 de 10; **sin red, "Todos" carga los 10 sistemas** sin errores; liberar espacio → caché vacía.
 
-### Etapa 4: Instalación y experiencia de app
-- [ ] Botón **"Instalar app"** (evento `beforeinstallprompt` en Android, Chrome y Edge) en el menú ☰.
-- [ ] En iOS (no hay evento): instrucciones breves "Compartir → Añadir a pantalla de inicio".
-- [ ] En modo instalado (`display-mode: standalone`): sin enlaces que saquen de la app sin avisar y
-      con atrás/cerrar coherentes en los paneles.
-- [ ] Privacidad: datos guardados en el dispositivo y cómo borrarlos.
+### Etapa 4: Instalación y experiencia de app ✅ (D-028)
+- [x] **"Instalar app"** en el menú ☰ (móvil y tablet): diálogo nativo con `beforeinstallprompt`
+      (Android, Chrome y Edge), capturado antes de montar React. Desaparece una vez instalada.
+- [x] iOS y otros navegadores sin ese evento: ventana con instrucciones ("Compartir → Añadir a
+      pantalla de inicio" en Safari; menú del navegador en el resto).
+- [x] En escritorio no se añade botón: el navegador ya muestra el icono de instalar en la barra de direcciones.
+- [x] Botón **atrás** (Android y app instalada): cierra primero la ventana de cuenta o créditos y
+      después el panel, sin salir de la app. Cerrar desde la interfaz no deja entradas vacías en el historial.
+- [x] Enlaces externos (fuentes y licencias): ya se abren aparte (`target="_blank"`), así que la app no se pierde.
+- [x] Privacidad: qué se guarda en el dispositivo (app, catálogo y modelos, sin datos personales) y cómo borrarlo.
+- [x] Verificado (emulación a 390 px): menú con "Instalar app" en Chromium; instrucciones con un *user agent*
+      de iPhone sin el evento; atrás → cierra login → cierra panel → la página sigue.
 
 ### Etapa 5: Verificación
 - [ ] Automática (DevTools Protocol, como en la Fase 5B): manifiesto sin errores

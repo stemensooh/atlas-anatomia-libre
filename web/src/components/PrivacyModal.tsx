@@ -40,6 +40,27 @@ export function PrivacyModal() {
         <li>Sin sesión no se guarda nada: puedes usar el visor y jugar los cuestionarios públicos de forma anónima.</li>
       </ul>
 
+      <h3>Qué se guarda en tu dispositivo</h3>
+      <ul>
+        <li>
+          Para abrir rápido y funcionar <strong>sin conexión</strong>, el navegador guarda los archivos de
+          la app, el catálogo de estructuras y los modelos 3D que has visto o descargado (incluidos los
+          órganos de HuBMAP que hayas abierto). Son los mismos para todos: <strong>no contienen ningún
+          dato personal</strong>.
+        </li>
+        <li>
+          Tu sesión, tus resultados, vistas y notas <strong>nunca</strong> se guardan en esta caché: se
+          piden siempre al servidor.
+        </li>
+        <li>
+          Para liberar espacio: <strong>Capas → Uso sin conexión → Liberar espacio</strong>. Para borrarlo
+          todo, desinstala la app o borra los datos del sitio en los ajustes del navegador.
+        </li>
+        <li>
+          El navegador también recuerda algunas preferencias de pantalla (por ejemplo, el ancho del panel).
+        </li>
+      </ul>
+
       <h3>Quién ve tus datos</h3>
       <ul>
         <li>Tus cuestionarios son privados hasta que un docente o administrador los publica.</li>

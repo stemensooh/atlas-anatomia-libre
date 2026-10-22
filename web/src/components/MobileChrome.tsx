@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   Bookmark,
+  Download,
   Compass,
   FileText,
   HelpCircle,
@@ -16,6 +17,8 @@ import {
 import { Layout } from "../hooks/useLayout";
 import { useAuthStore } from "../store/useAuthStore";
 import { CameraPreset, RightTab, SheetSize, useViewerStore } from "../store/useViewerStore";
+import { installPlatform, InstallPlatform, promptInstall, useInstallStore } from "../data/install";
+import { InstallHelpModal } from "./InstallHelpModal";
 
 // Controles que solo existen en móvil y tablet (docs/PLAN_MOVIL.md, etapa 1).
 
@@ -198,9 +201,11 @@ export function CameraFab() {
   );
 }
 
-// Menú ☰ de la barra superior compacta: pines, tema y créditos.
+// Menú ☰ de la barra superior compacta: instalar la app, pines, tema y créditos.
 export function CompactMenu() {
   const [open, setOpen] = useState(false);
+  const platform = useInstallStore(installPlatform);
+  const [installHelp, setInstallHelp] = useState<InstallPlatform | null>(null);
   const ref = useDismiss(open, () => setOpen(false));
   const showLabels3D = useViewerStore((s) => s.showLabels3D);
   const theme = useViewerStore((s) => s.theme);
@@ -220,6 +225,21 @@ export function CompactMenu() {
       </button>
       {open && (
         <div className="user-dropdown" role="menu">
+          {platform && (
+            <button
+              role="menuitem"
+              className="menu-install"
+              onClick={() =>
+                run(() => {
+                  // Diálogo nativo si el navegador lo ofrece; si no, instrucciones.
+                  if (platform === "native") promptInstall();
+                  else setInstallHelp(platform);
+                })
+              }
+            >
+              <Download size={15} /> Instalar app
+            </button>
+          )}
           <button role="menuitem" onClick={() => run(toggleLabels3D)}>
             <MapPin size={15} /> {showLabels3D ? "Ocultar pines 3D" : "Mostrar pines 3D"}
           </button>
@@ -232,6 +252,7 @@ export function CompactMenu() {
           </button>
         </div>
       )}
+      {installHelp && <InstallHelpModal platform={installHelp} onClose={() => setInstallHelp(null)} />}
     </div>
   );
 }

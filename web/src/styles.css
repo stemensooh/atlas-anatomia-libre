@@ -2978,3 +2978,21 @@ body,
   border-radius: 999px;
   white-space: nowrap;
 }
+
+/* PWA etapa 4: instalar la app. */
+.menu-install {
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+
+.install-steps {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.install-steps svg {
+  vertical-align: -3px;
+}

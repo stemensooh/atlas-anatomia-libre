@@ -75,6 +75,45 @@ export function App() {
     openSheet("info", "half");
   }, [pick3DSeq, compact, openSheet, setRightTab]);
 
+  // Móvil/tablet (y app instalada): el botón "atrás" cierra primero lo que esté abierto encima
+  // (ventana de cuenta o créditos, después el panel deslizante) en vez de salir de la app.
+  const accountModal = useAuthStore((s) => s.modal);
+  const creditsOpen = useViewerStore((s) => s.creditsOpen);
+  const overlayOpen = compact && (!!sheet.panel || !!accountModal || creditsOpen);
+  const backEntryRef = useRef(false);
+  useEffect(() => {
+    if (overlayOpen && !backEntryRef.current) {
+      history.pushState({ atlasOverlay: true }, "");
+      backEntryRef.current = true;
+    } else if (!overlayOpen && backEntryRef.current) {
+      // Se cerró desde la interfaz: se retira la entrada para no dejar un "atrás" vacío.
+      backEntryRef.current = false;
+      if (history.state?.atlasOverlay) history.back();
+    }
+  }, [overlayOpen]);
+  useEffect(() => {
+    const onPop = () => {
+      if (!backEntryRef.current) return;
+      backEntryRef.current = false;
+      const auth = useAuthStore.getState();
+      const viewer = useViewerStore.getState();
+      if (auth.modal || viewer.creditsOpen) {
+        if (auth.modal) auth.openModal(null);
+        else viewer.setCreditsOpen(false);
+        // Debajo sigue abierto el panel: necesita su propia entrada para el siguiente "atrás"
+        // (el estado "hay algo abierto" no cambia, así que el efecto no la añadiría).
+        if (viewer.sheet.panel) {
+          history.pushState({ atlasOverlay: true }, "");
+          backEntryRef.current = true;
+        }
+      } else {
+        viewer.closeSheet();
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   // Las notas son del usuario: se cargan al iniciar sesión y se vacían al cerrarla.
   useEffect(() => {
     if (user) loadNotes(user.id).catch(() => clearNotes());

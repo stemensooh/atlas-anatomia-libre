@@ -2,6 +2,19 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-22 · D-028 · PWA etapa 4: instalar la app, botón atrás y privacidad del almacenamiento local
+- **Contexto:** Etapa 4 de `docs/PLAN_PWA.md`.
+- **Decisión:**
+  - **`web/src/data/install.ts`**, importado en `main.tsx` antes de montar React:
+    - captura `beforeinstallprompt` (que puede llegar muy pronto), evita el aviso automático y lo guarda en un store;
+    - `installPlatform()` decide entre `native` (diálogo), `ios` (iPhone y iPad, también iPadOS que se presenta como Mac táctil) u `other`, o null si ya está instalada (`display-mode: standalone` o `navigator.standalone`);
+    - escucha `appinstalled`.
+  - **Menú ☰** (móvil y tablet): "Instalar app" abre el diálogo nativo o `InstallHelpModal` con instrucciones. En escritorio no se añade nada, porque el navegador ya ofrece instalar desde la barra de direcciones.
+  - **Botón atrás:** al abrirse en móvil o tablet un panel, una ventana de cuenta o los créditos, se añade una entrada al historial. `popstate` cierra la capa superior y, si debajo sigue el panel, añade otra entrada. Cerrar desde la interfaz retira la entrada.
+    - Las pruebas encontraron un fallo: tras cerrar la ventana, el segundo "atrás" salía de la página porque el estado "hay algo abierto" no cambiaba y no se añadía la entrada del panel. Corregido.
+  - **Privacidad:** nueva sección "Qué se guarda en tu dispositivo": la app, el catálogo y los modelos, sin datos personales; la sesión y los datos personales nunca en caché; cómo liberar espacio o borrarlo todo.
+- **Consecuencia:** Verificado con emulación. Queda la etapa 5: auditoría y prueba en Android e iPhone reales (instalar, sin red, descargar, actualizar y desinstalar).
+
 ## 2026-10-22 · D-027 · PWA etapa 3: descargar un cuerpo para usarlo sin conexión
 - **Contexto:** Decisión 3B del plan de la PWA: además de guardar lo que se ve, un botón para descargar un cuerpo completo (35 MB el masculino, 63 MB el femenino).
 - **Decisión:**
