@@ -15,6 +15,8 @@ services:
       dockerfile: server/Dockerfile
     image: atlas-api:latest
     network_mode: host
+    volumes:
+      - ../data/processed:/app/data/processed:ro
     env_file:
       - /etc/atlas/api.env
     environment:

@@ -19,7 +19,7 @@ RUN pnpm install --prod --frozen-lockfile && pnpm store prune
 
 # 2) Código y los datos que lee la API (solo lectura: metadata.json y modelos .glb para mallas y tamaños).
 COPY server/src ./src
-COPY data/processed /app/data/processed
+COPY data/processed/ /app/data/processed/
 COPY web/src/data/defaultQuizzes.json /app/web/src/data/defaultQuizzes.json
 
 # Usuario sin privilegios (incluido en la imagen oficial de Node).
