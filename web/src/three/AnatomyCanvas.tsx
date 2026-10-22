@@ -14,6 +14,7 @@ import { KEY_LANDMARK_IDS } from "../data/didacticData";
 import { cameraBridge, Vec3 } from "../data/viewState";
 import { LOW_POWER } from "../data/devicePerf";
 import { useLayout } from "../hooks/useLayout";
+import { hubmapGlbUrl } from "../data/hubmap";
 import { useViewerStore } from "../store/useViewerStore";
 
 // Un clic (o toque) solo selecciona si el puntero apenas se movió entre pulsar y soltar: al
@@ -349,8 +350,9 @@ function HubmapOrganScene({
 
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
+    // Desde el CDN oficial de HuBMAP (D-023); permite CORS.
     loader.load(
-      `/${organ.glbFile}`,
+      hubmapGlbUrl(organ),
       (gltf) => {
         if (cancelled) return;
         const group = gltf.scene;
@@ -398,7 +400,7 @@ function HubmapOrganScene({
     return () => {
       cancelled = true;
     };
-  }, [organ.glbFile]);
+  }, [organ]);
 
   useEffect(() => {
     if (!root) return;

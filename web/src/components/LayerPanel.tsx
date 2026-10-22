@@ -33,6 +33,7 @@ import {
 import { useViewerStore } from "../store/useViewerStore";
 import { useLayout } from "../hooks/useLayout";
 import { LIGHT_START, SAVE_DATA } from "../data/devicePerf";
+import { hubmapGlbBytes } from "../data/hubmap";
 
 const formatMB = (bytes: number) => `${(bytes / 1e6).toFixed(bytes < 1e6 ? 1 : 0)} MB`;
 
@@ -914,7 +915,19 @@ export function LayerPanel({
                   className={`hubmap-item ${
                     activeHubmapOrganId === org.id ? "active" : ""
                   }`}
-                  onClick={() => setMode("hubmap", org.id)}
+                  onClick={() => {
+                    // Los modelos de HuBMAP no están optimizados: en móvil se avisa de los grandes.
+                    const bytes = hubmapGlbBytes(org) ?? 0;
+                    if (
+                      showSizes &&
+                      bytes > 15e6 &&
+                      activeHubmapOrganId !== org.id &&
+                      !window.confirm(`«${org.nameEs || org.organ}» descargará unos ${formatMB(bytes)}. ¿Continuar?`)
+                    ) {
+                      return;
+                    }
+                    setMode("hubmap", org.id);
+                  }}
                 >
                   <div className="hubmap-item-top">
                     <span className="hubmap-name">
@@ -932,7 +945,10 @@ export function LayerPanel({
                     <span>
                       {SYSTEM_META[org.system]?.labelEs || org.system}
                     </span>
-                    <span>{org.nodesCount} subestructuras</span>
+                    <span>
+                      {org.nodesCount} subestructuras
+                      {hubmapGlbBytes(org) ? ` · ${formatMB(hubmapGlbBytes(org)!)}` : ""}
+                    </span>
                   </div>
                 </button>
               ))}

@@ -25,6 +25,7 @@ import { useNotesStore } from "./store/useNotesStore";
 import { LocateStructure } from "./components/ProfileModal";
 import { CameraFab, CompactMenu, MobileTabBar, SheetHandle, sheetClass } from "./components/MobileChrome";
 import { useLayout } from "./hooks/useLayout";
+import { isHubmapOrganAvailable } from "./data/hubmap";
 
 export function App() {
   const [metadata, setMetadata] = useState<MetadataDoc | null>(null);
@@ -126,6 +127,12 @@ export function App() {
     selectStructure,
   ]);
 
+  // Órganos HuBMAP disponibles (sin los conjuntos de cuerpo entero, D-023).
+  const hubmapOrgans = useMemo(
+    () => (metadata?.hubmapReferenceOrgans || []).filter(isHubmapOrganAvailable),
+    [metadata]
+  );
+
   const {
     activeStructures,
     activeSystemsInfo,
@@ -157,7 +164,7 @@ export function App() {
         byId.set(st.id, st);
         byMesh.set(st.meshName, st);
       }
-      for (const hb of metadata.hubmapReferenceOrgans || []) {
+      for (const hb of hubmapOrgans) {
         byHubmap.set(hb.id, hb);
       }
     }
@@ -172,7 +179,7 @@ export function App() {
         female: metadata?.femaleStructures || [],
       },
     };
-  }, [metadata, bodySex]);
+  }, [metadata, bodySex, hubmapOrgans]);
 
   const locateStructure = useMemo<LocateStructure>(() => {
     const index = new Map<string, ReturnType<LocateStructure>>();
@@ -196,7 +203,7 @@ export function App() {
                   )} estructuras FMA + ${
                     metadata.femaleStructuresCount?.toLocaleString("es") || 0
                   } femeninas + ${
-                    metadata.hubmapReferenceOrgansCount
+                    hubmapOrgans.length
                   } órganos HuBMAP`
                 : "Cargando catálogo…"}
             </span>
@@ -325,7 +332,7 @@ export function App() {
             <LayerPanel
               systemsInfo={activeSystemsInfo}
               structures={activeStructures}
-              hubmapOrgans={metadata.hubmapReferenceOrgans}
+              hubmapOrgans={hubmapOrgans}
             />
           )}
           {metadata && (

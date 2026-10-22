@@ -32,6 +32,11 @@ export function PrivacyModal() {
       <ul>
         <li>No pedimos correo, nombre real ni ningún otro dato personal.</li>
         <li>No hay analítica, publicidad ni cookies de terceros.</li>
+        <li>
+          Solo si abres un órgano de la pestaña <strong>HuBMAP</strong>, tu navegador lo descarga
+          directamente del servidor oficial de HuBMAP (<code>cdn.humanatlas.io</code>), que puede
+          ver tu dirección IP como cualquier web que visitas. No se le envía ningún otro dato.
+        </li>
         <li>Sin sesión no se guarda nada: puedes usar el visor y jugar los cuestionarios públicos de forma anónima.</li>
       </ul>
 

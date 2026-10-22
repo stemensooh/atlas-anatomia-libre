@@ -2,6 +2,31 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-22 · D-024 · Icono propio de la app
+- **Contexto:** La PWA necesita icono (`docs/PLAN_PWA.md`, decisión 5). El usuario pidió un diseño propio. Tampoco había *favicon* (404 en la consola).
+- **Decisión:** Diseño original de STEMENSOFT en SVG (`web/public/icons/icon.svg`), con licencia de contenido **CC BY-SA 4.0**:
+  - fondo en degradado azul noche (el del visor);
+  - figura humana en color hueso (`#e8e0c9`, el del sistema esquelético);
+  - órbita en el degradado de la marca (`#38bdf8` → `#818cf8`), que pasa por delante y por detrás de la figura y sugiere el giro 3D;
+  - punto de luz en el corazón (el punto de la marca).
+
+  Hay una variante **maskable** (a sangre, con el contenido dentro del 68 % central) para Android. Los PNG (192, 512, maskable 192 y 512, `apple-touch-icon` 180 opaco y *favicon* 32) se generan con Edge sin ventana mediante el DevTools Protocol, sin dependencias nuevas.
+- **Consecuencia:** La web ya tiene *favicon* e icono para iOS. El manifiesto que usa los iconos llega en la etapa 1 de la PWA.
+
+## 2026-10-22 · D-023 · Órganos HuBMAP desde el CDN oficial, sin los conjuntos de cuerpo entero
+- **Contexto:** El modo de órganos HuBMAP cargaba sus `.glb` de `data/raw/hubmap/`, que no se versiona: no funcionaba en ningún equipo sin esa descarga ni en producción (ya pendiente en D-009). Son 87 modelos y 1,15 GB sin optimizar; los dos conjuntos `united-*` pesan 357 y 230 MB, y `mouth-female` 99 MB. Es requisito previo de la PWA (`docs/PLAN_PWA.md`).
+- **Comprobaciones (2026-10-22):**
+  - Licencia **CC BY 4.0** en los metadatos oficiales en vivo.
+  - Las 85 URLs del CDN responden con el **mismo tamaño en bytes** que el registrado con SHA-256 en `SOURCE.txt`, así que son la misma versión.
+  - El CDN permite CORS (`Access-Control-Allow-Origin: *`).
+  - Los 85 son glTF estándar, sin extensiones requeridas.
+- **Decisión (del usuario):**
+  - **Cargar los modelos del CDN oficial** (`https://cdn.humanatlas.io/digital-objects/ref-organ/<órgano>/<versión>/assets/<archivo>`), construyendo la URL en `web/src/data/hubmap.ts` a partir de `metadata.json`. No se versionan ni se alojan en el VPS. Se quita de `vite.config.ts` el servicio de `data/raw/hubmap`.
+  - **Se excluyen los conjuntos `united-female` y `united-male`:** no son órganos y duplican el visor por sistemas. Quedan 85, y el contador de la cabecera y de la pestaña lo refleja.
+  - **El tamaño de cada órgano** sale de `web/src/data/hubmapSizes.json` (generado a partir de `SOURCE.txt`) y se muestra en la lista. En móvil o con ahorro de datos, los de más de 15 MB piden confirmación.
+  - **Privacidad** explica que, al abrir un órgano, el navegador pide el archivo a `cdn.humanatlas.io`. En `ATTRIBUTIONS.md` consta que los `.glb` no se redistribuyen.
+- **Consecuencia:** El modo funciona en local y en producción sin almacenamiento adicional, y la PWA puede cachear estos modelos como recurso de otro origen con CORS. Depende de la disponibilidad del CDN de HuBMAP; si cambiara, el plan B es descargar, optimizar con meshopt y alojar.
+
 ## 2026-10-21 · D-022 · Verificación de la adaptación a móvil y correcciones de pantallas bajas (Fase 5B, etapa 5)
 - **Contexto:** Barrido emulado por 7 dispositivos, con pantalla física y entrada táctil.
 - **Hallazgos y decisión:**

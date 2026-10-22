@@ -4,7 +4,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 const DATA_PROCESSED = path.resolve(__dirname, "../data/processed");
-const DATA_RAW_HUBMAP = path.resolve(__dirname, "../data/raw/hubmap");
 
 function serveAnatomyDataPlugin() {
   return {
@@ -17,9 +16,6 @@ function serveAnatomyDataPlugin() {
         if (url.startsWith("/data/processed/")) {
           const rel = decodeURIComponent(url.replace("/data/processed/", ""));
           filePath = path.join(DATA_PROCESSED, rel);
-        } else if (url.startsWith("/data/raw/hubmap/")) {
-          const rel = decodeURIComponent(url.replace("/data/raw/hubmap/", ""));
-          filePath = path.join(DATA_RAW_HUBMAP, rel);
         }
 
         if (filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {

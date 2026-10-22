@@ -44,7 +44,8 @@ flowchart LR
     F3 --> F4["Fase 4<br/>Funciones didácticas"]
     F4 --> F5["Fase 5<br/>Backend y cuentas (opcional)"]
     F5 --> F5B["Fase 5B<br/>Adaptación a móvil"]
-    F5B --> F6["Fase 6<br/>Publicación y comunidad"]
+    F5B --> F5C["Fase 5C<br/>App instalable (PWA)"]
+    F5C --> F6["Fase 6<br/>Publicación y comunidad"]
     F2 -.-> F7["Fase 7 (opcional)<br/>Modelos propios desde CT"]
 ```
 
@@ -353,6 +354,14 @@ Un usuario puede registrarse, guardar una vista y recuperar sus resultados. **Cu
 **Objetivo:** usar el atlas en móviles y tablets sin cambiar la experiencia de escritorio. Va antes de la publicación.
 
 Plan detallado por etapas, con diagnóstico y criterio de salida: [`docs/PLAN_MOVIL.md`](PLAN_MOVIL.md).
+
+---
+
+## FASE 5C: App instalable (PWA)
+
+**Objetivo:** instalar el atlas como una app (icono, pantalla completa) y usarlo sin conexión con los modelos descargados, sin tiendas de apps ni coste. Requiere HTTPS en producción (Fase 6, certbot).
+
+Plan detallado por etapas, decisiones pendientes y criterio de salida: [`docs/PLAN_PWA.md`](PLAN_PWA.md).
 
 ---
 
