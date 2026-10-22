@@ -17,9 +17,9 @@ WORKDIR /app/server
 COPY server/package.json server/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile && pnpm store prune
 
-# 2) Código y los dos archivos de datos que lee la API (solo lectura).
+# 2) Código y los datos que lee la API (solo lectura: metadata.json y modelos .glb para mallas y tamaños).
 COPY server/src ./src
-COPY data/processed/metadata.json /app/data/processed/metadata.json
+COPY data/processed /app/data/processed
 COPY web/src/data/defaultQuizzes.json /app/web/src/data/defaultQuizzes.json
 
 # Usuario sin privilegios (incluido en la imagen oficial de Node).
