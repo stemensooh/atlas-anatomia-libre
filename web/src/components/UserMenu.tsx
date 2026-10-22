@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Bookmark, ChevronDown, LogIn, LogOut, Shield, ShieldCheck, UserCircle2 } from "lucide-react";
 import { ROLE_LABEL } from "../data/authApi";
 import { useAuthStore } from "../store/useAuthStore";
+import { useOnline } from "../hooks/useOnline";
 import { AdminUsersModal } from "./AdminUsersModal";
 import { AuthModal } from "./AuthModal";
 import { PrivacyModal } from "./PrivacyModal";
@@ -17,6 +18,7 @@ export function UserMenu() {
   const logout = useAuthStore((s) => s.logout);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const online = useOnline();
 
   useEffect(() => {
     if (!open) return;
@@ -30,8 +32,8 @@ export function UserMenu() {
   if (!ready) return null;
   if (!serverOnline) {
     return (
-      <span className="user-offline" title="Arranca el servidor (server/) para usar cuentas">
-        Sin servidor de cuentas
+      <span className="user-offline" title={online ? "El servidor de cuentas no responde" : "Sin conexión a internet"}>
+        {online ? "Sin servidor de cuentas" : "Sin conexión"}
       </span>
     );
   }

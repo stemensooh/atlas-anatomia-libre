@@ -73,15 +73,22 @@
 - [x] Verificado con `vite preview` y DevTools Protocol: manifiesto sin errores, **criterios de instalación cumplidos**, *service worker* activo con 13 archivos en caché, nada de `data/` y sin errores en consola.
 - **Hecho cuando:** el navegador ofrece instalarla (Android/Chrome/Edge) y el manifiesto no da errores.
 
-### Etapa 2: Arranque sin conexión y actualizaciones
-- [ ] *Precache* de la app y *stale-while-revalidate* de `metadata.json`.
-- [ ] *Service worker* desactivado en desarrollo (`pnpm run dev`); se prueba con `vite build && vite preview`.
-- [ ] Aviso "Hay una versión nueva · Actualizar" (sin recargar a la fuerza en mitad de un cuestionario).
-- [ ] Indicador **"Sin conexión"** y comportamiento de cuentas, vistas y notas sin red.
-- **Hecho cuando:** con la red cortada, la app abre, muestra el esqueleto y los cuestionarios incluidos.
+### Etapa 2: Arranque sin conexión y actualizaciones ✅ (D-026)
+- [x] *Precache* de la app y *stale-while-revalidate* de `metadata.json`.
+- [x] *Cache-first* de los modelos ya cargados (`atlas-modelos`, 60 días) y de los órganos HuBMAP del
+      CDN (`atlas-hubmap`, 30 días); se adelanta aquí de la etapa 3 para que el esqueleto funcione sin red.
+- [x] Primera visita: `clientsClaim` y recarga desde la caché HTTP de lo ya pedido, para que el
+      esqueleto y los metadatos queden guardados sin esperar a una segunda visita.
+- [x] *Service worker* desactivado en desarrollo (`pnpm run dev`); se prueba con `vite build && vite preview`.
+- [x] Aviso "Hay una versión nueva del atlas · Actualizar / Más tarde" (sin recargar a la fuerza) y
+      comprobación de versiones cada hora.
+- [x] Aviso **"Sin conexión"** (se puede cerrar) y textos claros en cuenta y cuestionarios. La sesión se
+      comprueba también sin red, para pasar enseguida al modo sin servidor.
+- [x] Verificado con un perfil limpio y la caché HTTP desactivada: primera visita → caché; sin red → app,
+      esqueleto y cuestionarios incluidos; versión nueva → aviso y actualización.
 
 ### Etapa 3: Modelos sin conexión
-- [ ] *Cache-first* para los `.glb` ya cargados, con caducidad y límite.
+- [x] *Cache-first* para los `.glb` ya cargados, con caducidad y límite (adelantado en la etapa 2).
 - [ ] (Si se elige B) **"Descargar para usar sin conexión"** por cuerpo: tamaño, progreso, cancelar,
       `navigator.storage.estimate()` antes de empezar y `navigator.storage.persist()` para que el
       navegador no borre la caché.

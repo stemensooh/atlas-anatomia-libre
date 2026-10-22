@@ -2,6 +2,27 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-22 · D-026 · PWA etapa 2: arranque sin conexión, aviso de versión nueva y estado sin conexión
+- **Contexto:** Etapa 2 de `docs/PLAN_PWA.md`. Criterio: con la red cortada la app abre, muestra el esqueleto y los cuestionarios incluidos, y avisa de las versiones nuevas sin cortar lo que se está haciendo.
+- **Decisión:**
+  - **Cachés en tiempo de ejecución** (Workbox):
+    - `atlas-metadatos`, *stale-while-revalidate*;
+    - `atlas-modelos`, *cache-first* de `/data/processed/*.glb` (30 entradas, 60 días);
+    - `atlas-hubmap`, *cache-first* de `cdn.humanatlas.io/*.glb` (15 entradas, 30 días).
+    - Todas con `purgeOnQuotaError`. `/api/` sigue sin pasar por ninguna caché.
+  - **Primera visita:** `clientsClaim` hace que el service worker controle la página en cuanto se instala. Después, `PwaPrompt` vuelve a pedir con `cache: "force-cache"` lo ya cargado de `/data/processed/`; sale de la caché HTTP, sin gastar datos, y queda guardado. Sin esto, el esqueleto no estaría disponible sin red hasta una segunda visita.
+  - **Registro desde la app** (`virtual:pwa-register/react`, `injectRegister: false`):
+    - aviso "Hay una versión nueva · Actualizar / Más tarde": nunca recarga sola, para no cortar un cuestionario;
+    - comprobación de versiones cada hora;
+    - aviso único "Listo: el atlas se puede abrir sin conexión".
+  - **Estado sin conexión:**
+    - `useOnline()` (`navigator.onLine`);
+    - aviso que se puede cerrar y vuelve si se pierde la red otra vez;
+    - "Sin conexión" en la cuenta y en el estado de los cuestionarios;
+    - al recuperar la red se vuelve a comprobar la sesión y se recargan los cuestionarios.
+  - **Corrección encontrada en la prueba:** la sesión se comprobaba solo con red, y sin red la cuenta y el quiz se quedaban esperando para siempre. Ahora se comprueba siempre y, sin red, falla enseguida.
+- **Consecuencia:** Verificado con un perfil limpio y la caché HTTP desactivada. Sigue la etapa 3: botón "Descargar para usar sin conexión" por cuerpo, espacio disponible y liberar espacio.
+
 ## 2026-10-22 · D-025 · PWA etapa 1: manifiesto y service worker con vite-plugin-pwa
 - **Contexto:** Primera etapa de `docs/PLAN_PWA.md`: que el atlas se pueda instalar como una app.
 - **Decisión:**

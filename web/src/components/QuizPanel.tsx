@@ -32,6 +32,7 @@ import { useViewerStore } from "../store/useViewerStore";
 import { QuizEditorModal, EditorMode } from "./QuizEditor";
 import { QuizResultsModal } from "./QuizResultsModal";
 import { useLayout } from "../hooks/useLayout";
+import { useOnline } from "../hooks/useOnline";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = arr.slice();
@@ -62,6 +63,7 @@ export function QuizPanel({
   const user = useAuthStore((s) => s.user);
   const authReady = useAuthStore((s) => s.ready);
   const openModal = useAuthStore((s) => s.openModal);
+  const network = useOnline();
 
   const [quizzes, setQuizzes] = useState<AnatomyQuiz[]>([]);
   const [online, setOnline] = useState<boolean | null>(null);
@@ -99,7 +101,7 @@ export function QuizPanel({
   // Al iniciar o cerrar sesión cambian los cuestionarios visibles y sus permisos.
   useEffect(() => {
     if (authReady) reload();
-  }, [reload, authReady, user?.id]);
+  }, [reload, authReady, user?.id, network]);
 
   const activeQuiz = quizzes.find((q) => q.id === activeQuizId) || null;
   const currentQuestion: QuizQuestion | null =
@@ -223,7 +225,9 @@ export function QuizPanel({
     if (!activeQuiz) return;
     setFinished(true);
     if (!online) {
-      setSaveStatus("Sin servidor: el resultado no se ha guardado.");
+      setSaveStatus(
+        network ? "Sin servidor: el resultado no se ha guardado." : "Sin conexión: el resultado no se ha guardado."
+      );
       return;
     }
     if (!user) {
@@ -279,7 +283,9 @@ export function QuizPanel({
             ? "Conectando con la base de datos…"
             : online
             ? `Base de datos conectada · ${quizzes.length} cuestionarios`
-            : "Sin servidor: cuestionarios incluidos (los resultados no se guardan)"}
+            : network
+            ? "Sin servidor: cuestionarios incluidos (los resultados no se guardan)"
+            : "Sin conexión: cuestionarios incluidos (los resultados no se guardan)"}
         </span>
       </div>
 

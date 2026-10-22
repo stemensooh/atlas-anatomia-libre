@@ -26,6 +26,8 @@ import { LocateStructure } from "./components/ProfileModal";
 import { CameraFab, CompactMenu, MobileTabBar, SheetHandle, sheetClass } from "./components/MobileChrome";
 import { useLayout } from "./hooks/useLayout";
 import { isHubmapOrganAvailable } from "./data/hubmap";
+import { PwaPrompt } from "./components/PwaPrompt";
+import { useOnline } from "./hooks/useOnline";
 
 export function App() {
   const [metadata, setMetadata] = useState<MetadataDoc | null>(null);
@@ -57,9 +59,13 @@ export function App() {
   const loadNotes = useNotesStore((s) => s.load);
   const clearNotes = useNotesStore((s) => s.clear);
 
+  // La sesión se comprueba al abrir y cada vez que cambia la conexión. Sin red la comprobación
+  // falla enseguida y la app pasa a modo sin servidor (cuestionarios incluidos); si no se hiciera,
+  // todo lo que espera a saber si hay sesión se quedaría bloqueado.
+  const online = useOnline();
   useEffect(() => {
     loadSession();
-  }, [loadSession]);
+  }, [loadSession, online]);
 
   // Móvil/tablet: al tocar una estructura con el panel cerrado se abre su ficha a media altura.
   // Durante un cuestionario se abre el cuestionario, para ver si el toque fue la respuesta correcta.
@@ -350,6 +356,7 @@ export function App() {
 
       <CreditsModal />
       <AccountModals locate={locateStructure} />
+      <PwaPrompt />
     </div>
   );
 }

@@ -2867,3 +2867,52 @@ body,
 .layout-compact .sheet .panel-right {
   overscroll-behavior: contain;
 }
+
+/* ===== PWA: avisos de versión nueva, lista sin conexión y sin conexión ===== */
+.pwa-toasts {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(60px + env(safe-area-inset-top));
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(460px, calc(100% - 24px));
+  pointer-events: none;
+}
+
+.pwa-toast {
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  background: var(--bg-1);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-0);
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.4);
+}
+
+.pwa-toast > span {
+  flex: 1;
+  min-width: 180px;
+}
+
+.pwa-toast.offline {
+  border-color: rgba(234, 179, 8, 0.55);
+}
+
+.pwa-toast.offline svg {
+  color: #eab308;
+}
+
+.pwa-toast-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}

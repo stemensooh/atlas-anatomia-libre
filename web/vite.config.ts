@@ -48,12 +48,14 @@ function serveAnatomyDataPlugin() {
   };
 }
 
-// App instalable (PWA, docs/PLAN_PWA.md). Etapa 1: manifiesto y service worker que solo guarda
-// la "carcasa" de la app; metadatos y modelos tendrán su propia estrategia (etapas 2 y 3).
+// App instalable (PWA, docs/PLAN_PWA.md). Precache de la "carcasa" de la app y cachés en tiempo de
+// ejecución para metadatos y modelos (etapa 2). /api/ nunca se guarda: sesiones y datos personales.
+const DAY = 24 * 60 * 60;
 const pwa = VitePWA({
   // "prompt": una versión nueva espera y no recarga la página a mitad de un cuestionario.
   registerType: "prompt",
-  injectRegister: "script-defer",
+  // El registro lo hace la app (PwaPrompt, virtual:pwa-register/react) para poder avisar de versiones nuevas.
+  injectRegister: false,
   // En desarrollo no hay service worker: evita servir versiones viejas mientras se programa.
   devOptions: { enabled: false },
   // Los iconos ya entran por globPatterns: que el plugin no los añada otra vez.
@@ -92,6 +94,39 @@ const pwa = VitePWA({
     // La API y los datos nunca se responden con la app en caché.
     navigateFallbackDenylist: [/^\/api\//, /^\/data\//],
     cleanupOutdatedCaches: true,
+    // En la primera instalación el service worker toma el control de la página ya abierta
+    // (las versiones nuevas siguen esperando a que el usuario acepte: registerType "prompt").
+    clientsClaim: true,
+    runtimeCaching: [
+      {
+        // Catálogo: se sirve la copia guardada al instante y se actualiza en segundo plano.
+        urlPattern: /\/data\/processed\/metadata\.json$/,
+        handler: "StaleWhileRevalidate",
+        options: { cacheName: "atlas-metadatos", expiration: { maxEntries: 2 } },
+      },
+      {
+        // Modelos por sistema: los ya cargados quedan disponibles sin conexión. No se descarga
+        // nada que no se haya pedido (arranque ligero, D-020); "Descargar para usar sin conexión"
+        // (etapa 3) usa esta misma caché.
+        urlPattern: /\/data\/processed\/[^/]+\.glb$/,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "atlas-modelos",
+          cacheableResponse: { statuses: [200] },
+          expiration: { maxEntries: 30, maxAgeSeconds: 60 * DAY, purgeOnQuotaError: true },
+        },
+      },
+      {
+        // Órganos HuBMAP del CDN oficial (D-023, CORS): los vistos quedan en caché un tiempo.
+        urlPattern: /^https:\/\/cdn\.humanatlas\.io\/.+\.glb$/,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "atlas-hubmap",
+          cacheableResponse: { statuses: [200] },
+          expiration: { maxEntries: 15, maxAgeSeconds: 30 * DAY, purgeOnQuotaError: true },
+        },
+      },
+    ],
   },
 });
 
