@@ -43,7 +43,8 @@ flowchart LR
     F2 --> F3["Fase 3<br/>Visor MVP"]
     F3 --> F4["Fase 4<br/>Funciones didácticas"]
     F4 --> F5["Fase 5<br/>Backend y cuentas (opcional)"]
-    F5 --> F6["Fase 6<br/>Publicación y comunidad"]
+    F5 --> F5B["Fase 5B<br/>Adaptación a móvil"]
+    F5B --> F6["Fase 6<br/>Publicación y comunidad"]
     F2 -.-> F7["Fase 7 (opcional)<br/>Modelos propios desde CT"]
 ```
 
@@ -344,6 +345,14 @@ Al menos 3 tours y 2 cuestionarios funcionales, búsqueda y cortes operativos.
 
 ### Criterio de salida
 Un usuario puede registrarse, guardar una vista y recuperar sus resultados. **Cumplido (D-014).**
+
+---
+
+## FASE 5B: Adaptación a móvil
+
+**Objetivo:** usar el atlas en móviles y tablets sin cambiar la experiencia de escritorio. Va antes de la publicación.
+
+Plan detallado por etapas, con diagnóstico y criterio de salida: [`docs/PLAN_MOVIL.md`](PLAN_MOVIL.md).
 
 ---
 

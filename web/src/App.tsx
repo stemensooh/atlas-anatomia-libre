@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bookmark,
   Compass,
@@ -23,6 +23,8 @@ import { AccountModals, UserMenu } from "./components/UserMenu";
 import { useAuthStore } from "./store/useAuthStore";
 import { useNotesStore } from "./store/useNotesStore";
 import { LocateStructure } from "./components/ProfileModal";
+import { CameraFab, CompactMenu, MobileTabBar, SheetHandle, sheetClass } from "./components/MobileChrome";
+import { useLayout } from "./hooks/useLayout";
 
 export function App() {
   const [metadata, setMetadata] = useState<MetadataDoc | null>(null);
@@ -41,6 +43,10 @@ export function App() {
   const toggleTheme = useViewerStore((s) => s.toggleTheme);
   const setCreditsOpen = useViewerStore((s) => s.setCreditsOpen);
   const leftPanelWidth = useViewerStore((s) => s.leftPanelWidth);
+  const sheet = useViewerStore((s) => s.sheet);
+  const layout = useLayout();
+  const compact = layout !== "desktop";
+  const sheetRef = useRef<HTMLDivElement>(null);
   const loadSession = useAuthStore((s) => s.loadSession);
   const user = useAuthStore((s) => s.user);
   const openModal = useAuthStore((s) => s.openModal);
@@ -165,7 +171,7 @@ export function App() {
   }, [catalogBySex]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell layout-${layout} ${compact ? "layout-compact" : ""}`}>
       <header className="topbar">
         <div className="brand">
           <span className="brand-dot" />
@@ -186,6 +192,13 @@ export function App() {
           </div>
         </div>
 
+        {compact ? (
+          <div className="topbar-right">
+            <UserMenu />
+            <CompactMenu />
+          </div>
+        ) : (
+          <>
         <div className="camera-toolbar" aria-label="Vistas de cámara">
           <Compass size={15} className="toolbar-icon" />
           <button className="btn-cam" onClick={() => triggerCamera("front")}>
@@ -248,22 +261,14 @@ export function App() {
           </button>
           <UserMenu />
         </div>
+          </>
+        )}
       </header>
 
       <main
-        className="workspace"
-        style={{
-          gridTemplateColumns: `${leftPanelWidth}px 1fr 330px`,
-        }}
+        className={`workspace ${compact && sheet.panel ? "has-open-sheet" : ""}`}
+        style={compact ? undefined : { gridTemplateColumns: `${leftPanelWidth}px 1fr 330px` }}
       >
-        {metadata && (
-          <LayerPanel
-            systemsInfo={activeSystemsInfo}
-            structures={activeStructures}
-            hubmapOrgans={metadata.hubmapReferenceOrgans}
-          />
-        )}
-
         <section className="canvas-stage">
           {error ? (
             <div className="error-banner">
@@ -276,6 +281,8 @@ export function App() {
               hubmapById={hubmapById}
             />
           )}
+
+          {compact && <CameraFab />}
 
           <footer className="stage-footer">
             <span>
@@ -294,15 +301,34 @@ export function App() {
           </footer>
         </section>
 
-        {metadata && (
-          <InfoPanel
-            structures={activeStructures}
-            structureById={structureById}
-            hubmapById={hubmapById}
-            catalogBySex={catalogBySex}
-          />
-        )}
+        {/* En escritorio este contenedor es transparente (display: contents) y los paneles son
+            columnas de la rejilla; en móvil/tablet es el panel deslizante. Los dos paneles siguen
+            montados aunque no se vean, para no perder el estado del quiz o del tour. */}
+        <div
+          ref={sheetRef}
+          className={sheetClass(layout, sheet.panel, sheet.size)}
+          data-panel={compact ? sheet.panel ?? "none" : undefined}
+        >
+          {layout === "mobile" && <SheetHandle sheetRef={sheetRef} />}
+          {metadata && (
+            <LayerPanel
+              systemsInfo={activeSystemsInfo}
+              structures={activeStructures}
+              hubmapOrgans={metadata.hubmapReferenceOrgans}
+            />
+          )}
+          {metadata && (
+            <InfoPanel
+              structures={activeStructures}
+              structureById={structureById}
+              hubmapById={hubmapById}
+              catalogBySex={catalogBySex}
+            />
+          )}
+        </div>
       </main>
+
+      {compact && <MobileTabBar />}
 
       <CreditsModal />
       <AccountModals locate={locateStructure} />

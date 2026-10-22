@@ -7,6 +7,9 @@ export type BodySex = "male" | "female";
 export type LeftTab = "body" | "tree" | "hubmap";
 export type RightTab = "info" | "tours" | "quiz";
 export type SliderMode = "dissection" | "opacity";
+// Panel deslizante de móvil y tablet: qué panel se ve y a qué altura (en tablet solo abierto/cerrado).
+export type SheetPanel = "layers" | "info";
+export type SheetSize = "half" | "full";
 
 interface LayerState {
   enabled: boolean;
@@ -45,6 +48,7 @@ interface ViewerState {
   sliderMode: SliderMode;
   creditsOpen: boolean;
   leftPanelWidth: number;
+  sheet: { panel: SheetPanel | null; size: SheetSize };
 
   // Callback opcional cuando hay una pregunta "find3d" activa en el cuestionario
   quizClickHandler: ((clickedStructureId: string) => void) | null;
@@ -54,6 +58,9 @@ interface ViewerState {
   setBodySex: (sex: BodySex) => void;
   setSliderMode: (mode: SliderMode) => void;
   setLeftPanelWidth: (width: number) => void;
+  openSheet: (panel: SheetPanel, size?: SheetSize) => void;
+  setSheetSize: (size: SheetSize) => void;
+  closeSheet: () => void;
   toggleLayer: (sys: SystemId) => void;
   setLayerEnabled: (sys: SystemId, enabled: boolean) => void;
   setLayerOpacity: (sys: SystemId, opacity: number) => void;
@@ -147,6 +154,7 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   creditsOpen: false,
   quizClickHandler: null,
   leftPanelWidth: getStoredLeftWidth(),
+  sheet: { panel: null, size: "half" },
 
   setMode: (mode, hubmapOrganId = null) =>
     set((s) => ({
@@ -177,6 +185,10 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
     } catch {}
     set({ leftPanelWidth: clamped });
   },
+
+  openSheet: (panel, size) => set((s) => ({ sheet: { panel, size: size ?? s.sheet.size } })),
+  setSheetSize: (size) => set((s) => ({ sheet: { ...s.sheet, size } })),
+  closeSheet: () => set((s) => ({ sheet: { ...s.sheet, panel: null } })),
 
   toggleLayer: (sys) =>
     set((s) => ({

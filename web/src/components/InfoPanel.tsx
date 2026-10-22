@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Crosshair,
@@ -78,6 +78,13 @@ export function InfoPanel({
     });
   };
 
+  // Al entrar en Tours (por su pestaña o por la barra inferior en móvil) se aplica el paso actual.
+  useEffect(() => {
+    if (rightTab === "tours") launchTourStep(activeTourId, tourStepIdx);
+    // Solo al cambiar de pestaña: los pasos siguientes los lanza la propia navegación del tour.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rightTab]);
+
   const selectedStructure = selectedId ? structureById.get(selectedId) : null;
   const hoveredStructure = hoveredId ? structureById.get(hoveredId) : null;
   const parentStructure = selectedStructure?.parentId
@@ -117,10 +124,7 @@ export function InfoPanel({
         </button>
         <button
           className={`mode-tab ${rightTab === "tours" ? "active" : ""}`}
-          onClick={() => {
-            setRightTab("tours");
-            launchTourStep(activeTourId, tourStepIdx);
-          }}
+          onClick={() => setRightTab("tours")}
         >
           <Compass size={14} />
           <span>Tours ({ANATOMY_TOURS.length})</span>
