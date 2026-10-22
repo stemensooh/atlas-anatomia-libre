@@ -13,6 +13,7 @@ import {
 import { KEY_LANDMARK_IDS } from "../data/didacticData";
 import { cameraBridge, Vec3 } from "../data/viewState";
 import { LOW_POWER } from "../data/devicePerf";
+import { useLayout } from "../hooks/useLayout";
 import { useViewerStore } from "../store/useViewerStore";
 
 // Un clic (o toque) solo selecciona si el puntero apenas se movió entre pulsar y soltar: al
@@ -450,7 +451,24 @@ function HubmapOrganScene({
 function CameraController() {
   const cameraPreset = useViewerStore((s) => s.cameraPreset);
   const cameraView = useViewerStore((s) => s.cameraView);
-  const { camera, invalidate } = useThree();
+  const sheetPanel = useViewerStore((s) => s.sheet.panel);
+  const sheetSize = useViewerStore((s) => s.sheet.size);
+  const layout = useLayout();
+  const { camera, invalidate, size } = useThree();
+
+  // Móvil con el panel a media altura: el panel tapa la mitad inferior del visor, así que se
+  // desplaza la imagen para centrar el modelo en la mitad visible. setViewOffset cambia la
+  // proyección, que también usan el raycasting y los pines: los toques siguen apuntando bien.
+  useEffect(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    if (layout === "mobile" && sheetPanel && sheetSize === "half") {
+      cam.setViewOffset(size.width, size.height, 0, size.height * 0.25, size.width, size.height);
+    } else {
+      cam.clearViewOffset();
+    }
+    cam.updateProjectionMatrix();
+    invalidate();
+  }, [layout, sheetPanel, sheetSize, size.width, size.height, camera, invalidate]);
   const controlsRef = useRef<any>(null);
 
   // Permite leer la cámara desde fuera del Canvas para guardar vistas.

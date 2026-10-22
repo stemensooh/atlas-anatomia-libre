@@ -67,6 +67,9 @@ export function AuthModal({ mode }: { mode: "login" | "register" }) {
           <input
             type="text"
             autoComplete="username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             autoFocus
             value={username}
             onChange={(e) => setUsername(e.target.value.trim())}

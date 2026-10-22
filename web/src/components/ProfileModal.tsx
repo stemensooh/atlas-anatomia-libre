@@ -203,7 +203,7 @@ export function ProfileModal({ locate }: { locate: LocateStructure }) {
             <p>
               {attempts.length} intentos · media de aciertos {avg} %
             </p>
-            <table className="account-table">
+            <table className="account-table cards">
               <thead>
                 <tr>
                   <th>Cuestionario</th>
@@ -214,11 +214,11 @@ export function ProfileModal({ locate }: { locate: LocateStructure }) {
               <tbody>
                 {attempts.map((a) => (
                   <tr key={a.id}>
-                    <td>{a.quizTitle}</td>
-                    <td>
+                    <td data-label="Cuestionario">{a.quizTitle}</td>
+                    <td data-label="Resultado">
                       {a.score}/{a.total} ({Math.round((a.score / a.total) * 100)} %)
                     </td>
-                    <td>{new Date(a.finishedAt).toLocaleString("es")}</td>
+                    <td data-label="Fecha">{new Date(a.finishedAt).toLocaleString("es")}</td>
                   </tr>
                 ))}
               </tbody>

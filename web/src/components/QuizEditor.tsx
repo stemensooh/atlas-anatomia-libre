@@ -148,6 +148,7 @@ function GenerateForm({
           <span>Número de preguntas</span>
           <input
             type="number"
+            inputMode="numeric"
             min={3}
             max={20}
             value={input.count}

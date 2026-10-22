@@ -56,6 +56,9 @@ export function AdminUsersModal() {
           type="text"
           className="admin-filter"
           placeholder="Filtrar por usuario…"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
@@ -65,7 +68,7 @@ export function AdminUsersModal() {
       {message && <div className={message.ok ? "account-ok" : "editor-error"}>{message.text}</div>}
 
       <div className="account-table-wrap">
-        <table className="account-table">
+        <table className="account-table cards">
           <thead>
             <tr>
               <th>Usuario</th>
@@ -84,11 +87,11 @@ export function AdminUsersModal() {
               return (
                 <React.Fragment key={u.id}>
                   <tr className={u.isActive ? "" : "is-inactive"}>
-                    <td>
+                    <td data-label="Usuario">
                       <strong>{u.username}</strong>
                       {isMe && <small> (tú)</small>}
                     </td>
-                    <td>
+                    <td data-label="Rol">
                       <select
                         value={u.role}
                         disabled={isMe}
@@ -107,7 +110,7 @@ export function AdminUsersModal() {
                         ))}
                       </select>
                     </td>
-                    <td>
+                    <td data-label="Activo">
                       <input
                         type="checkbox"
                         checked={u.isActive}
@@ -120,11 +123,11 @@ export function AdminUsersModal() {
                         }
                       />
                     </td>
-                    <td>{u.quizCount}</td>
-                    <td>{u.attemptCount}</td>
-                    <td>{formatDate(u.createdAt)}</td>
-                    <td>{formatDate(u.lastLoginAt)}</td>
-                    <td className="admin-actions">
+                    <td data-label="Cuestionarios">{u.quizCount}</td>
+                    <td data-label="Intentos">{u.attemptCount}</td>
+                    <td data-label="Alta">{formatDate(u.createdAt)}</td>
+                    <td data-label="Último acceso">{formatDate(u.lastLoginAt)}</td>
+                    <td data-label="Acciones" className="admin-actions">
                       <button
                         className="icon-btn"
                         title="Restablecer contraseña"

@@ -57,7 +57,7 @@ export function QuizResultsModal({ quiz, onClose }: { quiz: AnatomyQuiz; onClose
           <div className="account-section">
             <h3>Por alumno</h3>
             <div className="account-table-wrap">
-              <table className="account-table">
+              <table className="account-table cards">
                 <thead>
                   <tr>
                     <th>Alumno</th>
@@ -71,18 +71,18 @@ export function QuizResultsModal({ quiz, onClose }: { quiz: AnatomyQuiz; onClose
                 <tbody>
                   {results.students.map((s) => (
                     <tr key={s.userId}>
-                      <td>{s.username}</td>
-                      <td>{s.attempts}</td>
-                      <td>
+                      <td data-label="Alumno">{s.username}</td>
+                      <td data-label="Intentos">{s.attempts}</td>
+                      <td data-label="Mejor">
                         {s.bestScore}/{s.total}
                       </td>
-                      <td>
+                      <td data-label="Último">
                         {s.lastScore}/{s.total}
                       </td>
-                      <td>
+                      <td data-label="Media">
                         <Meter ratio={s.avgRatio} /> {pct(s.avgRatio)}
                       </td>
-                      <td>{new Date(s.lastAt).toLocaleString("es")}</td>
+                      <td data-label="Última vez">{new Date(s.lastAt).toLocaleString("es")}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -96,7 +96,7 @@ export function QuizResultsModal({ quiz, onClose }: { quiz: AnatomyQuiz; onClose
               Las preguntas con menos aciertos son las que conviene repasar en clase.
             </p>
             <div className="account-table-wrap">
-              <table className="account-table results-questions">
+              <table className="account-table cards results-questions">
                 <thead>
                   <tr>
                     <th>#</th>
@@ -111,12 +111,12 @@ export function QuizResultsModal({ quiz, onClose }: { quiz: AnatomyQuiz; onClose
                     const ratio = q.answered ? q.correct / q.answered : 0;
                     return (
                       <tr key={q.questionId}>
-                        <td>{i + 1}</td>
-                        <td className="results-prompt">
+                        <td data-label="#">{i + 1}</td>
+                        <td data-label="Pregunta" className="results-prompt">
                           {q.prompt}
                           <small>Respuesta: {q.targetNameEs}</small>
                         </td>
-                        <td>
+                        <td data-label="Aciertos">
                           {q.answered ? (
                             <>
                               <Meter ratio={ratio} /> {pct(ratio)} ({q.correct}/{q.answered})
@@ -125,8 +125,8 @@ export function QuizResultsModal({ quiz, onClose }: { quiz: AnatomyQuiz; onClose
                             "—"
                           )}
                         </td>
-                        <td>{q.revealed}</td>
-                        <td className="results-prompt">
+                        <td data-label="Reveladas">{q.revealed}</td>
+                        <td data-label="Errores más comunes" className="results-prompt">
                           {q.topWrong.length
                             ? q.topWrong.map((w) => `${w.answer} (${w.count})`).join(" · ")
                             : "—"}

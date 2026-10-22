@@ -57,11 +57,13 @@
 - [x] Caché de los `.glb` entre visitas: la da la configuración de Nginx de producción (7 días, D-017); no hace falta un service worker.
 - [x] Medido: primera carga en móvil de **unos 4,1 MB con gzip** (antes, unos 20 MB solo de modelos); escritorio sin cambios (20,9 MB, render continuo).
 
-### Etapa 4: Pantallas secundarias
-- [ ] Modales a pantalla completa en móvil.
-- [ ] Tablas de Administración y Resultados como tarjetas.
-- [ ] Formularios con letra de 16 px, `inputmode` adecuado y botones grandes.
-- [ ] El quiz, los tours y la ficha no tapan la pieza que se está viendo o preguntando.
+### Etapa 4: Pantallas secundarias ✅ (D-021)
+- [x] Modales a pantalla completa en móvil (media query: se montan en `<body>` con un portal).
+- [x] Tablas de Administración, Resultados (por alumno y por pregunta) y Mi perfil como tarjetas, con `data-label` por celda.
+- [x] Formularios con letra de 16 px (sin zoom en iOS), una columna, `inputmode`, `autocapitalize` y `enterkeyhint` adecuados, y botones de al menos 36–44 px.
+- [x] El modelo se centra en la mitad visible cuando el panel está a media altura (`camera.setViewOffset`).
+- [x] En móvil y tablet, las listas de tours y cuestionarios se pliegan al elemento activo ("Cambiar de…"), para que el paso o la pregunta queden a la vista.
+- [x] Comprobado con emulación a 390 px (quiz, tours, login y perfil con historial) y sin regresiones a 375, 390 y 1280 px.
 
 ### Etapa 5: Verificación
 - [ ] Emulación en Chrome: iPhone SE (375 px), iPhone 14 (390 px), Pixel (412 px), iPad (768 y 1024 px), en vertical y horizontal.

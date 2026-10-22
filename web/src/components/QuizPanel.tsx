@@ -31,6 +31,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useViewerStore } from "../store/useViewerStore";
 import { QuizEditorModal, EditorMode } from "./QuizEditor";
 import { QuizResultsModal } from "./QuizResultsModal";
+import { useLayout } from "../hooks/useLayout";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = arr.slice();
@@ -75,6 +76,13 @@ export function QuizPanel({
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [editor, setEditor] = useState<EditorMode | null>(null);
   const [resultsFor, setResultsFor] = useState<AnatomyQuiz | null>(null);
+  // En móvil/tablet la lista se pliega al cuestionario activo para que la pregunta quede a la vista.
+  const compact = useLayout() !== "desktop";
+  const [listOpen, setListOpen] = useState(false);
+  const choose = (quiz: AnatomyQuiz) => {
+    startQuiz(quiz);
+    setListOpen(false);
+  };
 
   const reload = useCallback(async (selectId?: string) => {
     const res = await loadQuizzes();
@@ -298,15 +306,15 @@ export function QuizPanel({
       )}
 
       <div className="tour-selector quiz-list">
-        {quizzes.map((qz) => (
+        {(compact && !listOpen && activeQuiz ? [activeQuiz] : quizzes).map((qz) => (
           <div
             key={qz.id}
             className={`tour-select-card ${activeQuiz?.id === qz.id ? "active" : ""}`}
             role="button"
             tabIndex={0}
-            onClick={() => startQuiz(qz)}
+            onClick={() => choose(qz)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") startQuiz(qz);
+              if (e.key === "Enter") choose(qz);
             }}
           >
             <div className="tour-select-title">
@@ -373,6 +381,11 @@ export function QuizPanel({
             )}
           </div>
         ))}
+        {compact && quizzes.length > 1 && (
+          <button className="btn-xs list-toggle" onClick={() => setListOpen((o) => !o)}>
+            {listOpen ? "Ocultar la lista" : `Cambiar de cuestionario (${quizzes.length})`}
+          </button>
+        )}
       </div>
 
       {activeQuiz && currentQuestion && !finished && (

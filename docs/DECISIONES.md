@@ -2,6 +2,22 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-21 · D-021 · Pantallas secundarias en móvil: modales completos, tablas como tarjetas y modelo visible sobre el panel (Fase 5B, etapa 4)
+- **Contexto:**
+  - Las ventanas y tablas, pensadas para escritorio, se cortaban en el móvil.
+  - Los campos de 13–14 px hacían que iOS ampliara la página al tocarlos.
+  - Con el panel a media altura, el modelo quedaba centrado detrás de él.
+  - Las listas de tours y cuestionarios empujaban fuera de la vista el paso o la pregunta actual.
+- **Decisión:**
+  - **Media query `max-width: 767px`** (y no la clase de disposición), porque los modales se montan en `<body>`:
+    - modales a pantalla completa con márgenes seguros;
+    - tablas `.account-table.cards` como tarjetas: cada `td` lleva un `data-label` generado a partir de los encabezados;
+    - campos de 16 px, editor en una columna y botones más grandes.
+  - **Atributos de teclado móvil:** `autocapitalize="none"`, `autocorrect="off"` y `spellcheck={false}` en los nombres de usuario; `inputmode="numeric"` en números; `enterkeyhint="search"` en el buscador.
+  - **`camera.setViewOffset`** desplaza la imagen un 25 % del alto cuando el panel móvil está a media altura, y se quita al cerrarlo o ampliarlo. El raycasting y los pines usan la misma proyección.
+  - **Listas plegadas en móvil y tablet:** se muestra solo el tour o el cuestionario activo, con un botón para ver los demás.
+- **Consecuencia:** Las pantallas de cuenta, administración y resultados se usan en un móvil sin zoom ni desplazamiento horizontal, y la pieza que se estudia queda a la vista. El escritorio no cambia. Falta la etapa 5: prueba en un dispositivo real.
+
 ## 2026-10-21 · D-020 · Arranque ligero y render a demanda en dispositivos de bajo consumo (Fase 5B, etapa 3)
 - **Contexto:** Al abrir el atlas se descargaban 6 sistemas (19,9 MB en el modelo masculino, 52 MB en el femenino) y el visor dibujaba 60 fotogramas por segundo con resolución de hasta 2× y antialias, incluso sin moverse nada. En un móvil eso supone datos, espera, calor y batería.
 - **Decisión:**

@@ -21,7 +21,7 @@ import {
 import { ANATOMY_TOURS } from "../data/didacticData";
 import { QuizPanel } from "./QuizPanel";
 import { StructureNotes } from "./StructureNotes";
-import { useCoarsePointer } from "../hooks/useLayout";
+import { useCoarsePointer, useLayout } from "../hooks/useLayout";
 import { useViewerStore } from "../store/useViewerStore";
 
 export function InfoPanel({
@@ -36,6 +36,9 @@ export function InfoPanel({
   catalogBySex: Record<"male" | "female", AnatomyStructure[]>;
 }) {
   const coarse = useCoarsePointer();
+  // En móvil/tablet la lista de tours se pliega para que el paso actual quede a la vista.
+  const compact = useLayout() !== "desktop";
+  const [toursListOpen, setToursListOpen] = useState(false);
   const mode = useViewerStore((s) => s.mode);
   const rightTab = useViewerStore((s) => s.rightTab);
   const activeHubmapOrganId = useViewerStore((s) => s.activeHubmapOrganId);
@@ -150,6 +153,9 @@ export function InfoPanel({
                 <input
                   type="text"
                   placeholder="Buscar hueso, músculo, arteria, FMA…"
+                  enterKeyHint="search"
+                  autoCorrect="off"
+                  spellCheck={false}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -497,13 +503,19 @@ export function InfoPanel({
       {rightTab === "tours" && (
         <div className="didactic-section">
           <div className="tour-selector">
-            {ANATOMY_TOURS.map((tour) => (
+            {(compact && !toursListOpen
+              ? ANATOMY_TOURS.filter((t) => t.id === activeTour.id)
+              : ANATOMY_TOURS
+            ).map((tour) => (
               <button
                 key={tour.id}
                 className={`tour-select-card ${
                   activeTour.id === tour.id ? "active" : ""
                 }`}
-                onClick={() => launchTourStep(tour.id, 0)}
+                onClick={() => {
+                  launchTourStep(tour.id, 0);
+                  setToursListOpen(false);
+                }}
               >
                 <div className="tour-select-title">
                   <Play size={13} />
@@ -512,6 +524,11 @@ export function InfoPanel({
                 <small>{tour.subtitle}</small>
               </button>
             ))}
+            {compact && (
+              <button className="btn-xs list-toggle" onClick={() => setToursListOpen((o) => !o)}>
+                {toursListOpen ? "Ocultar la lista" : `Cambiar de tour (${ANATOMY_TOURS.length})`}
+              </button>
+            )}
           </div>
 
           <div className="tour-player-card">
