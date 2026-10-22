@@ -53,6 +53,7 @@ Regla: **ningún archivo entra a `data/` sin una fila aquí.**
 | SQLite (vía `node:sqlite`, integrado en Node.js 24) | Dominio público |
 | node-postgres `pg` 8 (driver de PostgreSQL; licencia verificada en su `package.json` el 2026-10-21) | MIT |
 | PGlite `@electric-sql/pglite` 0.5 (PostgreSQL embebido, solo tests; verificada el 2026-10-21) | Apache-2.0 |
+| vite-plugin-pwa 2.0, Workbox (`workbox-build`, `workbox-window`) 7.4 (PWA; verificadas en npm el 2026-10-22) | MIT |
 | Blender, MeshLab | GPL (los modelos exportados no heredan GPL) |
 | 3D Slicer | Licencia estilo BSD |
 

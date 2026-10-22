@@ -62,13 +62,15 @@
 
 ## Etapas
 
-### Etapa 1: Instalable
-- [ ] Verificar licencias y añadir `vite-plugin-pwa` (y Workbox) a `web/`.
-- [ ] Manifiesto: nombre, nombre corto, `start_url`, `scope`, `display: standalone`, colores de
-      tema y fondo (claro y oscuro), `lang: es`, orientación libre, categorías `education` y `medical`.
+### Etapa 1: Instalable ✅ (D-025)
+- [x] Licencias verificadas en npm (MIT) y añadidos `vite-plugin-pwa` 2.0, `workbox-build` 7.4 y `workbox-window` 7.4.
+- [x] Manifiesto: nombre, nombre corto, `start_url`, `scope`, `display: standalone`, colores de
+      tema y fondo, `lang: es`, orientación libre, categorías `education` y `medical`.
 - [x] Iconos (192, 512, *maskable*, `apple-touch-icon`) en `web/public/icons/`, y *favicon* (D-024).
-- [ ] Metadatos para iOS: `apple-mobile-web-app-capable`, título, estilo de la barra de estado y `theme-color`.
-- [ ] Nginx (`deploy/nginx/…`): `sw.js` y `manifest.webmanifest` **sin caché** y con el tipo MIME correcto.
+- [x] Metadatos para iOS: `apple-mobile-web-app-capable`, título, estilo de la barra de estado y `theme-color` claro/oscuro.
+- [x] Nginx (`deploy/nginx/…`): `sw.js`, `registerSW.js` y `manifest.webmanifest` **sin caché**, con el tipo MIME correcto.
+- [x] *Service worker* con *precache* solo de la app (13 archivos, 1,49 MB, sin duplicados); `data/` y `/api/` excluidos; desactivado en desarrollo.
+- [x] Verificado con `vite preview` y DevTools Protocol: manifiesto sin errores, **criterios de instalación cumplidos**, *service worker* activo con 13 archivos en caché, nada de `data/` y sin errores en consola.
 - **Hecho cuando:** el navegador ofrece instalarla (Android/Chrome/Edge) y el manifiesto no da errores.
 
 ### Etapa 2: Arranque sin conexión y actualizaciones

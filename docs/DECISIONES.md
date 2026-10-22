@@ -2,6 +2,27 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-22 · D-025 · PWA etapa 1: manifiesto y service worker con vite-plugin-pwa
+- **Contexto:** Primera etapa de `docs/PLAN_PWA.md`: que el atlas se pueda instalar como una app.
+- **Decisión:**
+  - **Dependencias:** `vite-plugin-pwa` 2.0, `workbox-build` 7.4 y `workbox-window` 7.4, MIT según sus metadatos oficiales en npm (2026-10-22). Admiten la Vite 5 actual.
+  - **Manifiesto:**
+    - "Atlas Anatómico 3D Libre", nombre corto "Atlas 3D", `lang: es`;
+    - `display: standalone`, orientación libre, `start_url`, `scope` e `id` en `/`;
+    - fondo `#0b1120` y tema `#0f172a`;
+    - categorías `education` y `medical`;
+    - iconos de D-024 (normales, *maskable* y SVG).
+  - **iOS:** `apple-mobile-web-app-capable`, título, barra de estado translúcida (los márgenes seguros ya existen, D-018) y `theme-color` según el tema del sistema.
+  - **Service worker:**
+    - `registerType: "prompt"`: una versión nueva espera y no recarga la app a mitad de un cuestionario; el aviso llega en la etapa 2;
+    - desactivado en desarrollo;
+    - *precache* solo de la app (HTML, JS, CSS e iconos: 13 archivos, 1,49 MB);
+    - `data/` (metadatos y 98 MB de modelos) excluido aunque el build lo copie a `dist/`;
+    - `/api/` y `/data/` fuera del *navigate fallback*;
+    - sin entradas duplicadas: `includeManifestIcons: false` y el manifiesto lo añade el plugin. Con entradas repetidas Workbox puede fallar al instalar.
+  - **Nginx:** `sw.js`, `registerSW.js` y `manifest.webmanifest` con `Cache-Control: no-cache`; el manifiesto como `application/manifest+json`.
+- **Consecuencia:** El build genera una app instalable. Siguen la etapa 2 (arranque sin conexión con los metadatos y aviso de versión nueva) y la 3 (modelos sin conexión). Al desplegar hay que copiar de nuevo la configuración de Nginx sin pisar lo que añadió certbot.
+
 ## 2026-10-22 · D-024 · Icono propio de la app
 - **Contexto:** La PWA necesita icono (`docs/PLAN_PWA.md`, decisión 5). El usuario pidió un diseño propio. Tampoco había *favicon* (404 en la consola).
 - **Decisión:** Diseño original de STEMENSOFT en SVG (`web/public/icons/icon.svg`), con licencia de contenido **CC BY-SA 4.0**:
