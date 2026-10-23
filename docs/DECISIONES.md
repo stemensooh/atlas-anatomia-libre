@@ -2,6 +2,102 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-22 · D-028 · PWA etapa 4: instalar la app, botón atrás y privacidad del almacenamiento local
+- **Contexto:** Etapa 4 de `docs/PLAN_PWA.md`.
+- **Decisión:**
+  - **`web/src/data/install.ts`**, importado en `main.tsx` antes de montar React:
+    - captura `beforeinstallprompt` (que puede llegar muy pronto), evita el aviso automático y lo guarda en un store;
+    - `installPlatform()` decide entre `native` (diálogo), `ios` (iPhone y iPad, también iPadOS que se presenta como Mac táctil) u `other`, o null si ya está instalada (`display-mode: standalone` o `navigator.standalone`);
+    - escucha `appinstalled`.
+  - **Menú ☰** (móvil y tablet): "Instalar app" abre el diálogo nativo o `InstallHelpModal` con instrucciones. En escritorio no se añade nada, porque el navegador ya ofrece instalar desde la barra de direcciones.
+  - **Botón atrás:** al abrirse en móvil o tablet un panel, una ventana de cuenta o los créditos, se añade una entrada al historial. `popstate` cierra la capa superior y, si debajo sigue el panel, añade otra entrada. Cerrar desde la interfaz retira la entrada.
+    - Las pruebas encontraron un fallo: tras cerrar la ventana, el segundo "atrás" salía de la página porque el estado "hay algo abierto" no cambiaba y no se añadía la entrada del panel. Corregido.
+  - **Privacidad:** nueva sección "Qué se guarda en tu dispositivo": la app, el catálogo y los modelos, sin datos personales; la sesión y los datos personales nunca en caché; cómo liberar espacio o borrarlo todo.
+- **Consecuencia:** Verificado con emulación. Queda la etapa 5: auditoría y prueba en Android e iPhone reales (instalar, sin red, descargar, actualizar y desinstalar).
+
+## 2026-10-22 · D-027 · PWA etapa 3: descargar un cuerpo para usarlo sin conexión
+- **Contexto:** Decisión 3B del plan de la PWA: además de guardar lo que se ve, un botón para descargar un cuerpo completo (35 MB el masculino, 63 MB el femenino).
+- **Decisión:**
+  - **`web/src/data/offlineModels.ts`** descarga los sistemas que faltan de ese cuerpo, más `metadata.json`, en las **mismas cachés del service worker** (`atlas-modelos` y `atlas-metadatos`). El service worker los sirve con *cache-first* sin red.
+    - La descarga se hace desde la página y se guarda con la Cache API, para poder leer el progreso por partes y cancelarla con `AbortController` conservando lo ya guardado.
+  - **Antes de empezar:** se comprueba el espacio con `navigator.storage.estimate()` (hace falta el tamaño más un 10 %), se pide `navigator.storage.persist()` y, con `saveData` o red móvil, se pide confirmación.
+  - **`OfflinePanel`** en la pestaña Capas:
+    - estado (N de 10 sistemas y lo que ocupan);
+    - descargar o completar con el tamaño, progreso y cancelar;
+    - liberar espacio;
+    - espacio libre y si el almacenamiento es persistente.
+  - **Marca "sin red ✓"** en cada sistema guardado. El estado se vuelve a consultar al cambiar de cuerpo o al terminar de cargarse un sistema.
+  - **Solo aparece si hay un service worker controlando la página:** en desarrollo, lo descargado no se usaría.
+  - **Los órganos HuBMAP quedan fuera** del botón por su tamaño (566 MB). Los vistos sí se guardan un tiempo (D-026).
+- **Consecuencia:** Verificado con un perfil limpio: descarga con progreso, **los 10 sistemas cargan sin red** y liberar espacio vacía la caché. Siguen la etapa 4 (instalación y Privacidad) y la 5 (verificación en Android e iPhone reales).
+
+## 2026-10-22 · D-026 · PWA etapa 2: arranque sin conexión, aviso de versión nueva y estado sin conexión
+- **Contexto:** Etapa 2 de `docs/PLAN_PWA.md`. Criterio: con la red cortada la app abre, muestra el esqueleto y los cuestionarios incluidos, y avisa de las versiones nuevas sin cortar lo que se está haciendo.
+- **Decisión:**
+  - **Cachés en tiempo de ejecución** (Workbox):
+    - `atlas-metadatos`, *stale-while-revalidate*;
+    - `atlas-modelos`, *cache-first* de `/data/processed/*.glb` (30 entradas, 60 días);
+    - `atlas-hubmap`, *cache-first* de `cdn.humanatlas.io/*.glb` (15 entradas, 30 días).
+    - Todas con `purgeOnQuotaError`. `/api/` sigue sin pasar por ninguna caché.
+  - **Primera visita:** `clientsClaim` hace que el service worker controle la página en cuanto se instala. Después, `PwaPrompt` vuelve a pedir con `cache: "force-cache"` lo ya cargado de `/data/processed/`; sale de la caché HTTP, sin gastar datos, y queda guardado. Sin esto, el esqueleto no estaría disponible sin red hasta una segunda visita.
+  - **Registro desde la app** (`virtual:pwa-register/react`, `injectRegister: false`):
+    - aviso "Hay una versión nueva · Actualizar / Más tarde": nunca recarga sola, para no cortar un cuestionario;
+    - comprobación de versiones cada hora;
+    - aviso único "Listo: el atlas se puede abrir sin conexión".
+  - **Estado sin conexión:**
+    - `useOnline()` (`navigator.onLine`);
+    - aviso que se puede cerrar y vuelve si se pierde la red otra vez;
+    - "Sin conexión" en la cuenta y en el estado de los cuestionarios;
+    - al recuperar la red se vuelve a comprobar la sesión y se recargan los cuestionarios.
+  - **Corrección encontrada en la prueba:** la sesión se comprobaba solo con red, y sin red la cuenta y el quiz se quedaban esperando para siempre. Ahora se comprueba siempre y, sin red, falla enseguida.
+- **Consecuencia:** Verificado con un perfil limpio y la caché HTTP desactivada. Sigue la etapa 3: botón "Descargar para usar sin conexión" por cuerpo, espacio disponible y liberar espacio.
+
+## 2026-10-22 · D-025 · PWA etapa 1: manifiesto y service worker con vite-plugin-pwa
+- **Contexto:** Primera etapa de `docs/PLAN_PWA.md`: que el atlas se pueda instalar como una app.
+- **Decisión:**
+  - **Dependencias:** `vite-plugin-pwa` 2.0, `workbox-build` 7.4 y `workbox-window` 7.4, MIT según sus metadatos oficiales en npm (2026-10-22). Admiten la Vite 5 actual.
+  - **Manifiesto:**
+    - "Atlas Anatómico 3D Libre", nombre corto "Atlas 3D", `lang: es`;
+    - `display: standalone`, orientación libre, `start_url`, `scope` e `id` en `/`;
+    - fondo `#0b1120` y tema `#0f172a`;
+    - categorías `education` y `medical`;
+    - iconos de D-024 (normales, *maskable* y SVG).
+  - **iOS:** `apple-mobile-web-app-capable`, título, barra de estado translúcida (los márgenes seguros ya existen, D-018) y `theme-color` según el tema del sistema.
+  - **Service worker:**
+    - `registerType: "prompt"`: una versión nueva espera y no recarga la app a mitad de un cuestionario; el aviso llega en la etapa 2;
+    - desactivado en desarrollo;
+    - *precache* solo de la app (HTML, JS, CSS e iconos: 13 archivos, 1,49 MB);
+    - `data/` (metadatos y 98 MB de modelos) excluido aunque el build lo copie a `dist/`;
+    - `/api/` y `/data/` fuera del *navigate fallback*;
+    - sin entradas duplicadas: `includeManifestIcons: false` y el manifiesto lo añade el plugin. Con entradas repetidas Workbox puede fallar al instalar.
+  - **Nginx:** `sw.js`, `registerSW.js` y `manifest.webmanifest` con `Cache-Control: no-cache`; el manifiesto como `application/manifest+json`.
+- **Consecuencia:** El build genera una app instalable. Siguen la etapa 2 (arranque sin conexión con los metadatos y aviso de versión nueva) y la 3 (modelos sin conexión). Al desplegar hay que copiar de nuevo la configuración de Nginx sin pisar lo que añadió certbot.
+
+## 2026-10-22 · D-024 · Icono propio de la app
+- **Contexto:** La PWA necesita icono (`docs/PLAN_PWA.md`, decisión 5). El usuario pidió un diseño propio. Tampoco había *favicon* (404 en la consola).
+- **Decisión:** Diseño original de STEMENSOFT en SVG (`web/public/icons/icon.svg`), con licencia de contenido **CC BY-SA 4.0**:
+  - fondo en degradado azul noche (el del visor);
+  - figura humana en color hueso (`#e8e0c9`, el del sistema esquelético);
+  - órbita en el degradado de la marca (`#38bdf8` → `#818cf8`), que pasa por delante y por detrás de la figura y sugiere el giro 3D;
+  - punto de luz en el corazón (el punto de la marca).
+
+  Hay una variante **maskable** (a sangre, con el contenido dentro del 68 % central) para Android. Los PNG (192, 512, maskable 192 y 512, `apple-touch-icon` 180 opaco y *favicon* 32) se generan con Edge sin ventana mediante el DevTools Protocol, sin dependencias nuevas.
+- **Consecuencia:** La web ya tiene *favicon* e icono para iOS. El manifiesto que usa los iconos llega en la etapa 1 de la PWA.
+
+## 2026-10-22 · D-023 · Órganos HuBMAP desde el CDN oficial, sin los conjuntos de cuerpo entero
+- **Contexto:** El modo de órganos HuBMAP cargaba sus `.glb` de `data/raw/hubmap/`, que no se versiona: no funcionaba en ningún equipo sin esa descarga ni en producción (ya pendiente en D-009). Son 87 modelos y 1,15 GB sin optimizar; los dos conjuntos `united-*` pesan 357 y 230 MB, y `mouth-female` 99 MB. Es requisito previo de la PWA (`docs/PLAN_PWA.md`).
+- **Comprobaciones (2026-10-22):**
+  - Licencia **CC BY 4.0** en los metadatos oficiales en vivo.
+  - Las 85 URLs del CDN responden con el **mismo tamaño en bytes** que el registrado con SHA-256 en `SOURCE.txt`, así que son la misma versión.
+  - El CDN permite CORS (`Access-Control-Allow-Origin: *`).
+  - Los 85 son glTF estándar, sin extensiones requeridas.
+- **Decisión (del usuario):**
+  - **Cargar los modelos del CDN oficial** (`https://cdn.humanatlas.io/digital-objects/ref-organ/<órgano>/<versión>/assets/<archivo>`), construyendo la URL en `web/src/data/hubmap.ts` a partir de `metadata.json`. No se versionan ni se alojan en el VPS. Se quita de `vite.config.ts` el servicio de `data/raw/hubmap`.
+  - **Se excluyen los conjuntos `united-female` y `united-male`:** no son órganos y duplican el visor por sistemas. Quedan 85, y el contador de la cabecera y de la pestaña lo refleja.
+  - **El tamaño de cada órgano** sale de `web/src/data/hubmapSizes.json` (generado a partir de `SOURCE.txt`) y se muestra en la lista. En móvil o con ahorro de datos, los de más de 15 MB piden confirmación.
+  - **Privacidad** explica que, al abrir un órgano, el navegador pide el archivo a `cdn.humanatlas.io`. En `ATTRIBUTIONS.md` consta que los `.glb` no se redistribuyen.
+- **Consecuencia:** El modo funciona en local y en producción sin almacenamiento adicional, y la PWA puede cachear estos modelos como recurso de otro origen con CORS. Depende de la disponibilidad del CDN de HuBMAP; si cambiara, el plan B es descargar, optimizar con meshopt y alojar.
+
 ## 2026-10-21 · D-022 · Verificación de la adaptación a móvil y correcciones de pantallas bajas (Fase 5B, etapa 5)
 - **Contexto:** Barrido emulado por 7 dispositivos, con pantalla física y entrada táctil.
 - **Hallazgos y decisión:**

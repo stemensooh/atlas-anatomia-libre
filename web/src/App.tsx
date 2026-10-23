@@ -25,6 +25,9 @@ import { useNotesStore } from "./store/useNotesStore";
 import { LocateStructure } from "./components/ProfileModal";
 import { CameraFab, CompactMenu, MobileTabBar, SheetHandle, sheetClass } from "./components/MobileChrome";
 import { useLayout } from "./hooks/useLayout";
+import { isHubmapOrganAvailable } from "./data/hubmap";
+import { PwaPrompt } from "./components/PwaPrompt";
+import { useOnline } from "./hooks/useOnline";
 
 export function App() {
   const [metadata, setMetadata] = useState<MetadataDoc | null>(null);
@@ -56,9 +59,13 @@ export function App() {
   const loadNotes = useNotesStore((s) => s.load);
   const clearNotes = useNotesStore((s) => s.clear);
 
+  // La sesión se comprueba al abrir y cada vez que cambia la conexión. Sin red la comprobación
+  // falla enseguida y la app pasa a modo sin servidor (cuestionarios incluidos); si no se hiciera,
+  // todo lo que espera a saber si hay sesión se quedaría bloqueado.
+  const online = useOnline();
   useEffect(() => {
     loadSession();
-  }, [loadSession]);
+  }, [loadSession, online]);
 
   // Móvil/tablet: al tocar una estructura con el panel cerrado se abre su ficha a media altura.
   // Durante un cuestionario se abre el cuestionario, para ver si el toque fue la respuesta correcta.
@@ -67,6 +74,45 @@ export function App() {
     if (useViewerStore.getState().rightTab !== "quiz") setRightTab("info");
     openSheet("info", "half");
   }, [pick3DSeq, compact, openSheet, setRightTab]);
+
+  // Móvil/tablet (y app instalada): el botón "atrás" cierra primero lo que esté abierto encima
+  // (ventana de cuenta o créditos, después el panel deslizante) en vez de salir de la app.
+  const accountModal = useAuthStore((s) => s.modal);
+  const creditsOpen = useViewerStore((s) => s.creditsOpen);
+  const overlayOpen = compact && (!!sheet.panel || !!accountModal || creditsOpen);
+  const backEntryRef = useRef(false);
+  useEffect(() => {
+    if (overlayOpen && !backEntryRef.current) {
+      history.pushState({ atlasOverlay: true }, "");
+      backEntryRef.current = true;
+    } else if (!overlayOpen && backEntryRef.current) {
+      // Se cerró desde la interfaz: se retira la entrada para no dejar un "atrás" vacío.
+      backEntryRef.current = false;
+      if (history.state?.atlasOverlay) history.back();
+    }
+  }, [overlayOpen]);
+  useEffect(() => {
+    const onPop = () => {
+      if (!backEntryRef.current) return;
+      backEntryRef.current = false;
+      const auth = useAuthStore.getState();
+      const viewer = useViewerStore.getState();
+      if (auth.modal || viewer.creditsOpen) {
+        if (auth.modal) auth.openModal(null);
+        else viewer.setCreditsOpen(false);
+        // Debajo sigue abierto el panel: necesita su propia entrada para el siguiente "atrás"
+        // (el estado "hay algo abierto" no cambia, así que el efecto no la añadiría).
+        if (viewer.sheet.panel) {
+          history.pushState({ atlasOverlay: true }, "");
+          backEntryRef.current = true;
+        }
+      } else {
+        viewer.closeSheet();
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // Las notas son del usuario: se cargan al iniciar sesión y se vacían al cerrarla.
   useEffect(() => {
@@ -126,6 +172,12 @@ export function App() {
     selectStructure,
   ]);
 
+  // Órganos HuBMAP disponibles (sin los conjuntos de cuerpo entero, D-023).
+  const hubmapOrgans = useMemo(
+    () => (metadata?.hubmapReferenceOrgans || []).filter(isHubmapOrganAvailable),
+    [metadata]
+  );
+
   const {
     activeStructures,
     activeSystemsInfo,
@@ -157,7 +209,7 @@ export function App() {
         byId.set(st.id, st);
         byMesh.set(st.meshName, st);
       }
-      for (const hb of metadata.hubmapReferenceOrgans || []) {
+      for (const hb of hubmapOrgans) {
         byHubmap.set(hb.id, hb);
       }
     }
@@ -172,7 +224,7 @@ export function App() {
         female: metadata?.femaleStructures || [],
       },
     };
-  }, [metadata, bodySex]);
+  }, [metadata, bodySex, hubmapOrgans]);
 
   const locateStructure = useMemo<LocateStructure>(() => {
     const index = new Map<string, ReturnType<LocateStructure>>();
@@ -196,7 +248,7 @@ export function App() {
                   )} estructuras FMA + ${
                     metadata.femaleStructuresCount?.toLocaleString("es") || 0
                   } femeninas + ${
-                    metadata.hubmapReferenceOrgansCount
+                    hubmapOrgans.length
                   } órganos HuBMAP`
                 : "Cargando catálogo…"}
             </span>
@@ -325,7 +377,7 @@ export function App() {
             <LayerPanel
               systemsInfo={activeSystemsInfo}
               structures={activeStructures}
-              hubmapOrgans={metadata.hubmapReferenceOrgans}
+              hubmapOrgans={hubmapOrgans}
             />
           )}
           {metadata && (
@@ -343,6 +395,7 @@ export function App() {
 
       <CreditsModal />
       <AccountModals locate={locateStructure} />
+      <PwaPrompt />
     </div>
   );
 }

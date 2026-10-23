@@ -12,7 +12,7 @@ Regla: **ningún archivo entra a `data/` sin una fila aquí.**
 |---|---|---|---|---|---|---|---|---|---|
 | S01 | Z-Anatomy (solo `TA2.csv`, sin mallas) | Equipo Z-Anatomy (Gauthier Kervyn et al.) | https://github.com/Z-Anatomy/Models-of-human-anatomy | CC BY-SA 4.0 | ✅ verificado (mallas descartadas por incluir partes NC) | 2026-10-20 | `data/raw/z-anatomy/` | Sus términos de la Terminologia Anatomica (latín) y sus correspondencias se usaron para asignar `nameLa` y generar `nameEs` (con traducción y adaptación propias) en `data/processed/metadata.json`. No se redistribuyen sus mallas ni la tabla TA2 completa (corrección D-015). | Atribución, indicar cambios y **ShareAlike**: `metadata.json` se publica bajo CC BY-SA 4.0 (`LICENSE-CONTENT`) |
 | S02 | BodyParts3D (v4.0, IS-A y PART-OF 99%) | DBCLS (Database Center for Life Science), Japón | https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html | CC BY 4.0 (actualizada 2025-02-27) | ✅ verificado | 2026-10-20 | `data/raw/bodyparts3d/` | Unión de sub-mallas `FJ*.obj` por `Concept ID` FMA (1.658 estructuras), conversión `mm Z-up` a `m Y-up`, agrupación en 10 `.glb` por sistema, cuantización y compresión `EXT_meshopt_compression` (`data/processed/*.glb`) | Atribuir: *"BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International"* e indicar cambios |
-| S03 | HuBMAP 3D Reference Object Library | HuBMAP / Human Reference Atlas (Katy Börner, Kristen Browne et al.) | https://lod.humanatlas.io/ref-organ | CC BY 4.0 | ✅ verificado | 2026-10-20 | `data/raw/hubmap/` | Extracción de nodos y ontologías (`crosswalk.csv`) e integración en `data/processed/metadata.json` con traducción de etiquetas ES/LA | Atribución a HuBMAP CCF 3D Reference Object Library + cita/DOI por órgano e indicar cambios |
+| S03 | HuBMAP 3D Reference Object Library | HuBMAP / Human Reference Atlas (Katy Börner, Kristen Browne et al.) | https://lod.humanatlas.io/ref-organ | CC BY 4.0 | ✅ verificado (licencia comprobada de nuevo en los metadatos oficiales el 2026-10-22) | 2026-10-20 | `data/raw/hubmap/` (solo `SOURCE.txt` y licencia) | Extracción de nodos y ontologías (`crosswalk.csv`) e integración en `data/processed/metadata.json` con traducción de etiquetas ES/LA. **Los `.glb` no se redistribuyen:** el visor los carga sin modificar desde el CDN oficial `cdn.humanatlas.io`, en la misma versión verificada por SHA-256 (85 órganos; se excluyen los conjuntos `united-*`, D-023) | Atribución a HuBMAP CCF 3D Reference Object Library + cita/DOI por órgano e indicar cambios |
 | S04 | NIH 3D | Varios autores | https://3d.nih.gov | Varía por modelo | ⏳ pendiente | | | | Revisar cada modelo; evitar NC/ND |
 
 ## Ontologías y terminología
@@ -36,6 +36,12 @@ Regla: **ningún archivo entra a `data/` sin una fila aquí.**
 | D01 | TotalSegmentator dataset | https://zenodo.org | CC BY 4.0 (esperada) | ⏳ pendiente | |
 | D02 | TCIA (colección por definir) | https://www.cancerimagingarchive.net | Varía por colección | ⏳ pendiente | Evitar colecciones NC |
 
+## Recursos gráficos propios
+
+| Recurso | Autor | Licencia | Archivos |
+|---|---|---|---|
+| Icono de la app (figura, órbita y punto de luz) | STEMENSOFT (diseño original, D-024) | CC BY-SA 4.0 | `web/public/icons/` |
+
 ## Software / dependencias principales
 
 | Componente | Licencia |
@@ -47,6 +53,7 @@ Regla: **ningún archivo entra a `data/` sin una fila aquí.**
 | SQLite (vía `node:sqlite`, integrado en Node.js 24) | Dominio público |
 | node-postgres `pg` 8 (driver de PostgreSQL; licencia verificada en su `package.json` el 2026-10-21) | MIT |
 | PGlite `@electric-sql/pglite` 0.5 (PostgreSQL embebido, solo tests; verificada el 2026-10-21) | Apache-2.0 |
+| vite-plugin-pwa 2.0, Workbox (`workbox-build`, `workbox-window`) 7.4 (PWA; verificadas en npm el 2026-10-22) | MIT |
 | Blender, MeshLab | GPL (los modelos exportados no heredan GPL) |
 | 3D Slicer | Licencia estilo BSD |
 
