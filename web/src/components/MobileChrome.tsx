@@ -3,6 +3,9 @@ import {
   Bookmark,
   Download,
   Compass,
+  Crosshair,
+  Eye,
+  EyeOff,
   FileText,
   HelpCircle,
   Layers,
@@ -14,7 +17,7 @@ import {
   Sun,
   Route,
 } from "lucide-react";
-import { Layout } from "../hooks/useLayout";
+import { Layout, useLayout } from "../hooks/useLayout";
 import { useAuthStore } from "../store/useAuthStore";
 import { CameraPreset, RightTab, SheetSize, useViewerStore } from "../store/useViewerStore";
 import { installPlatform, InstallPlatform, promptInstall, useInstallStore } from "../data/install";
@@ -196,6 +199,68 @@ export function CameraFab() {
             <Bookmark size={15} /> {user ? "Mis vistas" : "Vistas (inicia sesión)"}
           </button>
         </div>
+      )}
+    </div>
+  );
+}
+
+// Botones flotantes bajo el de cámara: aislar / ocultar lo seleccionado y "mostrar todo".
+// Funcionan igual en Sistemas, Árbol y HuBMAP porque todos usan selectedId, isolatedId e
+// hiddenIds. En el cuestionario no se muestran, para no interferir con las respuestas.
+export function SelectionFabs() {
+  const layout = useLayout();
+  const rightTab = useViewerStore((s) => s.rightTab);
+  const sheet = useViewerStore((s) => s.sheet);
+  const selectedId = useViewerStore((s) => s.selectedId);
+  const isolatedId = useViewerStore((s) => s.isolatedId);
+  const hiddenIds = useViewerStore((s) => s.hiddenIds);
+  const toggleIsolate = useViewerStore((s) => s.toggleIsolate);
+  const toggleHide = useViewerStore((s) => s.toggleHide);
+  const showAllStructures = useViewerStore((s) => s.showAllStructures);
+
+  const hiddenCount = Object.keys(hiddenIds).length;
+  const anyFiltered = !!isolatedId || hiddenCount > 0;
+  // En móvil, con el panel a pantalla completa los botones quedarían tapados.
+  const covered = layout === "mobile" && sheet.panel !== null && sheet.size === "full";
+  if (rightTab === "quiz" || covered || (!selectedId && !anyFiltered)) return null;
+
+  const isIsolated = !!selectedId && isolatedId === selectedId;
+  const isHidden = !!selectedId && !!hiddenIds[selectedId];
+
+  return (
+    <div className="selection-fabs" role="toolbar" aria-label="Acciones sobre la selección">
+      {selectedId && (
+        <button
+          className={`selection-fab ${isIsolated ? "active" : ""}`}
+          aria-pressed={isIsolated}
+          aria-label={isIsolated ? "Salir de aislar" : "Aislar"}
+          onClick={() => toggleIsolate(selectedId)}
+        >
+          <span className="fab-btn">
+            <Crosshair size={20} />
+          </span>
+          <small>{isIsolated ? "Salir" : "Aislar"}</small>
+        </button>
+      )}
+      {selectedId && (
+        <button
+          className={`selection-fab ${isHidden ? "active" : ""}`}
+          aria-pressed={isHidden}
+          aria-label={isHidden ? "Mostrar" : "Ocultar"}
+          onClick={() => toggleHide(selectedId)}
+        >
+          <span className="fab-btn">{isHidden ? <Eye size={20} /> : <EyeOff size={20} />}</span>
+          <small>{isHidden ? "Mostrar" : "Ocultar"}</small>
+        </button>
+      )}
+      {anyFiltered && (
+        <button className="selection-fab" aria-label="Mostrar todo" onClick={showAllStructures}>
+          <span className="fab-btn">
+            <RotateCcw size={20} />
+            {hiddenCount > 0 && <span className="fab-badge">{hiddenCount}</span>}
+          </span>
+          <small>Todo</small>
+        </button>
       )}
     </div>
   );

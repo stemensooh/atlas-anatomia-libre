@@ -2,6 +2,11 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-27 · D-031 · Móvil y tablet: botones flotantes para aislar y ocultar
+- **Contexto:** en móvil y tablet, aislar u ocultar obligaba a abrir la Ficha o la lista del panel, que tapan medio visor.
+- **Decisión:** `SelectionFabs` (`MobileChrome.tsx`): botones redondos flotantes, solo en el diseño compacto, en columna bajo el de cámara y con una etiqueta corta debajo (en táctil no hay tooltips): **Aislar / Salir**, **Ocultar / Mostrar** y **Todo** (con el número de ocultas) cuando hay algo oculto o aislado. Funcionan igual en Sistemas, Árbol y HuBMAP porque los tres usan `selectedId`, `isolatedId` e `hiddenIds`. "Todo" usa la nueva acción `showAllStructures` del store, que no quita la selección ni los cortes (a diferencia de `resetVisibility`). Primero se probó una barra inferior con el nombre; el usuario prefirió botones flotantes.
+- **Consecuencia:** con el panel a pantalla completa en móvil se ocultan, y tampoco aparecen en el cuestionario.
+
 ## 2026-10-27 · D-030 · Órganos HuBMAP: colores por tipo de pieza
 - **Contexto:** los GLB de HuBMAP pintan todas las mallas de un órgano con un solo color (el corazón entero en rojo oscuro), lo que dificulta distinguir sus partes.
 - **Decisión:** `web/src/data/hubmapColors.ts` asigna un color según el nombre del nodo con reglas por palabra clave probadas en orden, siguiendo las convenciones de los atlas: válvulas marfil, músculos papilares rosa, aurículas y ventrículos en rojos distintos, arterias rojas, venas azules, nervios amarillos, cartílago gris azulado, hueso marfil, vías urinarias amarillo ocre, vías biliares verdes, etc. Lo que no encaja (lóbulos del hígado, giros del cerebro, tramos del colon) toma un tono de una paleta de 12. Las piezas del mismo tipo reciben un matiz de luz distinto (±10 %), calculado con un hash del nombre para que sea estable.

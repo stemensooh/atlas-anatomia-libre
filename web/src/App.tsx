@@ -23,7 +23,14 @@ import { AccountModals, UserMenu } from "./components/UserMenu";
 import { useAuthStore } from "./store/useAuthStore";
 import { useNotesStore } from "./store/useNotesStore";
 import { LocateStructure } from "./components/ProfileModal";
-import { CameraFab, CompactMenu, MobileTabBar, SheetHandle, sheetClass } from "./components/MobileChrome";
+import {
+  CameraFab,
+  CompactMenu,
+  MobileTabBar,
+  SelectionFabs,
+  SheetHandle,
+  sheetClass,
+} from "./components/MobileChrome";
 import { useLayout } from "./hooks/useLayout";
 import { isHubmapOrganAvailable } from "./data/hubmap";
 import { PwaPrompt } from "./components/PwaPrompt";
@@ -346,6 +353,8 @@ export function App() {
           )}
 
           {compact && <CameraFab />}
+          {/* Aislar / ocultar lo seleccionado sin abrir los paneles (D-031). */}
+          {compact && <SelectionFabs />}
 
           <footer className="stage-footer">
             <span>

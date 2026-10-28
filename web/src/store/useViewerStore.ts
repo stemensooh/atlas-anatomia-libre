@@ -89,6 +89,8 @@ interface ViewerState {
   toggleHide: (id: string) => void;
   setStructuresHidden: (ids: string[], hidden: boolean) => void;
   resetVisibility: () => void;
+  // Vuelve a mostrar lo oculto o aislado sin tocar la selección ni los cortes.
+  showAllStructures: () => void;
 
   setSearchQuery: (q: string) => void;
   triggerCamera: (preset: CameraPreset) => void;
@@ -344,6 +346,8 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
       }
       return { hiddenIds: next };
     }),
+
+  showAllStructures: () => set({ isolatedId: null, hiddenIds: {} }),
 
   resetVisibility: () =>
     set({

@@ -2577,6 +2577,71 @@ body,
   background: rgba(56, 189, 248, 0.12);
 }
 
+/* Botones flotantes de aislar / ocultar, en columna bajo el de cámara (móvil y tablet). */
+.selection-fabs {
+  position: absolute;
+  top: 70px;
+  right: max(10px, env(safe-area-inset-right));
+  z-index: 14;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.selection-fab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-0);
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.selection-fab .fab-btn {
+  position: relative;
+}
+
+.selection-fab small {
+  font-size: 0.64rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+}
+
+.selection-fab.active .fab-btn {
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.22);
+  color: var(--accent);
+}
+
+.selection-fab.active small {
+  color: var(--accent);
+}
+
+.fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #0b1120;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
 .layout-compact .user-dropdown button {
   min-height: 42px;
   font-size: 0.86rem;

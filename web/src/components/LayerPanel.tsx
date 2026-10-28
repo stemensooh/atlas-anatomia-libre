@@ -69,6 +69,7 @@ export function LayerPanel({
   const toggleHide = useViewerStore((s) => s.toggleHide);
   const isolatedId = useViewerStore((s) => s.isolatedId);
   const toggleIsolate = useViewerStore((s) => s.toggleIsolate);
+  const showAllStructures = useViewerStore((s) => s.showAllStructures);
   const hubmapLayer = useViewerStore((s) => s.hubmapLayer);
   const setHubmapSliderValue = useViewerStore((s) => s.setHubmapSliderValue);
   const hubmapGhostOthers = useViewerStore((s) => s.hubmapGhostOthers);
@@ -943,11 +944,7 @@ export function LayerPanel({
                   {(isolatedId || Object.keys(hiddenIds).length > 0) && (
                     <button
                       className="btn-xs"
-                      onClick={() => {
-                        // Sin tocar la selección ni los cortes (resetVisibility también los quita).
-                        setStructuresHidden(Object.keys(hiddenIds), false);
-                        if (isolatedId) toggleIsolate(isolatedId);
-                      }}
+                      onClick={showAllStructures}
                       title="Mostrar de nuevo todas las subestructuras"
                     >
                       <RotateCcw size={12} />
