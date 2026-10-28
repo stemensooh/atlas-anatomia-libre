@@ -786,6 +786,36 @@ body,
   flex: 1;
 }
 
+.hubmap-organ-card {
+  flex-shrink: 0;
+}
+
+.hubmap-ghost-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.hubmap-ghost-check input {
+  accent-color: var(--accent);
+}
+
+.hubmap-nodes {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.hubmap-nodes .icon-btn.active {
+  color: var(--accent);
+}
+
 .hubmap-list {
   display: flex;
   flex-direction: column;

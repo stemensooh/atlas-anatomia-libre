@@ -117,7 +117,9 @@ export function CreditsModal() {
                 </td>
                 <td>
                   Integración de 87 órganos de referencia masculinos y femeninos
-                  y mapeo de sus subestructuras en <code>metadata.json</code>.
+                  y mapeo de sus subestructuras en <code>metadata.json</code>. Al
+                  mostrarlos, el visor puede recolorear cada pieza según su tipo
+                  (opción «Colores por pieza»); los colores son nuestros, no de HuBMAP.
                 </td>
               </tr>
               <tr>

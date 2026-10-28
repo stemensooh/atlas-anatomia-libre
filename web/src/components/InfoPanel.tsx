@@ -458,6 +458,33 @@ export function InfoPanel({
                   </p>
                 )}
 
+              {selectedId && activeHubmap.nodes.some((n) => n.nodeName === selectedId) && (
+                <div className="action-buttons">
+                  <button
+                    className={`btn-action ${isolatedId === selectedId ? "active" : ""}`}
+                    onClick={() => toggleIsolate(selectedId)}
+                  >
+                    <Crosshair size={15} />
+                    <span>
+                      {isolatedId === selectedId
+                        ? "Salir de aislar"
+                        : coarse ? "Aislar" : "Aislar (I)"}
+                    </span>
+                  </button>
+                  <button
+                    className={`btn-action ${hiddenIds[selectedId] ? "active" : ""}`}
+                    onClick={() => toggleHide(selectedId)}
+                  >
+                    <EyeOff size={15} />
+                    <span>
+                      {hiddenIds[selectedId]
+                        ? coarse ? "Mostrar" : "Mostrar (H)"
+                        : coarse ? "Ocultar" : "Ocultar (H)"}
+                    </span>
+                  </button>
+                </div>
+              )}
+
               <div className="nodes-sublist">
                 <h4>Subestructuras mapeadas ({activeHubmap.nodes.length})</h4>
                 <div className="nodes-scroll">

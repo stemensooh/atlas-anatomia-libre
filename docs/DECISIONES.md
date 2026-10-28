@@ -2,6 +2,21 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-27 · D-030 · Órganos HuBMAP: colores por tipo de pieza
+- **Contexto:** los GLB de HuBMAP pintan todas las mallas de un órgano con un solo color (el corazón entero en rojo oscuro), lo que dificulta distinguir sus partes.
+- **Decisión:** `web/src/data/hubmapColors.ts` asigna un color según el nombre del nodo con reglas por palabra clave probadas en orden, siguiendo las convenciones de los atlas: válvulas marfil, músculos papilares rosa, aurículas y ventrículos en rojos distintos, arterias rojas, venas azules, nervios amarillos, cartílago gris azulado, hueso marfil, vías urinarias amarillo ocre, vías biliares verdes, etc. Lo que no encaja (lóbulos del hígado, giros del cerebro, tramos del colon) toma un tono de una paleta de 12. Las piezas del mismo tipo reciben un matiz de luz distinto (±10 %), calculado con un hash del nombre para que sea estable.
+- **Consecuencia:** casilla "Colores por pieza" en la tarjeta del órgano, **activada por defecto**; al desactivarla vuelve el color original del GLB. Es una adaptación visual en tiempo de ejecución (el archivo no se modifica ni se redistribuye) y se indica en los créditos y en `docs/ATTRIBUTIONS.md`, como pide CC BY 4.0.
+
+## 2026-10-27 · D-029 · Órganos HuBMAP: selección visible, ocultar/aislar, disección y transparencia
+- **Contexto:** al hacer clic en una parte de un órgano HuBMAP (p. ej. el corazón) no se veía ningún resaltado. Sus GLB comparten **un único material** entre todas las mallas (`heart_mat` en las 14 del corazón), así que cambiar el brillo de una malla cambiaba el de todas y la siguiente lo apagaba.
+- **Decisión:**
+  - `HubmapOrganScene` clona un `MeshStandardMaterial` por malla (mismo color) y guarda los nombres de sus nodos padre: seleccionar, ocultar o aislar un grupo (p. ej. `VH_M_heart_valve`) afecta a todas sus mallas.
+  - Selección: solo brillo azul en la pieza elegida. Opcional (casilla "Atenuar el resto al seleccionar", `hubmapGhostOthers`, apagada por defecto a petición del usuario): el resto queda translúcido (0,22) para ver también las piezas internas. Resaltado al pasar el ratón (no en táctil).
+  - Ocultar y aislar usan `hiddenIds` / `isolatedId` del store, igual que el cuerpo. Se vacían al entrar o salir de HuBMAP y al cambiar de órgano, para no arrastrar ids de un modelo a otro.
+  - Barra del órgano (`hubmapLayer`) con los mismos dos modos que los sistemas. La **disección** ordena las mallas por el volumen de su caja (las externas, como las cavidades, envuelven a las internas) y las reparte por igual en la barra: en el corazón se retiran primero ventrículos y aurículas, luego válvulas y al final los músculos papilares.
+  - El clic y el hover salen sin detener la propagación si la malla tiene `visible = false`: el raycasting de R3F/three también alcanza mallas ocultas. Se aplica también a los sistemas del cuerpo.
+- **Consecuencia:** el panel izquierdo de HuBMAP muestra una tarjeta del órgano abierto (barra y lista de subestructuras con aislar y ocultar), y la ficha añade los botones Aislar (I) / Ocultar (H). La barra del órgano no se guarda en las vistas guardadas.
+
 ## 2026-10-22 · D-028 · PWA etapa 4: instalar la app, botón atrás y privacidad del almacenamiento local
 - **Contexto:** Etapa 4 de `docs/PLAN_PWA.md`.
 - **Decisión:**

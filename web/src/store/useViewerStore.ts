@@ -47,6 +47,12 @@ interface ViewerState {
   showLabels3D: boolean;
   theme: "dark" | "light";
   sliderMode: SliderMode;
+  // Barra del órgano HuBMAP abierto (equivale a la de un sistema): profundidad y opacidad.
+  hubmapLayer: { depth: number; opacity: number };
+  // Opcional: al seleccionar una subestructura, el resto del órgano se vuelve translúcido.
+  hubmapGhostOthers: boolean;
+  // Colores didácticos por tipo de pieza (D-030) o el color original del GLB.
+  hubmapPartColors: boolean;
   creditsOpen: boolean;
   leftPanelWidth: number;
   sheet: { panel: SheetPanel | null; size: SheetSize };
@@ -69,6 +75,9 @@ interface ViewerState {
   setLayerOpacity: (sys: SystemId, opacity: number) => void;
   setLayerDepth: (sys: SystemId, depth: number) => void;
   setLayerSliderValue: (sys: SystemId, val: number) => void;
+  setHubmapSliderValue: (val: number) => void;
+  toggleHubmapGhostOthers: () => void;
+  toggleHubmapPartColors: () => void;
   setLayerLoading: (sys: SystemId, loading: boolean, loaded?: boolean) => void;
   enableAllLayers: (enabled: boolean) => void;
 
@@ -157,6 +166,9 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   showLabels3D: false,
   theme: "dark",
   sliderMode: "dissection",
+  hubmapLayer: { depth: 1.0, opacity: 1.0 },
+  hubmapGhostOthers: false,
+  hubmapPartColors: true,
   creditsOpen: false,
   quizClickHandler: null,
   leftPanelWidth: getStoredLeftWidth(),
@@ -164,12 +176,23 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   pick3DSeq: 0,
 
   setMode: (mode, hubmapOrganId = null) =>
-    set((s) => ({
-      mode,
-      activeHubmapOrganId: hubmapOrganId ?? s.activeHubmapOrganId,
-      selectedId: mode === "hubmap" ? null : s.selectedId,
-      isolatedId: mode === "hubmap" ? null : s.isolatedId,
-    })),
+    set((s) => {
+      const organId = hubmapOrganId ?? s.activeHubmapOrganId;
+      // Ocultos y aislados usan los ids de cada modelo (FMA o nodos de HuBMAP): al entrar o
+      // salir de HuBMAP, o al cambiar de órgano, no deben arrastrarse al modelo siguiente.
+      const changesModel =
+        (mode === "hubmap") !== (s.mode === "hubmap") ||
+        (mode === "hubmap" && organId !== s.activeHubmapOrganId);
+      return {
+        mode,
+        activeHubmapOrganId: organId,
+        selectedId: mode === "hubmap" ? null : s.selectedId,
+        isolatedId: mode === "hubmap" || changesModel ? null : s.isolatedId,
+        ...(changesModel
+          ? { hiddenIds: {}, hoveredId: null, hubmapLayer: { depth: 1.0, opacity: 1.0 } }
+          : {}),
+      };
+    }),
 
   setRightTab: (rightTab) => set({ rightTab }),
 
@@ -247,6 +270,17 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
         };
       }
     }),
+
+  setHubmapSliderValue: (val) =>
+    set((s) => ({
+      hubmapLayer:
+        s.sliderMode === "dissection"
+          ? { ...s.hubmapLayer, depth: val }
+          : { ...s.hubmapLayer, opacity: val },
+    })),
+
+  toggleHubmapGhostOthers: () => set((s) => ({ hubmapGhostOthers: !s.hubmapGhostOthers })),
+  toggleHubmapPartColors: () => set((s) => ({ hubmapPartColors: !s.hubmapPartColors })),
 
   setLayerLoading: (sys, loading, loaded) =>
     set((s) => ({

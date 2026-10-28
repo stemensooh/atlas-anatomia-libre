@@ -16,6 +16,7 @@ import {
   Minimize2,
   Maximize2,
   MoveHorizontal,
+  Crosshair,
 } from "lucide-react";
 import {
   AnatomyStructure,
@@ -66,6 +67,16 @@ export function LayerPanel({
   const enableAllLayers = useViewerStore((s) => s.enableAllLayers);
   const selectStructure = useViewerStore((s) => s.selectStructure);
   const toggleHide = useViewerStore((s) => s.toggleHide);
+  const isolatedId = useViewerStore((s) => s.isolatedId);
+  const toggleIsolate = useViewerStore((s) => s.toggleIsolate);
+  const hubmapLayer = useViewerStore((s) => s.hubmapLayer);
+  const setHubmapSliderValue = useViewerStore((s) => s.setHubmapSliderValue);
+  const hubmapGhostOthers = useViewerStore((s) => s.hubmapGhostOthers);
+  const toggleHubmapGhostOthers = useViewerStore((s) => s.toggleHubmapGhostOthers);
+  const hubmapPartColors = useViewerStore((s) => s.hubmapPartColors);
+  const toggleHubmapPartColors = useViewerStore((s) => s.toggleHubmapPartColors);
+  const activeOrgan =
+    mode === "hubmap" ? hubmapOrgans.find((o) => o.id === activeHubmapOrganId) : undefined;
   const setStructuresHidden = useViewerStore((s) => s.setStructuresHidden);
   const setClipPlane = useViewerStore((s) => s.setClipPlane);
   const resetClipPlanes = useViewerStore((s) => s.resetClipPlanes);
@@ -529,7 +540,7 @@ export function LayerPanel({
           </div>
         )}
 
-        {mode !== "hubmap" && (
+        {(mode !== "hubmap" || activeOrgan) && (
           <div className="slider-mode-card">
             <span className="slider-mode-label">Modo de barra:</span>
             <div className="slider-mode-toggle-btns">
@@ -919,6 +930,122 @@ export function LayerPanel({
           </div>
         ) : (
           <div className="hubmap-list-section">
+            {activeOrgan && (
+              <div className="layer-card enabled hubmap-organ-card">
+                <div className="layer-row">
+                  <span className="layer-toggle">
+                    <span
+                      className="color-dot"
+                      style={{ backgroundColor: SYSTEM_META[activeOrgan.system]?.colorHex }}
+                    />
+                    <span className="layer-name">{activeOrgan.nameEs || activeOrgan.organ}</span>
+                  </span>
+                  {(isolatedId || Object.keys(hiddenIds).length > 0) && (
+                    <button
+                      className="btn-xs"
+                      onClick={() => {
+                        // Sin tocar la selección ni los cortes (resetVisibility también los quita).
+                        setStructuresHidden(Object.keys(hiddenIds), false);
+                        if (isolatedId) toggleIsolate(isolatedId);
+                      }}
+                      title="Mostrar de nuevo todas las subestructuras"
+                    >
+                      <RotateCcw size={12} />
+                      <span>Mostrar todo</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="opacity-row">
+                  <span className="opacity-label">
+                    {sliderMode === "dissection" ? "Profundidad" : "Opacidad"}
+                  </span>
+                  <input
+                    type="range"
+                    min={0.05}
+                    max={1}
+                    step={0.05}
+                    value={sliderMode === "dissection" ? hubmapLayer.depth : hubmapLayer.opacity}
+                    onChange={(e) => setHubmapSliderValue(parseFloat(e.target.value))}
+                    title={
+                      sliderMode === "dissection"
+                        ? "Desliza a la izquierda para retirar las subestructuras externas"
+                        : "Desliza a la izquierda para ver a través del órgano"
+                    }
+                  />
+                  <span className="opacity-val">
+                    {Math.round(
+                      (sliderMode === "dissection" ? hubmapLayer.depth : hubmapLayer.opacity) * 100
+                    )}%
+                  </span>
+                </div>
+
+                <label
+                  className="hubmap-ghost-check"
+                  title="Colorea cada pieza según su tipo (arterias rojas, venas azules, válvulas marfil…) en lugar del color único original"
+                >
+                  <input
+                    type="checkbox"
+                    checked={hubmapPartColors}
+                    onChange={toggleHubmapPartColors}
+                  />
+                  <span>Colores por pieza</span>
+                </label>
+
+                <label
+                  className="hubmap-ghost-check"
+                  title="Al seleccionar una subestructura, el resto del órgano se vuelve translúcido"
+                >
+                  <input
+                    type="checkbox"
+                    checked={hubmapGhostOthers}
+                    onChange={toggleHubmapGhostOthers}
+                  />
+                  <span>Atenuar el resto al seleccionar</span>
+                </label>
+
+                <div className="hubmap-nodes">
+                  {activeOrgan.nodes.map((n, i) => {
+                    const isHidden =
+                      Boolean(hiddenIds[n.nodeName]) ||
+                      (isolatedId !== null && isolatedId !== n.nodeName);
+                    return (
+                      <div
+                        key={`${n.nodeName}-${i}`}
+                        className={`tree-node-row ${selectedId === n.nodeName ? "selected" : ""} ${
+                          isHidden ? "is-hidden" : ""
+                        }`}
+                      >
+                        <button
+                          className="tree-node-select"
+                          onClick={() => selectStructure(n.nodeName)}
+                          title={n.nodeName}
+                        >
+                          <span className="tree-node-name">{n.nameEs || n.nameEn}</span>
+                        </button>
+                        <button
+                          className={`icon-btn ${isolatedId === n.nodeName ? "active" : ""}`}
+                          onClick={() => toggleIsolate(n.nodeName)}
+                          title={
+                            isolatedId === n.nodeName ? "Salir de aislar" : "Aislar esta subestructura"
+                          }
+                        >
+                          <Crosshair size={13} />
+                        </button>
+                        <button
+                          className="icon-btn"
+                          onClick={() => toggleHide(n.nodeName)}
+                          title={hiddenIds[n.nodeName] ? "Mostrar" : "Ocultar"}
+                        >
+                          {hiddenIds[n.nodeName] ? <EyeOff size={13} /> : <Eye size={13} />}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="panel-section-header">
               <div className="section-title">
                 <Box size={16} />

@@ -15,6 +15,7 @@ import { cameraBridge, Vec3 } from "../data/viewState";
 import { LOW_POWER } from "../data/devicePerf";
 import { useLayout } from "../hooks/useLayout";
 import { hubmapGlbUrl } from "../data/hubmap";
+import { hubmapPartColor } from "../data/hubmapColors";
 import { useViewerStore } from "../store/useViewerStore";
 
 // Un clic (o toque) solo selecciona si el puntero apenas se movió entre pulsar y soltar: al
@@ -22,6 +23,10 @@ import { useViewerStore } from "../store/useViewerStore";
 // (ni como respuesta en el modo clic 3D del cuestionario). R3F da esa distancia en event.delta.
 const TAP_TOLERANCE_PX = 8;
 const isTap = (e: ThreeEvent<MouseEvent>) => e.delta <= TAP_TOLERANCE_PX;
+
+// El raycasting de R3F/three también alcanza mallas con visible = false (ocultas, aisladas fuera
+// o retiradas por la disección). Sus manejadores salen sin detener la propagación, así el
+// evento llega a la siguiente malla bajo el puntero, que es la que el usuario ve.
 
 // Con el dedo no hay "pasar por encima": el resaltado de hover solo se usa con ratón o lápiz.
 const isTouch = (e: ThreeEvent<PointerEvent>) => e.pointerType === "touch";
@@ -256,6 +261,7 @@ function SystemLayerGroup({
   if (!sceneRoot || !layer.enabled) return null;
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    if (!e.object.visible) return;
     e.stopPropagation();
     if (!isTap(e)) return;
     const hit = e.object as THREE.Mesh;
@@ -266,6 +272,7 @@ function SystemLayerGroup({
   };
 
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
+    if (!e.object.visible) return;
     e.stopPropagation();
     if (isTouch(e)) return;
     const hit = e.object as THREE.Mesh;
@@ -340,13 +347,35 @@ function HubmapOrganScene({
   const [root, setRoot] = useState<THREE.Group | null>(null);
   const [loading, setLoading] = useState(false);
   const selectedId = useViewerStore((s) => s.selectedId);
+  const hoveredId = useViewerStore((s) => s.hoveredId);
+  const isolatedId = useViewerStore((s) => s.isolatedId);
+  const hiddenIds = useViewerStore((s) => s.hiddenIds);
+  const sliderMode = useViewerStore((s) => s.sliderMode);
+  const hubmapLayer = useViewerStore((s) => s.hubmapLayer);
+  const ghostOthers = useViewerStore((s) => s.hubmapGhostOthers);
+  const partColors = useViewerStore((s) => s.hubmapPartColors);
   const selectStructure = useViewerStore((s) => s.selectStructure);
+  const hoverStructure = useViewerStore((s) => s.hoverStructure);
   const invalidate = useThree((s) => s.invalidate);
+  // Cada malla con su material propio y los nombres de sus nodos padre: así se puede resaltar,
+  // ocultar o aislar una subestructura o un grupo (p. ej. "VH_M_heart_valve" engloba las cuatro
+  // válvulas). normDepth va de 0 (la más interna) a 1 (la más externa), para la disección.
+  const meshesRef = useRef<
+    Array<{
+      mesh: THREE.Mesh;
+      mat: THREE.MeshStandardMaterial;
+      ids: Set<string>;
+      normDepth: number;
+      originalColor: THREE.Color;
+      partColor: THREE.Color;
+    }>
+  >([]);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setRoot(null);
+    meshesRef.current = [];
 
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
@@ -369,24 +398,55 @@ function HubmapOrganScene({
           -center.z * scale
         );
         group.scale.setScalar(scale);
+        group.updateMatrixWorld(true);
 
+        const list: typeof meshesRef.current = [];
+        const volumes: number[] = [];
         group.traverse((obj) => {
           if ((obj as THREE.Mesh).isMesh) {
             const m = obj as THREE.Mesh;
             const nodeName = m.name || m.parent?.name || organ.organ;
             m.userData.structureId = nodeName;
-            if (Array.isArray(m.material)) {
-              m.material.forEach((mt) => {
-                mt.clippingPlanes = clippingPlanes;
-                mt.side = THREE.DoubleSide;
-              });
-            } else if (m.material) {
-              m.material.clippingPlanes = clippingPlanes;
-              m.material.side = THREE.DoubleSide;
+
+            // Los GLB de HuBMAP comparten un único material entre todas las mallas (el corazón
+            // usa "heart_mat" para las 14): cambiar su brillo resaltaría todo o nada. Se clona.
+            const src = Array.isArray(m.material) ? m.material[0] : m.material;
+            const originalColor =
+              (src as THREE.MeshStandardMaterial)?.color?.clone() ?? new THREE.Color(0xb05050);
+            const mat = new THREE.MeshStandardMaterial({
+              color: originalColor.clone(),
+              roughness: Math.max((src as THREE.MeshStandardMaterial)?.roughness ?? 0.5, 0.45),
+              metalness: (src as THREE.MeshStandardMaterial)?.metalness ?? 0,
+              side: THREE.DoubleSide,
+            });
+            m.material = mat;
+
+            const ids = new Set<string>([nodeName]);
+            for (let p = m.parent; p && p !== group; p = p.parent) {
+              if (p.name) ids.add(p.name);
             }
+            list.push({
+              mesh: m,
+              mat,
+              ids,
+              normDepth: 1,
+              originalColor,
+              partColor: hubmapPartColor(nodeName),
+            });
+            const s = new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3());
+            volumes.push(s.x * s.y * s.z);
           }
         });
 
+        // En un órgano aislado no sirve la distancia al eje del cuerpo que usan los sistemas: las
+        // estructuras externas (cavidades, corteza) envuelven a las internas y son las de mayor
+        // volumen. Se ordenan por volumen de su caja y se reparten por igual en la barra.
+        const order = volumes.map((v, i) => i).sort((a, b) => volumes[a] - volumes[b]);
+        order.forEach((idx, rank) => {
+          list[idx].normDepth = order.length > 1 ? rank / (order.length - 1) : 1;
+        });
+
+        meshesRef.current = list;
         setRoot(group);
         setLoading(false);
       },
@@ -404,26 +464,68 @@ function HubmapOrganScene({
 
   useEffect(() => {
     if (!root) return;
-    root.traverse((obj) => {
-      if ((obj as THREE.Mesh).isMesh) {
-        const m = obj as THREE.Mesh;
-        const mat = m.material as THREE.MeshStandardMaterial;
-        if (mat && mat.emissive) {
-          if (selectedId && m.userData.structureId === selectedId) {
-            mat.emissive.setHex(0x0ea5e9);
-            mat.emissiveIntensity = 0.45;
-          } else {
-            mat.emissive.setHex(0x000000);
-            mat.emissiveIntensity = 0;
-          }
-        }
-        if (mat) {
-          mat.clippingPlanes = clippingPlanes;
-        }
+    const list = meshesRef.current;
+    const isVisible = (ids: Set<string>, normDepth: number) => {
+      for (const id of ids) if (hiddenIds[id]) return false;
+      if (isolatedId && !ids.has(isolatedId)) return false;
+      return !(sliderMode === "dissection" && normDepth > hubmapLayer.depth);
+    };
+    // Solo se atenúa el resto si la selección corresponde a alguna malla visible de este órgano.
+    const hasSelection =
+      !!selectedId && list.some((it) => it.ids.has(selectedId) && isVisible(it.ids, it.normDepth));
+    const baseOpacity = sliderMode === "opacity" ? hubmapLayer.opacity : 1;
+
+    for (const { mesh, mat, ids, normDepth, originalColor, partColor } of list) {
+      mesh.visible = isVisible(ids, normDepth);
+      if (!mesh.visible) continue;
+      mat.color.copy(partColors ? partColor : originalColor);
+      const isSelected = hasSelection && ids.has(selectedId!);
+      const isHovered = !!hoveredId && ids.has(hoveredId);
+
+      if (isSelected) {
+        mat.emissive.setHex(0x0ea5e9);
+        mat.emissiveIntensity = 0.58;
+      } else if (isHovered) {
+        mat.emissive.setHex(0x38bdf8);
+        mat.emissiveIntensity = 0.28;
+      } else {
+        mat.emissive.setHex(0x000000);
+        mat.emissiveIntensity = 0;
       }
-    });
+
+      // Opcional: con una subestructura seleccionada, las demás quedan translúcidas para ver
+      // también las internas (válvulas, músculos papilares) tapadas por las cavidades.
+      const ghost = ghostOthers && hasSelection && !isSelected;
+      const opacity = ghost ? Math.min(0.22, baseOpacity) : baseOpacity;
+      mat.transparent = opacity < 0.99;
+      mat.opacity = opacity;
+      mat.depthWrite = !mat.transparent;
+      mat.clippingPlanes = clippingPlanes;
+      mat.needsUpdate = true;
+    }
     invalidate();
-  }, [root, selectedId, clippingPlanes, invalidate]);
+  }, [
+    root,
+    selectedId,
+    hoveredId,
+    isolatedId,
+    hiddenIds,
+    sliderMode,
+    hubmapLayer,
+    ghostOthers,
+    partColors,
+    clippingPlanes,
+    invalidate,
+  ]);
+
+  // Al cambiar de órgano no debe quedar el cursor de "mano" ni un hover huérfano.
+  useEffect(
+    () => () => {
+      hoverStructure(null);
+      document.body.style.cursor = "auto";
+    },
+    [organ, hoverStructure]
+  );
 
   if (loading) {
     return (
@@ -441,10 +543,26 @@ function HubmapOrganScene({
     <primitive
       object={root}
       onClick={(e: ThreeEvent<MouseEvent>) => {
+        if (!e.object.visible) return;
         e.stopPropagation();
         if (!isTap(e)) return;
         const id = e.object.userData?.structureId;
         if (id) selectStructure(id);
+      }}
+      onPointerOver={(e: ThreeEvent<PointerEvent>) => {
+        if (!e.object.visible) return;
+        e.stopPropagation();
+        if (isTouch(e)) return;
+        const id = e.object.userData?.structureId;
+        if (id) {
+          hoverStructure(id);
+          document.body.style.cursor = "pointer";
+        }
+      }}
+      onPointerOut={(e: ThreeEvent<PointerEvent>) => {
+        e.stopPropagation();
+        hoverStructure(null);
+        document.body.style.cursor = "auto";
       }}
     />
   );
