@@ -2,6 +2,17 @@
 
 Formato: una entrada corta por decisión, la más reciente arriba.
 
+## 2026-10-23 · D-030 · `interactive_3d` descartado; Thermion pasa a prueba física
+- **Contexto:** En el Samsung A52 (Android 14), `interactive_3d` 2.5.0 mostró un órgano HuBMAP pequeño pero no el esqueleto: falló tanto el GLB Meshopt original como las copias sin Meshopt y el LOD de 212.216 triángulos, con errores repetidos `EGL_BAD_ACCESS`.
+- **Decisión:** descartar `interactive_3d` para el atlas porque no cumple el requisito de mostrar simultáneamente las 281 estructuras. Probar `thermion_flutter` 0.5.0 (Apache-2.0, Filament 1.69.1) con el LOD anatómico, cámara orbital y superficie Flutter nativa. Su build requiere `flutter config --enable-native-assets` y descarga binarios precompilados en la caché local de Flutter.
+- **Consecuencia:** el APK de depuración pasa a 114 MB durante la prueba. La decisión final depende de que el Samsung muestre y manipule el esqueleto; picking, consumo y compatibilidad Meshopt permanecen por validar.
+
+## 2026-10-23 · D-029 · Prototipo Flutter nativo: `interactive_3d` como renderer bajo validación
+- **Contexto:** Inicio de `docs/PLAN_FLUTTER.md`: se necesita comprobar un visor Flutter sin WebView que cargue el esqueleto, permita gestos, selección y nombres anatómicos.
+- **Investigación:** se compararon `sceneview_flutter` (Apache-2.0, pero sin callbacks nativos de toque), `thermion_flutter` (Apache-2.0, requiere *native assets*) e `interactive_3d` 2.5.0 (MIT). Este último usa Google Filament en Android y SceneKit + GLTFSceneKit en iOS; documenta GLB/glTF, cámara orbital por gestos, selección por nodo, color de selección, visibilidad y liberación al desmontar el visor. Sus documentos no confirman `EXT_meshopt_compression`.
+- **Decisión provisional:** crear `mobile/` con Flutter 3.47.8/Dart 3.13.7 y usar `interactive_3d` 2.5.0 exclusivamente para la prueba técnica. El prototipo apunta al `skeletal.glb` original, que requiere `EXT_meshopt_compression` y `KHR_mesh_quantization`, para detectar compatibilidad real en Android. No se descomprime ni altera el contenido fuente.
+- **Consecuencia:** hasta ejecutar la app en Android, el soporte Meshopt, los FPS, memoria, descarga offline, clipping y el comportamiento iOS quedan pendientes. Un error de carga Meshopt bloqueará la adopción de este renderer y se conservará la prueba mínima reproducible.
+
 ## 2026-10-22 · D-028 · PWA etapa 4: instalar la app, botón atrás y privacidad del almacenamiento local
 - **Contexto:** Etapa 4 de `docs/PLAN_PWA.md`.
 - **Decisión:**
@@ -341,3 +352,7 @@ Formato: una entrada corta por decisión, la más reciente arriba.
 - **Contexto:** Z-Anatomy y BodyParts3D usan CC BY-SA (ShareAlike).
 - **Decisión:** el contenido derivado va bajo CC BY-SA 4.0 (`LICENSE-CONTENT`). El código no se mezcla con él.
 - **Consecuencia:** el ShareAlike del contenido no afecta al código.
+## 2026-10-23 · D-031 · Visor móvil mediante `model_viewer_plus` y WebView Android
+- **Contexto:** `interactive_3d` renderizó un órgano pequeño pero dejó en negro incluso una versión LOD del esqueleto. La prueba posterior con `thermion_flutter` inicializó Filament en OpenGL, pero el controlador Adreno 618 del Galaxy A52 produjo repetidamente `EGL_BAD_ACCESS`; además, su gancho de activos nativos quedó bloqueado durante el empaquetado con Flutter 3.47 en Windows. Thermion 0.5.0 no admite Vulkan en Android.
+- **Decisión:** Sustituir ambas pruebas por `model_viewer_plus` 1.10.0 (Apache-2.0), que incorpora el componente abierto Google `<model-viewer>` en un WebView y carga el GLB como asset empaquetado. Android permite HTTP sin cifrar exclusivamente hacia `localhost` y `127.0.0.1`, necesario para el servidor local de assets del componente; no se habilita tráfico HTTP general.
+- **Consecuencia:** Se evita la ruta EGL directa de los plugins anteriores. En el Samsung A52 / Android 14 se validó el LOD (carga, órbita y zoom). El GLB completo comprimido produjo el error de Chromium `setMeshoptDecoder must be called` porque `<model-viewer>` no expone ese decodificador; por ello la prueba usa `skeletal-uncompressed.glb`, derivado reproducible que conserva las 281 estructuras sin `EXT_meshopt_compression`. La selección anatómica y los nombres españoles quedan para la siguiente etapa.

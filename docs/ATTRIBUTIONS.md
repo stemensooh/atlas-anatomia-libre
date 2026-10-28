@@ -54,6 +54,9 @@ Regla: **ningún archivo entra a `data/` sin una fila aquí.**
 | node-postgres `pg` 8 (driver de PostgreSQL; licencia verificada en su `package.json` el 2026-10-21) | MIT |
 | PGlite `@electric-sql/pglite` 0.5 (PostgreSQL embebido, solo tests; verificada el 2026-10-21) | Apache-2.0 |
 | vite-plugin-pwa 2.0, Workbox (`workbox-build`, `workbox-window`) 7.4 (PWA; verificadas en npm el 2026-10-22) | MIT |
+| `interactive_3d` 2.5.0 (prototipo Flutter; licencia y documentación verificadas en pub.dev el 2026-10-23) | MIT |
+| `thermion_flutter` 0.5.0 y `thermion_dart` 0.5.0 (prototipo Flutter; licencia y documentación verificadas en pub.dev el 2026-10-23) | Apache-2.0 |
+| `model_viewer_plus` 1.10.0 (prototipo Flutter; licencia y compatibilidad Android verificadas en pub.dev el 2026-10-23) | Apache-2.0 |
 | Blender, MeshLab | GPL (los modelos exportados no heredan GPL) |
 | 3D Slicer | Licencia estilo BSD |
 
